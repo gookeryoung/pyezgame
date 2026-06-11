@@ -16,6 +16,3 @@ CMakeCache.txt
 
 # Virtual environments
 .venv
-
-# IDE settings
-.vscode

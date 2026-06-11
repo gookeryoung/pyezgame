@@ -1,4 +1,5 @@
 """GameUI CLI - Run GameLib examples from the command line."""
+from __future__ import annotations
 import argparse
 import importlib.util
 import sys
@@ -9,7 +10,7 @@ EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 
 def _discover_examples() -> list[tuple[str, str, str]]:
     """Return sorted list of (number, name, filepath) tuples."""
-    results = []
+    results: list[tuple[str, str, str]] = []
     if not EXAMPLES_DIR.is_dir():
         return results
     for f in sorted(EXAMPLES_DIR.glob("*.py")):
@@ -40,12 +41,12 @@ def cmd_list(_args: argparse.Namespace) -> None:
     print("Available examples:")
     for num, name, _ in examples:
         print(f"  {num}. {name}")
-    print(f"\nRun: gameui <number|name>")
+    print("\nRun: gameui <number|name>")
 
 
 def cmd_run(args: argparse.Namespace) -> None:
     """Run an example by number or name keyword."""
-    query = args.example.lower()
+    query: str = args.example.lower()  # pyright: ignore[reportAny]
     examples = _discover_examples()
     if not examples:
         print("No examples found.")
@@ -54,13 +55,13 @@ def cmd_run(args: argparse.Namespace) -> None:
     # Match by number or name keyword
     match = None
     for num, name, filepath in examples:
-        if num == query or query in name.lower() or query in num:
+        if num == query or query in name.lower() or query in num.lower():
             match = filepath
             break
 
     if match is None:
-        print(f"Example '{args.example}' not found.")
-        print("Use 'gameui list' to see available examples.")
+        print(f"Example '{args.example}' not found.\n")  # pyright: ignore[reportAny]
+        print("Use 'gameui list' to see available examples.\n")
         sys.exit(1)
 
     _run_example(match)
@@ -74,19 +75,19 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command")
 
     # list
-    sub.add_parser("list", help="List all available examples")
+    _ = sub.add_parser("list", help="List all available examples")
 
     # run
     run_p = sub.add_parser("run", help="Run an example by number or name")
-    run_p.add_argument("example", help="Example number (e.g. 01) or name keyword (e.g. snake)")
+    _ = run_p.add_argument("example", help="Example number (e.g. 01) or name keyword (e.g. snake)")
 
     args = parser.parse_args()
 
-    if args.command == "list":
+    if args.command == "list": # pyright: ignore[reportAny]
         cmd_list(args)
-    elif args.command == "run":
+    elif args.command == "run": # pyright: ignore[reportAny]
         cmd_run(args)
-    elif args.command is None:
+    elif args.command is None: # pyright: ignore[reportAny]
         parser.print_help()
         print()
         cmd_list(args)

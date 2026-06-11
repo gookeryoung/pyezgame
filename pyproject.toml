@@ -14,3 +14,13 @@ gameui = "gameui.cli:main"
 
 [tool.scikit-build]
 cmake.build-type = "Release"
+
+
+[tool.basedpyright]
+exclude                           = ["**/.git", "**/.venv", "**/__pycache__", "**/build", "**/dist"]
+include                           = ["src"]
+pythonVersion                     = "3.8"
+reportImplicitStringConcatenation = "error"
+reportMissingTypeStubs            = "none"
+reportUnusedCallResult            = "warning"
+typeCheckingMode = "recommended"
