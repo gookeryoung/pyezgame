@@ -9,6 +9,8 @@ Learn: comprehensive use of all core GameLib APIs
 import os
 import gameui as g
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 W, H = 480, 640
 MAX_STARS = 80
 MAX_BULLETS = 30
@@ -50,7 +52,17 @@ class EnemyBullet:
 
 
 def choose_existing_path(a, b):
-    return a if os.path.isfile(a) else (b if os.path.isfile(b) else a)
+    if os.path.isfile(a):
+        return a
+    if os.path.isfile(b):
+        return b
+    abs_a = os.path.join(SCRIPT_DIR, a)
+    abs_b = os.path.join(SCRIPT_DIR, b)
+    if os.path.isfile(abs_a):
+        return abs_a
+    if os.path.isfile(abs_b):
+        return abs_b
+    return a
 
 
 def spawn_explosion(explosions, x, y, timer):
@@ -417,6 +429,7 @@ def main():
         game.draw_printf(W - 100, 10, g.COLOR_GREEN, f"LIVES: {lives}")
         game.draw_printf(W // 2 - 30, 10, g.COLOR_YELLOW, f"LV.{level}")
         game.draw_text(10, H - 15, "Arrows:Move  Space:Shoot", g.COLOR_DARK_GRAY)
+        game.draw_printf(10, 40, g.COLOR_WHITE, f"FPS: {game.get_fps():.2f}")
 
         if game_over:
             game.fill_rect(W // 2 - 120, H // 2 - 50, 240, 100, g.COLOR_DARK_GRAY)

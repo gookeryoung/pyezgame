@@ -6,6 +6,8 @@ Learn: in-depth collision detection, multi-object management, game state
 import os
 import gameui as g
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 BRICK_ROWS = 6
 BRICK_COLS = 10
 BRICK_W = 58
@@ -20,6 +22,12 @@ def choose_existing_path(path_a, path_b):
         return path_a
     if os.path.isfile(path_b):
         return path_b
+    abs_a = os.path.join(SCRIPT_DIR, path_a)
+    abs_b = os.path.join(SCRIPT_DIR, path_b)
+    if os.path.isfile(abs_a):
+        return abs_a
+    if os.path.isfile(abs_b):
+        return abs_b
     return path_a
 
 

@@ -8,6 +8,8 @@ Learn: draw_grid, fill_cell, is_key_pressed, game state machine, timed movement,
 import os
 import gameui as g
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 GRID_ROWS = 20
 GRID_COLS = 20
 CELL_SIZE = 22
@@ -19,6 +21,12 @@ def choose_existing_path(path_a, path_b):
         return path_a
     if os.path.isfile(path_b):
         return path_b
+    abs_a = os.path.join(SCRIPT_DIR, path_a)
+    abs_b = os.path.join(SCRIPT_DIR, path_b)
+    if os.path.isfile(abs_a):
+        return abs_a
+    if os.path.isfile(abs_b):
+        return abs_b
     return path_a
 
 
@@ -152,7 +160,9 @@ def main():
         if spr_food >= 0:
             fx = grid_x + food_c * CELL_SIZE + 1
             fy = grid_y + food_r * CELL_SIZE + 1
-            game.draw_sprite_scaled(spr_food, fx, fy, CELL_SIZE - 2, CELL_SIZE - 2)
+            game.draw_sprite_scaled(
+                spr_food, fx, fy, CELL_SIZE - 2, CELL_SIZE - 2, g.SPRITE_COLORKEY
+            )
         else:
             game.fill_cell(grid_x, grid_y, food_r, food_c, CELL_SIZE, g.COLOR_RED)
 

@@ -8,6 +8,8 @@ Learn: lists for multiple objects, bullet firing, collision destroy, is_key_pres
 import os
 import gameui as g
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 MAX_BULLETS = 30
 MAX_ENEMIES = 15
 
@@ -17,6 +19,12 @@ def choose_existing_path(path_a, path_b):
         return path_a
     if os.path.isfile(path_b):
         return path_b
+    abs_a = os.path.join(SCRIPT_DIR, path_a)
+    abs_b = os.path.join(SCRIPT_DIR, path_b)
+    if os.path.isfile(abs_a):
+        return abs_a
+    if os.path.isfile(abs_b):
+        return abs_b
     return path_a
 
 
@@ -199,7 +207,7 @@ def main():
             sx = (i * 137 + 59) % game.get_width()
             sy = (i * 251 + 31) % game.get_height()
             if spr_star >= 0:
-                game.draw_sprite_scaled(spr_star, sx, sy, 4, 4)
+                game.draw_sprite_scaled(spr_star, sx, sy, 4, 4, g.SPRITE_COLORKEY)
             else:
                 game.set_pixel(sx, sy, g.COLOR_WHITE)
 
@@ -207,7 +215,9 @@ def main():
         for b in bullets:
             if b.active:
                 if spr_bullet >= 0:
-                    game.draw_sprite_scaled(spr_bullet, b.x - 3, b.y - 8, 6, 16)
+                    game.draw_sprite_scaled(
+                        spr_bullet, b.x - 3, b.y - 8, 6, 16, g.SPRITE_COLORKEY
+                    )
                 else:
                     game.fill_rect(b.x - 1, b.y - 4, 3, 8, g.COLOR_YELLOW)
 
@@ -215,7 +225,9 @@ def main():
         for e in enemies:
             if e.active:
                 if spr_enemy >= 0:
-                    game.draw_sprite_scaled(spr_enemy, e.x, e.y, 24, 24)
+                    game.draw_sprite_scaled(
+                        spr_enemy, e.x, e.y, 24, 24, g.SPRITE_COLORKEY
+                    )
                 else:
                     game.fill_rect(e.x, e.y, 24, 24, g.COLOR_RED)
                     game.draw_rect(e.x, e.y, 24, 24, g.COLOR_ORANGE)
@@ -224,7 +236,9 @@ def main():
         for ex in explosions:
             if ex.active:
                 if spr_explosion >= 0:
-                    game.draw_sprite_scaled(spr_explosion, ex.x - 4, ex.y - 4, 32, 32)
+                    game.draw_sprite_scaled(
+                        spr_explosion, ex.x - 4, ex.y - 4, 32, 32, g.SPRITE_COLORKEY
+                    )
                 else:
                     game.fill_circle(ex.x + 12, ex.y + 12, 16, g.COLOR_ORANGE)
                 ex.timer -= 1
@@ -233,7 +247,9 @@ def main():
 
         # Ship
         if spr_player >= 0:
-            game.draw_sprite_scaled(spr_player, ship_x, ship_y, ship_w, ship_h)
+            game.draw_sprite_scaled(
+                spr_player, ship_x, ship_y, ship_w, ship_h, g.SPRITE_COLORKEY
+            )
         else:
             game.fill_triangle(
                 ship_x + ship_w // 2,
@@ -248,6 +264,8 @@ def main():
         # HUD
         game.draw_printf(10, 10, g.COLOR_WHITE, f"Score: {score}")
         game.draw_printf(10, 25, g.COLOR_GREEN, f"Lives: {lives}")
+        fps = game.get_fps()
+        game.draw_printf(10, 40, g.COLOR_WHITE, f"FPS: {fps:.2f}")
         game.draw_text(game.get_width() - 230, 10, "Left/Right + Space", g.COLOR_GRAY)
 
         if game_over:

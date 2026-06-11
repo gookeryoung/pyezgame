@@ -7,12 +7,20 @@ Learn: play_beep, play_wav, stop_wav, is_playing, set_volume, stop_all,
 import os
 import gameui as g
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 def choose_existing_path(path_a, path_b):
     if os.path.isfile(path_a):
         return path_a
     if os.path.isfile(path_b):
         return path_b
+    abs_a = os.path.join(SCRIPT_DIR, path_a)
+    abs_b = os.path.join(SCRIPT_DIR, path_b)
+    if os.path.isfile(abs_a):
+        return abs_a
+    if os.path.isfile(abs_b):
+        return abs_b
     return path_a
 
 
