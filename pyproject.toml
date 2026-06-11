@@ -9,5 +9,8 @@ description = "Python bindings for GameLib - a beginner-friendly game developmen
 requires-python = ">=3.13"
 dependencies = []
 
+[project.scripts]
+gameui = "gameui.cli:main"
+
 [tool.scikit-build]
 cmake.build-type = "Release"
