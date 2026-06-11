@@ -8,7 +8,7 @@ find_package(pybind11 REQUIRED)
 
 pybind11_add_module(_gameui src/bindings.cpp)
 
-target_include_directories(_gameui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/GameLib)
+target_include_directories(_gameui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/clib)
 
 if(WIN32)
     target_link_libraries(_gameui PRIVATE user32)
@@ -16,3 +16,4 @@ endif()
 
 install(TARGETS _gameui LIBRARY DESTINATION gameui)
 install(FILES gameui/__init__.py DESTINATION gameui)
+install(FILES gameui/__init__.pyi DESTINATION gameui)
