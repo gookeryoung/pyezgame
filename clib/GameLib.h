@@ -3667,7 +3667,7 @@ void GameLib::_DrawSpriteAreaFast(int id, int x, int y, int sx, int sy, int sw, 
     GameSprite &spr = _sprites[id];
     bool flipH = (flags & SPRITE_FLIP_H) != 0;
     bool flipV = (flags & SPRITE_FLIP_V) != 0;
-    bool useAlpha = (flags & SPRITE_ALPHA) != 0;
+    bool useAlpha = true;  // always enable alpha blending for correct PNG/transparent sprite rendering
     bool useColorKey = (flags & SPRITE_COLORKEY) != 0;
     uint32_t colorKey = spr.colorKey;
     bool canMemcpyRows = !useAlpha && !useColorKey && !flipH && !flipV;
@@ -3796,7 +3796,7 @@ void GameLib::_DrawSpriteAreaScaled(int id, int x, int y, int sx, int sy, int sw
 
     bool flipH = (flags & SPRITE_FLIP_H) != 0;
     bool flipV = (flags & SPRITE_FLIP_V) != 0;
-    bool useAlpha = (flags & SPRITE_ALPHA) != 0;
+    bool useAlpha = true;  // always enable alpha blending
     bool useColorKey = (flags & SPRITE_COLORKEY) != 0;
     uint32_t colorKey = spr.colorKey;
 
@@ -3849,7 +3849,7 @@ void GameLib::_DrawSpriteAreaRotated(int id, int cx, int cy, int sx, int sy, int
 
     bool flipH = (flags & SPRITE_FLIP_H) != 0;
     bool flipV = (flags & SPRITE_FLIP_V) != 0;
-    bool useAlpha = (flags & SPRITE_ALPHA) != 0;
+    bool useAlpha = true;  // always enable alpha blending
     bool useColorKey = (flags & SPRITE_COLORKEY) != 0;
     uint32_t colorKey = spr.colorKey;
 
@@ -4368,7 +4368,7 @@ void GameLib::DrawTilemap(int mapId, int x, int y, int flags)
     if (col1 > tm.cols) col1 = tm.cols;
     if (row1 > tm.rows) row1 = tm.rows;
 
-    bool useAlpha    = (flags & SPRITE_ALPHA) != 0;
+    bool useAlpha    = true;  // always enable alpha blending
     bool useColorKey = (flags & SPRITE_COLORKEY) != 0;
     int tileFlags = flags & (SPRITE_ALPHA | SPRITE_COLORKEY);
     bool canMemcpyTiles = !useAlpha && !useColorKey;
