@@ -24,3 +24,12 @@ reportImplicitStringConcatenation = "error"
 reportMissingTypeStubs            = "none"
 reportUnusedCallResult            = "warning"
 typeCheckingMode = "recommended"
+
+[[tool.uv.index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
+default = true
+
+[dependency-groups]
+dev = [
+    "coverage>=7.6.1",
+]
