@@ -196,6 +196,12 @@ PYBIND11_MODULE(_gameui, m) {
         .def("draw_text_scale", &GameLib::DrawTextScale,
              py::arg("x"), py::arg("y"), py::arg("text"), py::arg("color"),
              py::arg("w"), py::arg("h"))
+        .def("draw_printf", [](GameLib& self, int x, int y, uint32_t color, const char* text) {
+            self.DrawText(x, y, text, color);
+        }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("text"))
+        .def("draw_printf_scale", [](GameLib& self, int x, int y, uint32_t color, int w, int h, const char* text) {
+            self.DrawTextScale(x, y, text, color, w, h);
+        }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("w"), py::arg("h"), py::arg("text"))
 
         // ---- Font Text Rendering (scalable fonts) ----
         .def("draw_text_font",
@@ -224,6 +230,14 @@ PYBIND11_MODULE(_gameui, m) {
              py::overload_cast<const char*, int>(
                  &GameLib::GetTextHeightFont),
              py::arg("text"), py::arg("font_size"))
+        .def("draw_printf_font",
+             [](GameLib& self, int x, int y, uint32_t color, const char* font_name, int font_size, const char* text) {
+                 self.DrawTextFont(x, y, text, color, font_name, font_size);
+             }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("font_name"), py::arg("font_size"), py::arg("text"))
+        .def("draw_printf_font",
+             [](GameLib& self, int x, int y, uint32_t color, int font_size, const char* text) {
+                 self.DrawTextFont(x, y, text, color, font_size);
+             }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("font_size"), py::arg("text"))
 
         // ---- Sprite System ----
         .def("create_sprite", &GameLib::CreateSprite,

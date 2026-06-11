@@ -355,6 +355,23 @@ class GameLib:
         """Draw text with each character scaled to w x h pixels (max 1024)."""
         ...
 
+    def draw_printf(self, x: int, y: int, color: int, text: str) -> None:
+        """Draw pre-formatted text at position using built-in 8x8 font.
+
+        In Python, use f-strings for formatting instead of C printf format strings.
+        Example: game.draw_printf(10, 10, COLOR_WHITE, f"Score: {score}")
+        """
+        ...
+
+    def draw_printf_scale(
+        self, x: int, y: int, color: int, w: int, h: int, text: str
+    ) -> None:
+        """Draw pre-formatted text with scaling.
+
+        In Python, use f-strings for formatting.
+        """
+        ...
+
     # ---- Font Text Rendering (scalable fonts, Unicode) ----
 
     @overload
@@ -389,6 +406,26 @@ class GameLib:
     @overload
     def get_text_height_font(self, text: str, font_size: int) -> int:
         """Measure text height with the default font."""
+        ...
+
+    @overload
+    def draw_printf_font(
+        self, x: int, y: int, color: int, font_name: str, font_size: int, text: str
+    ) -> None:
+        """Draw pre-formatted text with a named font.
+
+        In Python, use f-strings for formatting.
+        """
+        ...
+
+    @overload
+    def draw_printf_font(
+        self, x: int, y: int, color: int, font_size: int, text: str
+    ) -> None:
+        """Draw pre-formatted text with the default font.
+
+        In Python, use f-strings for formatting.
+        """
         ...
 
     # ---- Sprite System ----
