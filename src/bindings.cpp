@@ -12,7 +12,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(_gameui, m) {
+PYBIND11_MODULE(_pyezgame, m) {
     m.doc() = "Python bindings for GameLib - a beginner-friendly game development library";
 
     // =========================================================================

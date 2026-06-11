@@ -1,4 +1,4 @@
-"""gameui 功能测试 - 使用 unittest 测试不需要窗口的纯逻辑功能"""
+"""pyezgame 功能测试 - 使用 unittest 测试不需要窗口的纯逻辑功能"""
 
 from __future__ import annotations
 import os
@@ -6,22 +6,22 @@ import sys
 import tempfile
 import unittest
 
-import gameui
-from gameui import GameLib
+import pyezgame
+from pyezgame import GameLib
 
 
 class TestModuleImport(unittest.TestCase):
     """模块导入与版本"""
 
     def test_version_exists(self):
-        self.assertTrue(hasattr(gameui, "__version__"))
+        self.assertTrue(hasattr(pyezgame, "__version__"))
 
     def test_version_is_string(self):
-        self.assertIsInstance(gameui.__version__, str)
+        self.assertIsInstance(pyezgame.__version__, str)
 
     def test_version_format(self):
-        parts = gameui.__version__.split(".")
-        self.assertGreaterEqual(len(parts), 2, f"版本号格式异常: {gameui.__version__}")
+        parts = pyezgame.__version__.split(".")
+        self.assertGreaterEqual(len(parts), 2, f"版本号格式异常: {pyezgame.__version__}")
 
 
 class TestColorConstants(unittest.TestCase):
@@ -55,68 +55,68 @@ class TestColorConstants(unittest.TestCase):
     def test_all_color_constants_exist(self):
         for name in self.COLOR_NAMES:
             with self.subTest(color=name):
-                self.assertTrue(hasattr(gameui, name), f"{name} 不存在")
+                self.assertTrue(hasattr(pyezgame, name), f"{name} 不存在")
 
     def test_all_color_constants_are_int(self):
         for name in self.COLOR_NAMES:
             with self.subTest(color=name):
-                self.assertIsInstance(getattr(gameui, name), int, f"{name} 不是整数")
+                self.assertIsInstance(getattr(pyezgame, name), int, f"{name} 不是整数")
 
 
 class TestColorHelpers(unittest.TestCase):
     """颜色辅助函数"""
 
     def test_color_rgb_red(self):
-        c = gameui.COLOR_RGB(255, 0, 0)
-        self.assertEqual(gameui.COLOR_GET_R(c), 255)
-        self.assertEqual(gameui.COLOR_GET_G(c), 0)
-        self.assertEqual(gameui.COLOR_GET_B(c), 0)
-        self.assertEqual(gameui.COLOR_GET_A(c), 255)
+        c = pyezgame.COLOR_RGB(255, 0, 0)
+        self.assertEqual(pyezgame.COLOR_GET_R(c), 255)
+        self.assertEqual(pyezgame.COLOR_GET_G(c), 0)
+        self.assertEqual(pyezgame.COLOR_GET_B(c), 0)
+        self.assertEqual(pyezgame.COLOR_GET_A(c), 255)
 
     def test_color_rgb_green(self):
-        c = gameui.COLOR_RGB(0, 255, 0)
-        self.assertEqual(gameui.COLOR_GET_G(c), 255)
+        c = pyezgame.COLOR_RGB(0, 255, 0)
+        self.assertEqual(pyezgame.COLOR_GET_G(c), 255)
 
     def test_color_rgb_blue(self):
-        c = gameui.COLOR_RGB(0, 0, 255)
-        self.assertEqual(gameui.COLOR_GET_B(c), 255)
+        c = pyezgame.COLOR_RGB(0, 0, 255)
+        self.assertEqual(pyezgame.COLOR_GET_B(c), 255)
 
     def test_color_rgb_black(self):
-        c = gameui.COLOR_RGB(0, 0, 0)
-        self.assertEqual(gameui.COLOR_GET_R(c), 0)
-        self.assertEqual(gameui.COLOR_GET_G(c), 0)
-        self.assertEqual(gameui.COLOR_GET_B(c), 0)
+        c = pyezgame.COLOR_RGB(0, 0, 0)
+        self.assertEqual(pyezgame.COLOR_GET_R(c), 0)
+        self.assertEqual(pyezgame.COLOR_GET_G(c), 0)
+        self.assertEqual(pyezgame.COLOR_GET_B(c), 0)
 
     def test_color_rgb_white(self):
-        c = gameui.COLOR_RGB(255, 255, 255)
-        self.assertEqual(gameui.COLOR_GET_R(c), 255)
-        self.assertEqual(gameui.COLOR_GET_G(c), 255)
-        self.assertEqual(gameui.COLOR_GET_B(c), 255)
+        c = pyezgame.COLOR_RGB(255, 255, 255)
+        self.assertEqual(pyezgame.COLOR_GET_R(c), 255)
+        self.assertEqual(pyezgame.COLOR_GET_G(c), 255)
+        self.assertEqual(pyezgame.COLOR_GET_B(c), 255)
 
     def test_color_argb(self):
-        c = gameui.COLOR_ARGB(128, 200, 100, 50)
-        self.assertEqual(gameui.COLOR_GET_A(c), 128)
-        self.assertEqual(gameui.COLOR_GET_R(c), 200)
-        self.assertEqual(gameui.COLOR_GET_G(c), 100)
-        self.assertEqual(gameui.COLOR_GET_B(c), 50)
+        c = pyezgame.COLOR_ARGB(128, 200, 100, 50)
+        self.assertEqual(pyezgame.COLOR_GET_A(c), 128)
+        self.assertEqual(pyezgame.COLOR_GET_R(c), 200)
+        self.assertEqual(pyezgame.COLOR_GET_G(c), 100)
+        self.assertEqual(pyezgame.COLOR_GET_B(c), 50)
 
     def test_color_argb_fully_transparent(self):
-        c = gameui.COLOR_ARGB(0, 255, 255, 255)
-        self.assertEqual(gameui.COLOR_GET_A(c), 0)
+        c = pyezgame.COLOR_ARGB(0, 255, 255, 255)
+        self.assertEqual(pyezgame.COLOR_GET_A(c), 0)
 
     def test_get_components_all_zero(self):
-        c = gameui.COLOR_ARGB(0, 0, 0, 0)
-        self.assertEqual(gameui.COLOR_GET_A(c), 0)
-        self.assertEqual(gameui.COLOR_GET_R(c), 0)
-        self.assertEqual(gameui.COLOR_GET_G(c), 0)
-        self.assertEqual(gameui.COLOR_GET_B(c), 0)
+        c = pyezgame.COLOR_ARGB(0, 0, 0, 0)
+        self.assertEqual(pyezgame.COLOR_GET_A(c), 0)
+        self.assertEqual(pyezgame.COLOR_GET_R(c), 0)
+        self.assertEqual(pyezgame.COLOR_GET_G(c), 0)
+        self.assertEqual(pyezgame.COLOR_GET_B(c), 0)
 
     def test_get_components_all_max(self):
-        c = gameui.COLOR_ARGB(255, 255, 255, 255)
-        self.assertEqual(gameui.COLOR_GET_A(c), 255)
-        self.assertEqual(gameui.COLOR_GET_R(c), 255)
-        self.assertEqual(gameui.COLOR_GET_G(c), 255)
-        self.assertEqual(gameui.COLOR_GET_B(c), 255)
+        c = pyezgame.COLOR_ARGB(255, 255, 255, 255)
+        self.assertEqual(pyezgame.COLOR_GET_A(c), 255)
+        self.assertEqual(pyezgame.COLOR_GET_R(c), 255)
+        self.assertEqual(pyezgame.COLOR_GET_G(c), 255)
+        self.assertEqual(pyezgame.COLOR_GET_B(c), 255)
 
 
 class TestKeyConstants(unittest.TestCase):
@@ -147,12 +147,12 @@ class TestKeyConstants(unittest.TestCase):
     def test_all_key_constants_exist(self):
         for name in self.KEY_NAMES:
             with self.subTest(key=name):
-                self.assertTrue(hasattr(gameui, name), f"{name} 不存在")
+                self.assertTrue(hasattr(pyezgame, name), f"{name} 不存在")
 
     def test_all_key_constants_are_int(self):
         for name in self.KEY_NAMES:
             with self.subTest(key=name):
-                self.assertIsInstance(getattr(gameui, name), int, f"{name} 不是整数")
+                self.assertIsInstance(getattr(pyezgame, name), int, f"{name} 不是整数")
 
 
 class TestMouseConstants(unittest.TestCase):
@@ -161,8 +161,8 @@ class TestMouseConstants(unittest.TestCase):
     def test_mouse_constants_exist(self):
         for name in ["MOUSE_LEFT", "MOUSE_RIGHT", "MOUSE_MIDDLE"]:
             with self.subTest(button=name):
-                self.assertTrue(hasattr(gameui, name), f"{name} 不存在")
-                self.assertIsInstance(getattr(gameui, name), int)
+                self.assertTrue(hasattr(pyezgame, name), f"{name} 不存在")
+                self.assertIsInstance(getattr(pyezgame, name), int)
 
 
 class TestSpriteFlagConstants(unittest.TestCase):
@@ -176,8 +176,8 @@ class TestSpriteFlagConstants(unittest.TestCase):
             "SPRITE_ALPHA",
         ]:
             with self.subTest(flag=name):
-                self.assertTrue(hasattr(gameui, name), f"{name} 不存在")
-                self.assertIsInstance(getattr(gameui, name), int)
+                self.assertTrue(hasattr(pyezgame, name), f"{name} 不存在")
+                self.assertIsInstance(getattr(pyezgame, name), int)
 
 
 class TestMessageBoxConstants(unittest.TestCase):
@@ -192,8 +192,8 @@ class TestMessageBoxConstants(unittest.TestCase):
             "MESSAGEBOX_RESULT_NO",
         ]:
             with self.subTest(msgbox=name):
-                self.assertTrue(hasattr(gameui, name), f"{name} 不存在")
-                self.assertIsInstance(getattr(gameui, name), int)
+                self.assertTrue(hasattr(pyezgame, name), f"{name} 不存在")
+                self.assertIsInstance(getattr(pyezgame, name), int)
 
 
 class TestGameLibInstantiate(unittest.TestCase):

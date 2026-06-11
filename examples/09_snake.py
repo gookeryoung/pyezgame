@@ -6,7 +6,7 @@ Learn: draw_grid, fill_cell, is_key_pressed, game state machine, timed movement,
        load_sprite, draw_sprite_scaled, play_wav
 """
 import os
-import gameui as g
+import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

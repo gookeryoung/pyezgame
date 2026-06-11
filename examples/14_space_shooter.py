@@ -7,7 +7,7 @@ Features: asset-based player/bullets/explosions, scrolling starfield background,
 Learn: comprehensive use of all core GameLib APIs
 """
 import os
-import gameui as g
+import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

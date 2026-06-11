@@ -4,7 +4,7 @@ Demonstrates draw_text_font, draw_printf_font, text measurement,
 show_mouse, and show_message.
 Learn: draw_text_font, draw_printf_font, get_text_width_font, show_mouse, show_message
 """
-import gameui as g
+import pyezgame as g
 
 FONT_MONO = "Consolas"
 FONT_CJK = "MS Gothic"

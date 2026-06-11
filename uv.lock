@@ -320,8 +320,8 @@ wheels = [
 ]
 
 [[package]]
-name = "gameui"
-version = "0.1.1"
+name = "pyezgame"
+version = "0.1.2"
 source = { editable = "." }
 
 [package.dev-dependencies]

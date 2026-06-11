@@ -6,7 +6,7 @@ Two modes (press TAB to switch):
 Learn: is_key_down, fill_rect, fill_circle, draw_circle, draw_printf,
        get_fps, get_delta_time, float physics, wall collision
 """
-import gameui as g
+import pyezgame as g
 
 
 def main():

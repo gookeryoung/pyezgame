@@ -1,11 +1,11 @@
-"""GameUI CLI - Run GameLib examples from the command line."""
+"""pyezgame CLI - Run GameLib examples from the command line."""
 from __future__ import annotations
 import argparse
 import importlib.util
 import sys
 from pathlib import Path
 
-# Installed: gameui/examples/; Dev: ../examples/ (relative to gameui/)
+# Installed: pyezgame/examples/; Dev: ../examples/ (relative to pyezgame/)
 _pkg_dir = Path(__file__).resolve().parent
 _candidates = [_pkg_dir / "examples", _pkg_dir.parent / "examples"]
 EXAMPLES_DIR = next((p for p in _candidates if p.is_dir()), _pkg_dir / "examples")
@@ -51,7 +51,7 @@ def cmd_list(_args: argparse.Namespace) -> None:
     print("Available examples:")
     for num, name, _ in examples:
         print(f"  {num}. {name}")
-    print("\nRun: gameui <number|name>")
+    print("\nRun: pyezgame <number|name>")
 
 
 def cmd_run(args: argparse.Namespace) -> None:
@@ -71,7 +71,7 @@ def cmd_run(args: argparse.Namespace) -> None:
 
     if match is None:
         print(f"Example '{args.example}' not found.\n")  # pyright: ignore[reportAny]
-        print("Use 'gameui list' to see available examples.\n")
+        print("Use 'pyezgame list' to see available examples.\n")
         sys.exit(1)
 
     _run_example(match)
@@ -79,8 +79,8 @@ def cmd_run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="gameui",
-        description="GameUI - Run GameLib examples",
+        prog="pyezgame",
+        description="pyezgame - Run GameLib examples",
     )
     sub = parser.add_subparsers(dest="command")
 

@@ -9,7 +9,7 @@ Three clip windows on screen:
 Learn: set_clip, clear_clip, get_clip, how all draw calls respect clip
 """
 import math
-import gameui as g
+import pyezgame as g
 
 
 def create_star_sprite(game):

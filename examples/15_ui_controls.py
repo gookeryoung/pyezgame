@@ -11,7 +11,7 @@ Controls:
 Learn: button, checkbox, radio_box, toggle_button,
        release-trigger UI, built-in 8x8 UI labels
 """
-import gameui as g
+import pyezgame as g
 
 
 def draw_panel(game, x, y, w, h, title):

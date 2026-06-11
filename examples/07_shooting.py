@@ -6,7 +6,7 @@ Learn: lists for multiple objects, bullet firing, collision destroy, is_key_pres
 """
 
 import os
-import gameui as g
+import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

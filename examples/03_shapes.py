@@ -7,7 +7,7 @@ Learn: set_pixel, draw_line, draw_rect, fill_rect, draw_circle,
        fill_triangle, COLOR_ARGB
 """
 import math
-import gameui as g
+import pyezgame as g
 
 
 def draw_checkerboard(game, x, y, w, h, cell):

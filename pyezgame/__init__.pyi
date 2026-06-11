@@ -1,5 +1,5 @@
 """
-GameUI - Python bindings for GameLib
+pyezgame - Python bindings for GameLib
 
 A beginner-friendly game development library with simple API for
 window creation, graphics, sprites, sound, input, and more.

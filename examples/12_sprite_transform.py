@@ -12,7 +12,7 @@ Controls:
 Learn: draw_sprite_scaled, draw_sprite_frame_scaled, draw_sprite_rotated,
        draw_sprite_frame_rotated, set_sprite_color_key, SPRITE_COLORKEY
 """
-import gameui as g
+import pyezgame as g
 
 
 def clamp(v, lo, hi):

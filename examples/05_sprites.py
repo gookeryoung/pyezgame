@@ -6,7 +6,7 @@ Tab key to switch between two modes:
 Learn: create_sprite, set_sprite_pixel, draw_sprite, draw_sprite_ex, draw_sprite_scaled,
        draw_sprite_frame_scaled, free_sprite, get_delta_time
 """
-import gameui as g
+import pyezgame as g
 
 
 def create_ship_sprite(game):

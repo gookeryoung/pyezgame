@@ -12,7 +12,7 @@ Learn: create_tilemap, fill_tile_rect, clear_tilemap, world_to_tile_col/row,
        SPRITE_COLORKEY, SPRITE_FLIP_H, parallax scrolling
 """
 import os
-import gameui as g
+import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

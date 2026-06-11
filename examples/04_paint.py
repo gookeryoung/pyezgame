@@ -3,7 +3,7 @@
 A simple paint program: draw with mouse, change color/brush/clear with keyboard.
 Learn: get_mouse_x/y, is_mouse_down, is_mouse_released, get_mouse_wheel_delta, is_active
 """
-import gameui as g
+import pyezgame as g
 
 
 def main():

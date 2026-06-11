@@ -5,7 +5,7 @@ Learn: play_beep, play_wav, stop_wav, is_playing, set_volume, stop_all,
        set_master_volume, get_master_volume, play_music, stop_music
 """
 import os
-import gameui as g
+import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

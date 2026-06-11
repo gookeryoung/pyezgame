@@ -4,7 +4,7 @@ Classic Breakout: bounce the ball with paddle, destroy all bricks to win.
 Learn: in-depth collision detection, multi-object management, game state
 """
 import os
-import gameui as g
+import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
