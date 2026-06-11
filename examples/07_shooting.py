@@ -1,12 +1,23 @@
 """07_shooting.py - Simple Shooter
 
 Control a ship to move left/right, press Space to shoot bullets at falling targets.
-Learn: lists for multiple objects, bullet firing, collision destroy, is_key_pressed
+Learn: lists for multiple objects, bullet firing, collision destroy, is_key_pressed,
+       load_sprite, draw_sprite_scaled, play_wav
 """
+
+import os
 import gameui as g
 
 MAX_BULLETS = 30
 MAX_ENEMIES = 15
+
+
+def choose_existing_path(path_a, path_b):
+    if os.path.isfile(path_a):
+        return path_a
+    if os.path.isfile(path_b):
+        return path_b
+    return path_a
 
 
 class Bullet:
@@ -24,16 +35,54 @@ class Enemy:
         self.active = False
 
 
+class Explosion:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.timer = 0
+        self.active = False
+
+
 def main():
     game = g.GameLib()
     game.open(640, 480, "07 - Shooting Stars", True)
 
+    # Load sprite assets
+    player_path = choose_existing_path(
+        "../assets/player_ship.png", "assets/player_ship.png"
+    )
+    enemy_path = choose_existing_path(
+        "../assets/enemy_ship.png", "assets/enemy_ship.png"
+    )
+    bullet_path = choose_existing_path("../assets/bullet.png", "assets/bullet.png")
+    explosion_path = choose_existing_path(
+        "../assets/explosion.png", "assets/explosion.png"
+    )
+    star_path = choose_existing_path("../assets/star.png", "assets/star.png")
+
+    spr_player = game.load_sprite(player_path)
+    spr_enemy = game.load_sprite(enemy_path)
+    spr_bullet = game.load_sprite(bullet_path)
+    spr_explosion = game.load_sprite(explosion_path)
+    spr_star = game.load_sprite(star_path)
+
+    # Load sound assets
+    shoot_sfx = choose_existing_path(
+        "../assets/sound/click.wav", "assets/sound/click.wav"
+    )
+    hit_sfx = choose_existing_path("../assets/sound/hit.wav", "assets/sound/hit.wav")
+    coin_sfx = choose_existing_path("../assets/sound/coin.wav", "assets/sound/coin.wav")
+    game_over_sfx = choose_existing_path(
+        "../assets/sound/game_over.wav", "assets/sound/game_over.wav"
+    )
+
     # Player ship
-    ship_x, ship_y = 300, 440
-    ship_w, ship_h = 30, 20
+    ship_x, ship_y = 300, 420
+    ship_w, ship_h = 32, 32
 
     bullets = [Bullet() for _ in range(MAX_BULLETS)]
     enemies = [Enemy() for _ in range(MAX_ENEMIES)]
+    explosions = [Explosion() for _ in range(MAX_ENEMIES)]
 
     score = 0
     spawn_timer = 0
@@ -59,6 +108,7 @@ def main():
                         b.active = True
                         b.x = ship_x + ship_w // 2
                         b.y = ship_y - 5
+                        game.play_wav(shoot_sfx, 1, 600)
                         break
 
             # Update bullets
@@ -78,7 +128,7 @@ def main():
                     if not e.active:
                         e.active = True
                         e.x = g.GameLib.random(10, game.get_width() - 30)
-                        e.y = -20
+                        e.y = -24
                         e.speed = g.GameLib.random(1, 3 + score // 15)
                         break
 
@@ -92,6 +142,7 @@ def main():
                     lives -= 1
                     if lives <= 0:
                         game_over = True
+                        game.play_wav(game_over_sfx, 1, 1000)
 
             # Collision: bullet vs enemy
             for b in bullets:
@@ -100,23 +151,34 @@ def main():
                 for e in enemies:
                     if not e.active:
                         continue
-                    if g.GameLib.rect_overlap(b.x - 2, b.y - 4, 4, 8,
-                                              e.x, e.y, 20, 20):
+                    if g.GameLib.rect_overlap(b.x - 2, b.y - 4, 4, 8, e.x, e.y, 24, 24):
                         b.active = False
                         e.active = False
                         score += 1
+                        game.play_wav(coin_sfx, 1, 800)
+                        # Spawn explosion
+                        for ex in explosions:
+                            if not ex.active:
+                                ex.active = True
+                                ex.x = e.x
+                                ex.y = e.y
+                                ex.timer = 15
+                                break
                         break
 
             # Collision: enemy vs ship
             for e in enemies:
                 if not e.active:
                     continue
-                if g.GameLib.rect_overlap(e.x, e.y, 20, 20,
-                                          ship_x, ship_y, ship_w, ship_h):
+                if g.GameLib.rect_overlap(
+                    e.x, e.y, 24, 24, ship_x, ship_y, ship_w, ship_h
+                ):
                     e.active = False
                     lives -= 1
+                    game.play_wav(hit_sfx, 1, 800)
                     if lives <= 0:
                         game_over = True
+                        game.play_wav(game_over_sfx, 1, 1000)
         else:
             if game.is_key_pressed(g.KEY_R):
                 score = 0
@@ -126,33 +188,62 @@ def main():
                     b.active = False
                 for e in enemies:
                     e.active = False
+                for ex in explosions:
+                    ex.active = False
 
         # --- Drawing ---
         game.clear(g.COLOR_BLACK)
 
-        # Starfield background
+        # Starfield background (use star sprite if loaded)
         for i in range(60):
             sx = (i * 137 + 59) % game.get_width()
             sy = (i * 251 + 31) % game.get_height()
-            game.set_pixel(sx, sy, g.COLOR_WHITE)
+            if spr_star >= 0:
+                game.draw_sprite_scaled(spr_star, sx, sy, 4, 4)
+            else:
+                game.set_pixel(sx, sy, g.COLOR_WHITE)
 
         # Bullets
         for b in bullets:
             if b.active:
-                game.fill_rect(b.x - 1, b.y - 4, 3, 8, g.COLOR_YELLOW)
+                if spr_bullet >= 0:
+                    game.draw_sprite_scaled(spr_bullet, b.x - 3, b.y - 8, 6, 16)
+                else:
+                    game.fill_rect(b.x - 1, b.y - 4, 3, 8, g.COLOR_YELLOW)
 
-        # Enemies (red squares)
+        # Enemies
         for e in enemies:
             if e.active:
-                game.fill_rect(e.x, e.y, 20, 20, g.COLOR_RED)
-                game.draw_rect(e.x, e.y, 20, 20, g.COLOR_ORANGE)
+                if spr_enemy >= 0:
+                    game.draw_sprite_scaled(spr_enemy, e.x, e.y, 24, 24)
+                else:
+                    game.fill_rect(e.x, e.y, 24, 24, g.COLOR_RED)
+                    game.draw_rect(e.x, e.y, 24, 24, g.COLOR_ORANGE)
 
-        # Ship (triangle)
-        game.fill_triangle(
-            ship_x + ship_w // 2, ship_y - 5,
-            ship_x, ship_y + ship_h,
-            ship_x + ship_w, ship_y + ship_h,
-            g.COLOR_CYAN)
+        # Explosions
+        for ex in explosions:
+            if ex.active:
+                if spr_explosion >= 0:
+                    game.draw_sprite_scaled(spr_explosion, ex.x - 4, ex.y - 4, 32, 32)
+                else:
+                    game.fill_circle(ex.x + 12, ex.y + 12, 16, g.COLOR_ORANGE)
+                ex.timer -= 1
+                if ex.timer <= 0:
+                    ex.active = False
+
+        # Ship
+        if spr_player >= 0:
+            game.draw_sprite_scaled(spr_player, ship_x, ship_y, ship_w, ship_h)
+        else:
+            game.fill_triangle(
+                ship_x + ship_w // 2,
+                ship_y - 5,
+                ship_x,
+                ship_y + ship_h,
+                ship_x + ship_w,
+                ship_y + ship_h,
+                g.COLOR_CYAN,
+            )
 
         # HUD
         game.draw_printf(10, 10, g.COLOR_WHITE, f"Score: {score}")
@@ -168,6 +259,11 @@ def main():
 
         game.update()
         game.wait_frame(60)
+
+    # Free sprites
+    for s in [spr_player, spr_enemy, spr_bullet, spr_explosion, spr_star]:
+        if s >= 0:
+            game.free_sprite(s)
 
 
 if __name__ == "__main__":

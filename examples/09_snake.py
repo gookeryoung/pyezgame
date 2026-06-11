@@ -2,14 +2,24 @@
 
 Classic Snake: use arrow keys to control the snake, eat food to grow,
 game over if you hit the wall or yourself.
-Learn: draw_grid, fill_cell, is_key_pressed, game state machine, timed movement
+Learn: draw_grid, fill_cell, is_key_pressed, game state machine, timed movement,
+       load_sprite, draw_sprite_scaled, play_wav
 """
+import os
 import gameui as g
 
 GRID_ROWS = 20
 GRID_COLS = 20
 CELL_SIZE = 22
 MAX_SNAKE = 400
+
+
+def choose_existing_path(path_a, path_b):
+    if os.path.isfile(path_a):
+        return path_a
+    if os.path.isfile(path_b):
+        return path_b
+    return path_a
 
 
 def main():
@@ -20,6 +30,18 @@ def main():
     win_w = grid_w + 160
     win_h = grid_h + 40
     game.open(win_w, win_h, "09 - Snake", True)
+
+    # Load sprite assets
+    food_path = choose_existing_path(
+        "../assets/fruit_apple.png", "assets/fruit_apple.png"
+    )
+    spr_food = game.load_sprite(food_path)
+
+    # Load sound assets
+    eat_sfx = choose_existing_path("../assets/sound/coin.wav", "assets/sound/coin.wav")
+    game_over_sfx = choose_existing_path(
+        "../assets/sound/game_over.wav", "assets/sound/game_over.wav"
+    )
 
     grid_x, grid_y = 10, 30
 
@@ -80,10 +102,12 @@ def main():
                     # Wall collision
                     if head_r < 0 or head_r >= GRID_ROWS or head_c < 0 or head_c >= GRID_COLS:
                         game_over = True
+                        game.play_wav(game_over_sfx, 1, 1000)
                     else:
                         # Self collision
                         if (head_r, head_c) in snake[:snake_len]:
                             game_over = True
+                            game.play_wav(game_over_sfx, 1, 1000)
 
                     if not game_over:
                         ate = (head_r == food_r and head_c == food_c)
@@ -106,6 +130,7 @@ def main():
                                 food_c = g.GameLib.random(0, GRID_COLS - 1)
                                 if (food_r, food_c) not in snake[:snake_len]:
                                     break
+                            game.play_wav(eat_sfx, 1, 800)
         else:
             if game.is_key_pressed(g.KEY_R):
                 snake = [(10, 10), (10, 9), (10, 8)]
@@ -122,7 +147,14 @@ def main():
 
         game.draw_text_scale(grid_x, 5, "SNAKE", g.COLOR_GREEN, 16, 16)
         game.draw_grid(grid_x, grid_y, GRID_ROWS, GRID_COLS, CELL_SIZE, g.COLOR_DARK_GRAY)
-        game.fill_cell(grid_x, grid_y, food_r, food_c, CELL_SIZE, g.COLOR_RED)
+
+        # Draw food (use sprite if loaded)
+        if spr_food >= 0:
+            fx = grid_x + food_c * CELL_SIZE + 1
+            fy = grid_y + food_r * CELL_SIZE + 1
+            game.draw_sprite_scaled(spr_food, fx, fy, CELL_SIZE - 2, CELL_SIZE - 2)
+        else:
+            game.fill_cell(grid_x, grid_y, food_r, food_c, CELL_SIZE, g.COLOR_RED)
 
         for i in range(min(snake_len, len(snake))):
             sr, sc = snake[i]
@@ -158,6 +190,9 @@ def main():
 
         game.update()
         game.wait_frame(60)
+
+    if spr_food >= 0:
+        game.free_sprite(spr_food)
 
 
 if __name__ == "__main__":
