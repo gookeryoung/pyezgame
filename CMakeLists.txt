@@ -17,3 +17,8 @@ endif()
 install(TARGETS _gameui LIBRARY DESTINATION gameui)
 install(FILES gameui/__init__.py DESTINATION gameui)
 install(FILES gameui/__init__.pyi DESTINATION gameui)
+
+# Install Python examples and their assets under gameui/
+file(GLOB EXAMPLE_PY_FILES ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.py)
+install(FILES ${EXAMPLE_PY_FILES} DESTINATION gameui/examples)
+install(DIRECTORY examples/assets DESTINATION gameui/examples)

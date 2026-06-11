@@ -5,7 +5,10 @@ import importlib.util
 import sys
 from pathlib import Path
 
-EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
+# Installed: gameui/examples/; Dev: ../examples/ (relative to gameui/)
+_pkg_dir = Path(__file__).resolve().parent
+_candidates = [_pkg_dir / "examples", _pkg_dir.parent / "examples"]
+EXAMPLES_DIR = next((p for p in _candidates if p.is_dir()), _pkg_dir / "examples")
 
 
 def _discover_examples() -> list[tuple[str, str, str]]:
@@ -23,13 +26,20 @@ def _discover_examples() -> list[tuple[str, str, str]]:
 
 
 def _run_example(filepath: str) -> None:
-    spec = importlib.util.spec_from_file_location("__main__", filepath)
-    if spec is None or spec.loader is None:
-        print(f"Error: cannot load {filepath}")
-        sys.exit(1)
-    mod = importlib.util.module_from_spec(spec)
-    mod.__name__ = "__main__"
-    spec.loader.exec_module(mod)
+    import os
+    # Change cwd to the examples directory so relative asset paths work
+    prev_cwd = os.getcwd()
+    os.chdir(EXAMPLES_DIR)
+    try:
+        spec = importlib.util.spec_from_file_location("__main__", filepath)
+        if spec is None or spec.loader is None:
+            print(f"Error: cannot load {filepath}")
+            sys.exit(1)
+        mod = importlib.util.module_from_spec(spec)
+        mod.__name__ = "__main__"
+        spec.loader.exec_module(mod)
+    finally:
+        os.chdir(prev_cwd)
 
 
 def cmd_list(_args: argparse.Namespace) -> None:

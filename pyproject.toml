@@ -14,6 +14,7 @@ gameui = "gameui.cli:main"
 
 [tool.scikit-build]
 cmake.build-type = "Release"
+wheel.packages = ["gameui"]
 
 [tool.basedpyright]
 exclude                           = ["**/.git", "**/.venv", "**/__pycache__", "**/build", "**/dist"]
