@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>GameLib API Cheat Sheet v1.9.3</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 8mm 10mm;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 6.5pt; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+    line-height: 1.35;
+    color: #1a1a1a;
+    column-count: 4;
+    column-gap: 14px;
+    column-rule: 1px solid #ddd;
+    padding: 0;
+  }
+
+  /* ---------- headings ---------- */
+  h1 {
+    column-span: all;
+    font-size: 12pt;
+    text-align: center;
+    margin-bottom: 4px;
+    padding-bottom: 3px;
+    border-bottom: 2px solid #333;
+    letter-spacing: 1px;
+  }
+  h1 small { font-size: 7pt; font-weight: normal; color: #666; margin-left: 8px; }
+  h2 {
+    font-size: 8pt;
+    color: #fff;
+    background: #2c3e50;
+    padding: 1.5px 5px;
+    margin: 4px 0 2px 0;
+    border-radius: 2px;
+    break-after: avoid;
+  }
+  h3 {
+    font-size: 7pt;
+    color: #2c3e50;
+    margin: 3px 0 1px 0;
+    border-bottom: 1px solid #ccc;
+    break-after: avoid;
+  }
+
+  /* ---------- code ---------- */
+  code {
+    font-family: Consolas, "Cascadia Code", "Courier New", monospace;
+    font-size: 6.2pt;
+    background: #f0f0f0;
+    padding: 0 1.5px;
+    border-radius: 1.5px;
+    overflow-wrap: break-word;
+    word-break: break-all;
+  }
+  pre {
+    background: #f6f6f6;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 3px 5px;
+    margin: 2px 0;
+    overflow: hidden;
+    font-size: 6.2pt;
+    line-height: 1.3;
+    break-inside: avoid;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  /* ---------- lists ---------- */
+  ul, ol { padding-left: 1.2em; margin: 1px 0; }
+  li { margin: 0; padding: 0; }
+  li code { white-space: normal; overflow-wrap: break-word; word-break: break-all; }
+
+  /* ---------- tables ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2px 0;
+    font-size: 6.2pt;
+    break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 1px 3px;
+    text-align: left;
+  }
+  th { background: #eef; font-weight: bold; }
+
+  /* ---------- sections ---------- */
+  section { break-inside: avoid-column; }
+  .keep { break-inside: avoid; }
+
+  /* ---------- compact paragraph ---------- */
+  p { margin: 1px 0; }
+  .note {
+    font-size: 6pt;
+    color: #555;
+    border-left: 2px solid #aaa;
+    padding-left: 4px;
+    margin: 2px 0;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 5.5pt;
+    background: #e8e8e8;
+    color: #444;
+    padding: 0 3px;
+    border-radius: 2px;
+    margin-right: 2px;
+  }
+
+  /* ---------- print ---------- */
+  @media print {
+    body { column-count: 4; }
+    h1 { column-span: all; }
+  }
+  @media screen {
+    body { max-width: 297mm; margin: 0 auto; padding: 8mm 10mm; }
+  }
+</style>
+</head>
+<body>
+
+<h1>GameLib API Cheat Sheet <small>v1.9.3 &mdash; Single-header C++ Game Library for Win32</small></h1>
+
+<!-- ==================== Quick Start ==================== -->
+<section>
+<h2>Quick Start</h2>
+<pre><code>#include "GameLib.h"
+int main() {
+    GameLib game;
+    game.Open(640, 480, "Title", true);
+    while (!game.IsClosed()) {
+        game.Clear(COLOR_BLACK);
+        // ...draw here...
+        game.Update();
+        game.WaitFrame(60);
+    }
+}</code></pre>
+<p><b>Build:</b> <code>g++ -o game.exe main.cpp -mwindows</code></p>
+</section>
+
+<!-- ==================== Window ==================== -->
+<section>
+<h2>Window</h2>
+<ul>
+  <li><code>Open(w, h, title, center=false, resizable=false)</code> &rarr; 0=OK</li>
+  <li><code>IsClosed()</code> window closed?</li>
+  <li><code>Update()</code> flush frame &amp; poll input</li>
+  <li><code>WaitFrame(fps)</code> frame rate limit</li>
+  <li><code>GetWidth()</code> / <code>GetHeight()</code> framebuffer size</li>
+  <li><code>GetFramebuffer()</code> raw pixel pointer (uint32_t*), index as fb[y*W+x]</li>
+  <li><code>WinResize(w, h)</code> resize client area</li>
+  <li><code>SetMaximized(bool)</code> maximize (resizable only)</li>
+  <li><code>GetDeltaTime()</code> frame delta (s, double)</li>
+  <li><code>GetFPS()</code> / <code>GetTime()</code> FPS &amp; elapsed time</li>
+  <li><code>SetTitle(title)</code> change title (UTF-8)</li>
+  <li><code>ShowFps(bool)</code> FPS in titlebar</li>
+  <li><code>ShowMouse(bool)</code> show/hide cursor</li>
+  <li><code>ShowMessage(text, title, btns)</code> message box</li>
+</ul>
+<p class="note">Buttons: <code>MESSAGEBOX_OK</code> / <code>MESSAGEBOX_YESNO</code><br>
+Returns: <code>MESSAGEBOX_RESULT_OK</code> / <code>_YES</code> / <code>_NO</code></p>
+</section>
+
+<!-- ==================== Drawing ==================== -->
+<section>
+<h2>Drawing</h2>
+<ul>
+  <li><code>Clear(color=BLACK)</code> fill clip rect (no blend)</li>
+  <li><code>SetPixel(x, y, color)</code> draw pixel (alpha blend)</li>
+  <li><code>GetPixel(x, y)</code> read pixel</li>
+  <li><code>SetClip(x, y, w, h)</code> set clip rect</li>
+  <li><code>ClearClip()</code> reset to full screen</li>
+  <li><code>GetClip(&amp;x,&amp;y,&amp;w,&amp;h)</code> / <code>GetClipX/Y/W/H()</code></li>
+  <li><code>Screenshot(filename)</code> save BMP</li>
+</ul>
+<h3>Primitives (all alpha-blend capable)</h3>
+<ul>
+  <li><code>DrawLine(x1, y1, x2, y2, color)</code></li>
+  <li><code>DrawRect(x, y, w, h, color)</code> outline</li>
+  <li><code>FillRect(x, y, w, h, color)</code></li>
+  <li><code>DrawCircle(cx, cy, r, color)</code></li>
+  <li><code>FillCircle(cx, cy, r, color)</code></li>
+  <li><code>DrawEllipse(cx, cy, rx, ry, color)</code></li>
+  <li><code>FillEllipse(cx, cy, rx, ry, color)</code></li>
+  <li><code>DrawTriangle(x1,y1, x2,y2, x3,y3, color)</code></li>
+  <li><code>FillTriangle(x1,y1, x2,y2, x3,y3, color)</code></li>
+</ul>
+</section>
+
+<!-- ==================== Text ==================== -->
+<section>
+<h2>Text</h2>
+<h3>Built-in 8x8 Font (ASCII 32~126)</h3>
+<ul>
+  <li><code>DrawText(x, y, text, color)</code></li>
+  <li><code>DrawNumber(x, y, number, color)</code></li>
+  <li><code>DrawTextScale(x, y, text, color, w, h)</code></li>
+  <li><code>DrawPrintf(x, y, color, fmt, ...)</code></li>
+  <li><code>DrawPrintfScale(x, y, color, w, h, fmt, ...)</code></li>
+</ul>
+<h3>System Font (GDI, CJK support)</h3>
+<ul>
+  <li><code>DrawTextFont(x, y, text, color, fontSize)</code></li>
+  <li><code>DrawTextFont(x, y, text, color, fontName, fontSize)</code></li>
+  <li><code>DrawPrintfFont(x,y, color, size, fmt,...)</code></li>
+  <li><code>DrawPrintfFont(x,y, color, name, size, fmt,...)</code></li>
+  <li><code>GetTextWidthFont(text, [fontName,] fontSize)</code></li>
+  <li><code>GetTextHeightFont(text, [fontName,] fontSize)</code></li>
+</ul>
+</section>
+
+<!-- ==================== Sprites ==================== -->
+<section>
+<h2>Sprites</h2>
+<ul>
+  <li><code>CreateSprite(w, h)</code> &rarr; ID (-1=fail)</li>
+  <li><code>LoadSprite(file)</code> PNG/JPG/BMP/GIF/TIFF</li>
+  <li><code>LoadSpriteBMP(file)</code> BMP 8/24/32-bit</li>
+  <li><code>FreeSprite(id)</code></li>
+  <li><code>DrawSprite(id, x, y)</code> opaque fast path</li>
+  <li><code>DrawSpriteEx(id, x, y, flags)</code></li>
+  <li><code>DrawSpriteRegion(id, x, y, sx, sy, sw, sh)</code></li>
+  <li><code>DrawSpriteRegionEx(id, x,y, sx,sy,sw,sh, flags)</code></li>
+  <li><code>DrawSpriteScaled(id, x, y, w, h, flags=0)</code></li>
+  <li><code>DrawSpriteRotated(id, cx, cy, angle, flags=0)</code></li>
+  <li><code>DrawSpriteFrame(id, x,y, fW,fH, idx, flags=0)</code></li>
+  <li><code>DrawSpriteFrameScaled(id, x,y,</code><br><code>&ensp;fW,fH, idx, w,h, flags=0)</code></li>
+  <li><code>DrawSpriteFrameRotated(id, cx,cy,</code><br><code>&ensp;fW,fH, idx, angle, flags=0)</code></li>
+  <li><code>Set/GetSpritePixel(id, x, y [,color])</code></li>
+  <li><code>GetSpriteWidth(id)</code> / <code>GetSpriteHeight(id)</code></li>
+  <li><code>Set/GetSpriteColorKey(id [,color])</code></li>
+</ul>
+<div class="keep">
+<table>
+  <tr><th>Flag</th><th>Val</th><th>Effect</th></tr>
+  <tr><td><code>SPRITE_FLIP_H</code></td><td>1</td><td>Horizontal flip</td></tr>
+  <tr><td><code>SPRITE_FLIP_V</code></td><td>2</td><td>Vertical flip</td></tr>
+  <tr><td><code>SPRITE_COLORKEY</code></td><td>4</td><td>Color key transp.</td></tr>
+  <tr><td><code>SPRITE_ALPHA</code></td><td>8</td><td>Per-pixel alpha</td></tr>
+</table>
+<p class="note"><code>COLORKEY_DEFAULT</code> = <code>0xFFFF00FF</code> (magenta). Flags combinable with <code>|</code></p>
+</div>
+</section>
+
+<!-- ==================== Input ==================== -->
+<section>
+<h2>Input</h2>
+<h3>Keyboard</h3>
+<ul>
+  <li><code>IsKeyDown(key)</code> held down</li>
+  <li><code>IsKeyPressed(key)</code> just pressed (edge)</li>
+  <li><code>IsKeyReleased(key)</code> just released (edge)</li>
+</ul>
+<h3>Mouse</h3>
+<ul>
+  <li><code>GetMouseX()</code> / <code>GetMouseY()</code> logical pos</li>
+  <li><code>IsMouseDown(btn)</code> / <code>IsMousePressed(btn)</code><br>/ <code>IsMouseReleased(btn)</code></li>
+  <li><code>GetMouseWheelDelta()</code> since last Update</li>
+  <li><code>IsActive()</code> window focused?</li>
+</ul>
+<p class="note"><code>MOUSE_LEFT</code>=0 &ensp; <code>MOUSE_RIGHT</code>=1 &ensp; <code>MOUSE_MIDDLE</code>=2</p>
+</section>
+
+<!-- ==================== Key Constants ==================== -->
+<section>
+<h2>Key Constants</h2>
+<p>
+<span class="tag">KEY_LEFT/RIGHT/UP/DOWN</span>
+<span class="tag">KEY_A ~ KEY_Z</span>
+<span class="tag">KEY_0 ~ KEY_9</span>
+<span class="tag">KEY_F1 ~ KEY_F12</span>
+<span class="tag">KEY_SPACE</span>
+<span class="tag">KEY_ENTER</span>
+<span class="tag">KEY_ESCAPE</span>
+<span class="tag">KEY_TAB</span>
+<span class="tag">KEY_SHIFT</span>
+<span class="tag">KEY_CONTROL</span>
+<span class="tag">KEY_BACK</span>
+</p>
+<p class="note">All mapped to Windows Virtual Key Codes.</p>
+</section>
+
+<!-- ==================== Sound ==================== -->
+<section>
+<h2>Sound</h2>
+<ul>
+  <li><code>PlayWAV(file, repeat, volume)</code> → channel ID, -1/-2/-4=fail</li>
+  <li><code>PlayPCM(pcm, nch, nsamp, rate, repeat, volume)</code> → channel ID, -1/-2/-4=fail</li>
+  <li><code>StopWAV(channel)</code> → 1=success</li>
+  <li><code>IsPlaying(channel)</code> → 1/0</li>
+  <li><code>SetVolume(channel, volume)</code> 0~1000</li>
+  <li><code>StopAll()</code> stop all WAV</li>
+  <li><code>SetMasterVolume(volume)</code> 0~1000, returns actual</li>
+  <li><code>GetMasterVolume()</code></li>
+  <li><code>PlayMusic(file, loop)</code> MP3/MIDI/WAV → true</li>
+  <li><code>StopMusic()</code></li>
+  <li><code>IsMusicPlaying()</code></li>
+  <li><code>PlayBeep(freq, duration, repeat, volume)</code> async, returns channel ID</li>
+</ul>
+<p class="note">WAV and Music are independent, can play simultaneously. Volume range: 0~1000.</p>
+</section>
+
+<!-- ==================== Tilemap ==================== -->
+<section>
+<h2>Tilemap</h2>
+<ul>
+  <li><code>CreateTilemap(cols, rows, tileSize, tilesetId)</code> &rarr; ID</li>
+  <li><code>LoadTilemap(file, tilesetId)</code> from .glm</li>
+  <li><code>SaveTilemap(file, mapId)</code> to .glm</li>
+  <li><code>FreeTilemap(mapId)</code></li>
+  <li><code>SetTile(mapId, col, row, tileId)</code> -1=empty</li>
+  <li><code>GetTile(mapId, col, row)</code></li>
+  <li><code>GetTilemapCols/Rows(mapId)</code> / <code>GetTileSize(mapId)</code></li>
+  <li><code>WorldToTileCol(mapId, x)</code> / <code>WorldToTileRow(mapId, y)</code></li>
+  <li><code>GetTileAtPixel(mapId, x, y)</code></li>
+  <li><code>FillTileRect(mapId, col, row, cols, rows, tileId)</code></li>
+  <li><code>ClearTilemap(mapId, tileId=-1)</code></li>
+  <li><code>DrawTilemap(mapId, x, y, flags=0)</code></li>
+</ul>
+<p class="note">Scroll: <code>DrawTilemap(id, -camX, -camY)</code>. Supports COLORKEY/ALPHA flags.</p>
+</section>
+
+<!-- ==================== Scene ==================== -->
+<section>
+<h2>Scene Management</h2>
+<ul>
+  <li><code>SetScene(scene)</code> switch next frame</li>
+  <li><code>GetScene()</code> current scene</li>
+  <li><code>IsSceneChanged()</code> 1st frame of new scene?</li>
+  <li><code>GetPreviousScene()</code></li>
+</ul>
+<p class="note">Use <code>enum { MENU, PLAY, OVER }</code>. Initial=0, first frame <code>IsSceneChanged()=true</code>.</p>
+</section>
+
+<!-- ==================== UI ==================== -->
+<section>
+<h2>UI Controls <span class="tag">Immediate Mode</span></h2>
+<ul>
+  <li><code>Button(x, y, w, h, text, color)</code> &rarr; true on click</li>
+  <li><code>Checkbox(x, y, text, &amp;checked)</code> toggle</li>
+  <li><code>RadioBox(x, y, text, &amp;value, index)</code> mutual exclusive</li>
+  <li><code>ToggleButton(x, y, w, h, text, &amp;toggled, color)</code></li>
+</ul>
+</section>
+
+<!-- ==================== Save/Load ==================== -->
+<section>
+<h2>Save / Load <span class="tag">static</span></h2>
+<ul>
+  <li><code>GameLib::SaveInt(file, key, value)</code></li>
+  <li><code>GameLib::SaveFloat(file, key, value)</code></li>
+  <li><code>GameLib::SaveString(file, key, value)</code></li>
+  <li><code>GameLib::LoadInt(file, key, def=0)</code></li>
+  <li><code>GameLib::LoadFloat(file, key, def=0.0f)</code></li>
+  <li><code>GameLib::LoadString(file, key, def="")</code></li>
+  <li><code>GameLib::HasSaveKey(file, key)</code></li>
+  <li><code>GameLib::DeleteSaveKey(file, key)</code></li>
+  <li><code>GameLib::DeleteSave(file)</code></li>
+</ul>
+<p class="note">File: <code>GAMELIB_SAVE</code> header + <code>key=value</code> lines. UTF-8 paths.</p>
+</section>
+
+<!-- ==================== Utilities ==================== -->
+<section>
+<h2>Utilities <span class="tag">static</span></h2>
+<ul>
+  <li><code>GameLib::Random(min, max)</code> int [min,max]</li>
+  <li><code>GameLib::RectOverlap(x1,y1,w1,h1, x2,y2,w2,h2)</code></li>
+  <li><code>GameLib::CircleOverlap(cx1,cy1,r1, cx2,cy2,r2)</code></li>
+  <li><code>GameLib::PointInRect(px, py, x, y, w, h)</code></li>
+  <li><code>GameLib::Distance(x1, y1, x2, y2)</code> &rarr; float</li>
+</ul>
+<h3>Grid Helpers (instance)</h3>
+<ul>
+  <li><code>DrawGrid(x, y, rows, cols, size, color)</code></li>
+  <li><code>FillCell(gx, gy, row, col, size, color)</code></li>
+</ul>
+</section>
+
+<!-- ==================== Colors ==================== -->
+<section>
+<h2>Colors <span class="tag">ARGB 0xAARRGGBB</span></h2>
+<p>
+<code>COLOR_BLACK</code>
+<code>COLOR_WHITE</code>
+<code>COLOR_RED</code>
+<code>COLOR_GREEN</code>
+<code>COLOR_BLUE</code>
+<code>COLOR_YELLOW</code>
+<code>COLOR_CYAN</code>
+<code>COLOR_MAGENTA</code>
+<code>COLOR_ORANGE</code>
+<code>COLOR_PINK</code>
+<code>COLOR_PURPLE</code>
+<code>COLOR_GRAY</code>
+<code>COLOR_DARK_GRAY</code>
+<code>COLOR_LIGHT_GRAY</code>
+<code>COLOR_DARK_RED</code>
+<code>COLOR_DARK_GREEN</code>
+<code>COLOR_DARK_BLUE</code>
+<code>COLOR_SKY_BLUE</code>
+<code>COLOR_BROWN</code>
+<code>COLOR_GOLD</code>
+<code>COLOR_TRANSPARENT</code>
+</p>
+<h3>Color Macros</h3>
+<ul>
+  <li><code>COLOR_RGB(r, g, b)</code> opaque color</li>
+  <li><code>COLOR_ARGB(a, r, g, b)</code> with alpha</li>
+  <li><code>COLOR_GET_A/R/G/B(color)</code> extract channel</li>
+</ul>
+<p class="note">When alpha &lt; 255, SetPixel &amp; all primitives auto alpha-blend.</p>
+</section>
+
+</body>
+</html>
