@@ -350,7 +350,7 @@ class GameLib:
         ...
 
     def draw_text_scale(
-        self, x: int, y: int, text: str, color: int, w: int, h: int
+        self, x: int, y: int, text: str, color: int, w: int, h: int,
     ) -> None:
         """Draw text with each character scaled to w x h pixels (max 1024)."""
         ...
@@ -364,7 +364,7 @@ class GameLib:
         ...
 
     def draw_printf_scale(
-        self, x: int, y: int, color: int, w: int, h: int, text: str
+        self, x: int, y: int, color: int, w: int, h: int, text: str,
     ) -> None:
         """Draw pre-formatted text with scaling.
 
@@ -376,14 +376,14 @@ class GameLib:
 
     @overload
     def draw_text_font(
-        self, x: int, y: int, text: str, color: int, font_name: str, font_size: int
+        self, x: int, y: int, text: str, color: int, font_name: str, font_size: int,
     ) -> None:
         """Draw text with a named font at the given size (supports UTF-8)."""
         ...
 
     @overload
     def draw_text_font(
-        self, x: int, y: int, text: str, color: int, font_size: int
+        self, x: int, y: int, text: str, color: int, font_size: int,
     ) -> None:
         """Draw text with the default font at the given size (supports UTF-8)."""
         ...
@@ -410,7 +410,7 @@ class GameLib:
 
     @overload
     def draw_printf_font(
-        self, x: int, y: int, color: int, font_name: str, font_size: int, text: str
+        self, x: int, y: int, color: int, font_name: str, font_size: int, text: str,
     ) -> None:
         """Draw pre-formatted text with a named font.
 
@@ -420,7 +420,7 @@ class GameLib:
 
     @overload
     def draw_printf_font(
-        self, x: int, y: int, color: int, font_size: int, text: str
+        self, x: int, y: int, color: int, font_size: int, text: str,
     ) -> None:
         """Draw pre-formatted text with the default font.
 
@@ -455,7 +455,7 @@ class GameLib:
         ...
 
     def draw_sprite_region(
-        self, id: int, x: int, y: int, sx: int, sy: int, sw: int, sh: int
+        self, id: int, x: int, y: int, sx: int, sy: int, sw: int, sh: int,
     ) -> None:
         """Draw a sub-region of a sprite."""
         ...
@@ -470,13 +470,13 @@ class GameLib:
         ...
 
     def draw_sprite_scaled(
-        self, id: int, x: int, y: int, w: int, h: int, flags: int = 0
+        self, id: int, x: int, y: int, w: int, h: int, flags: int = 0,
     ) -> None:
         """Draw sprite scaled to target size (nearest-neighbor)."""
         ...
 
     def draw_sprite_rotated(
-        self, id: int, cx: int, cy: int, angle_deg: float, flags: int = 0
+        self, id: int, cx: int, cy: int, angle_deg: float, flags: int = 0,
     ) -> None:
         """Draw sprite rotated around center point (angle_deg > 0 = clockwise)."""
         ...
@@ -603,7 +603,7 @@ class GameLib:
     # ---- Grid Helpers ----
 
     def draw_grid(
-        self, x: int, y: int, rows: int, cols: int, cell_size: int, color: int
+        self, x: int, y: int, rows: int, cols: int, cell_size: int, color: int,
     ) -> None:
         """Draw a grid of cells."""
         ...
@@ -662,13 +662,13 @@ class GameLib:
     # ---- Sound ----
 
     def play_beep(
-        self, frequency: int, duration: int, repeat: int = 1, volume: int = 1000
+        self, frequency: int, duration: int, repeat: int = 1, volume: int = 1000,
     ) -> int:
         """Play a beep tone. Returns channel ID (>0), or negative on failure."""
         ...
 
     def play_wav(
-        self, filename: str, repeat: int = 1, volume: int = 1000
+        self, filename: str, repeat: int = 1, volume: int = 1000,
     ) -> int:
         """Play a WAV sound file. Returns channel ID (>0), or negative on failure."""
         ...
@@ -741,7 +741,7 @@ class GameLib:
         ...
 
     def radio_box(
-        self, x: int, y: int, text: str, value: int, index: int
+        self, x: int, y: int, text: str, value: int, index: int,
     ) -> tuple[bool, int]:
         """Draw an immediate-mode radio button.
 

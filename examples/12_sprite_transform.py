@@ -27,14 +27,14 @@ def wrap_angle(a):
     return a
 
 
-def draw_panel(game, x, y, w, h, title):
+def draw_panel(game, x, y, w, h, title) -> None:
     game.fill_rect(x, y, w, h, g.COLOR_RGB(28, 34, 50))
     game.draw_rect(x, y, w, h, g.COLOR_RGB(84, 94, 120))
     game.fill_rect(x + 1, y + 1, w - 2, 22, g.COLOR_RGB(38, 48, 72))
     game.draw_text(x + 8, y + 7, title, g.COLOR_WHITE)
 
 
-def draw_checkerboard(game, x, y, w, h, cell):
+def draw_checkerboard(game, x, y, w, h, cell) -> None:
     c0 = g.COLOR_RGB(48, 54, 70)
     c1 = g.COLOR_RGB(62, 70, 90)
     py_ = y
@@ -49,7 +49,7 @@ def draw_checkerboard(game, x, y, w, h, cell):
         py_ += cell
 
 
-def draw_crosshair(game, cx, cy, size, color):
+def draw_crosshair(game, cx, cy, size, color) -> None:
     game.draw_line(cx - size, cy, cx + size, cy, color)
     game.draw_line(cx, cy - size, cx, cy + size, color)
 
@@ -124,7 +124,7 @@ def create_pulse_sheet(game):
     return sid
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     SW, SH = 860, 580
     game.open(SW, SH, "12 - Sprite Transform", True)

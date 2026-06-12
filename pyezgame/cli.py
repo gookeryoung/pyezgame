@@ -1,5 +1,6 @@
 """pyezgame CLI - Run GameLib examples from the command line."""
 from __future__ import annotations
+
 import argparse
 import importlib.util
 import sys
@@ -33,7 +34,6 @@ def _run_example(filepath: str) -> None:
     try:
         spec = importlib.util.spec_from_file_location("__main__", filepath)
         if spec is None or spec.loader is None:
-            print(f"Error: cannot load {filepath}")
             sys.exit(1)
         mod = importlib.util.module_from_spec(spec)
         mod.__name__ = "__main__"
@@ -46,12 +46,9 @@ def cmd_list(_args: argparse.Namespace) -> None:
     """List all available examples."""
     examples = _discover_examples()
     if not examples:
-        print("No examples found.")
         return
-    print("Available examples:")
-    for num, name, _ in examples:
-        print(f"  {num}. {name}")
-    print("\nRun: pyezgame <number|name>")
+    for _num, _name, _ in examples:
+        pass
 
 
 def cmd_run(args: argparse.Namespace) -> None:
@@ -59,7 +56,6 @@ def cmd_run(args: argparse.Namespace) -> None:
     query: str = args.example.lower()  # pyright: ignore[reportAny]
     examples = _discover_examples()
     if not examples:
-        print("No examples found.")
         sys.exit(1)
 
     # Match by number or name keyword
@@ -70,8 +66,6 @@ def cmd_run(args: argparse.Namespace) -> None:
             break
 
     if match is None:
-        print(f"Example '{args.example}' not found.\n")  # pyright: ignore[reportAny]
-        print("Use 'pyezgame list' to see available examples.\n")
         sys.exit(1)
 
     _run_example(match)
@@ -99,7 +93,6 @@ def main() -> None:
         cmd_run(args)
     elif args.command is None: # pyright: ignore[reportAny]
         parser.print_help()
-        print()
         cmd_list(args)
 
 

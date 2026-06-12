@@ -10,7 +10,7 @@ FONT_MONO = "Consolas"
 FONT_CJK = "MS Gothic"
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(720, 520, "11 - Font Text and UI", True)
     game.show_fps(True)

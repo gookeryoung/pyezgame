@@ -5,6 +5,7 @@ Learn: play_beep, play_wav, stop_wav, is_playing, set_volume, stop_all,
        set_master_volume, get_master_volume, play_music, stop_music
 """
 import os
+
 import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,7 +25,7 @@ def choose_existing_path(path_a, path_b):
     return path_a
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "06 - Sound Demo", True)
 

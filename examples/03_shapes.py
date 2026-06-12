@@ -7,10 +7,11 @@ Learn: set_pixel, draw_line, draw_rect, fill_rect, draw_circle,
        fill_triangle, COLOR_ARGB
 """
 import math
+
 import pyezgame as g
 
 
-def draw_checkerboard(game, x, y, w, h, cell):
+def draw_checkerboard(game, x, y, w, h, cell) -> None:
     py_ = 0
     while py_ < h:
         px = 0
@@ -24,7 +25,7 @@ def draw_checkerboard(game, x, y, w, h, cell):
         py_ += cell
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "03 - Shapes and Alpha", True)
 

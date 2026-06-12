@@ -33,3 +33,47 @@ default = true
 dev = [
     "coverage>=7.6.1",
 ]
+
+
+
+[tool.ruff]
+line-length    = 88
+src            = ["src"]
+target-version = "py38"
+unsafe-fixes   = true
+
+[tool.ruff.lint]
+select = [
+    # 核心
+    "B",
+    "C4",
+    # 更简洁的推导式写法
+    "E",
+    "F",
+    "I",
+    "PERF", # 性能优化提示
+    "SIM",  # 简化不必要的复杂代码
+    "T10",  # 禁止调试代码提交 (如 pdb)
+    "T20",  # 在生产代码中禁止/警告 print
+    "TRY",  # 更好的异常处理实践
+    "UP",   # 提示使用新语法（对3.8+项目友好）
+    # 新增 - 代码清晰度
+    "A",
+    "COM",
+    "ERA",
+    "FBT",
+    # 新增 - 类型安全
+    "ANN",
+    "BLE",
+    "RUF",
+    "SLOT",
+    # 新增 - 导入规范
+    #"TID",
+    #"ICN",
+    # 新增 - 安全
+    "DTZ",
+    "LOG",
+    "S",
+    # 新增 - 命名
+    # "N"
+]

@@ -137,7 +137,7 @@ def create_char_sheet(game):
     return sid
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "05 - Sprites & Animation", True)
 

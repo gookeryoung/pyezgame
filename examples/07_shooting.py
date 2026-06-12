@@ -6,6 +6,7 @@ Learn: lists for multiple objects, bullet firing, collision destroy, is_key_pres
 """
 
 import os
+
 import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -29,14 +30,14 @@ def choose_existing_path(path_a, path_b):
 
 
 class Bullet:
-    def __init__(self):
+    def __init__(self) -> None:
         self.x = 0
         self.y = 0
         self.active = False
 
 
 class Enemy:
-    def __init__(self):
+    def __init__(self) -> None:
         self.x = 0
         self.y = 0
         self.speed = 0
@@ -44,27 +45,27 @@ class Enemy:
 
 
 class Explosion:
-    def __init__(self):
+    def __init__(self) -> None:
         self.x = 0
         self.y = 0
         self.timer = 0
         self.active = False
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "07 - Shooting Stars", True)
 
     # Load sprite assets
     player_path = choose_existing_path(
-        "../clib/assets/player_ship.png", "assets/player_ship.png"
+        "../clib/assets/player_ship.png", "assets/player_ship.png",
     )
     enemy_path = choose_existing_path(
-        "../clib/assets/enemy_ship.png", "assets/enemy_ship.png"
+        "../clib/assets/enemy_ship.png", "assets/enemy_ship.png",
     )
     bullet_path = choose_existing_path("../clib/assets/bullet.png", "assets/bullet.png")
     explosion_path = choose_existing_path(
-        "../clib/assets/explosion.png", "assets/explosion.png"
+        "../clib/assets/explosion.png", "assets/explosion.png",
     )
     star_path = choose_existing_path("../clib/assets/star.png", "assets/star.png")
 
@@ -76,12 +77,12 @@ def main():
 
     # Load sound assets
     shoot_sfx = choose_existing_path(
-        "../clib/assets/sound/click.wav", "assets/sound/click.wav"
+        "../clib/assets/sound/click.wav", "assets/sound/click.wav",
     )
     hit_sfx = choose_existing_path("../clib/assets/sound/hit.wav", "assets/sound/hit.wav")
     coin_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
     game_over_sfx = choose_existing_path(
-        "../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav"
+        "../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav",
     )
 
     # Player ship
@@ -179,7 +180,7 @@ def main():
                 if not e.active:
                     continue
                 if g.GameLib.rect_overlap(
-                    e.x, e.y, 24, 24, ship_x, ship_y, ship_w, ship_h
+                    e.x, e.y, 24, 24, ship_x, ship_y, ship_w, ship_h,
                 ):
                     e.active = False
                     lives -= 1
@@ -216,7 +217,7 @@ def main():
             if b.active:
                 if spr_bullet >= 0:
                     game.draw_sprite_scaled(
-                        spr_bullet, b.x - 3, b.y - 8, 6, 16, g.SPRITE_COLORKEY
+                        spr_bullet, b.x - 3, b.y - 8, 6, 16, g.SPRITE_COLORKEY,
                     )
                 else:
                     game.fill_rect(b.x - 1, b.y - 4, 3, 8, g.COLOR_YELLOW)
@@ -226,7 +227,7 @@ def main():
             if e.active:
                 if spr_enemy >= 0:
                     game.draw_sprite_scaled(
-                        spr_enemy, e.x, e.y, 24, 24, g.SPRITE_COLORKEY
+                        spr_enemy, e.x, e.y, 24, 24, g.SPRITE_COLORKEY,
                     )
                 else:
                     game.fill_rect(e.x, e.y, 24, 24, g.COLOR_RED)
@@ -237,7 +238,7 @@ def main():
             if ex.active:
                 if spr_explosion >= 0:
                     game.draw_sprite_scaled(
-                        spr_explosion, ex.x - 4, ex.y - 4, 32, 32, g.SPRITE_COLORKEY
+                        spr_explosion, ex.x - 4, ex.y - 4, 32, 32, g.SPRITE_COLORKEY,
                     )
                 else:
                     game.fill_circle(ex.x + 12, ex.y + 12, 16, g.COLOR_ORANGE)
@@ -248,7 +249,7 @@ def main():
         # Ship
         if spr_player >= 0:
             game.draw_sprite_scaled(
-                spr_player, ship_x, ship_y, ship_w, ship_h, g.SPRITE_COLORKEY
+                spr_player, ship_x, ship_y, ship_w, ship_h, g.SPRITE_COLORKEY,
             )
         else:
             game.fill_triangle(

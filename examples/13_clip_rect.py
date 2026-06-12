@@ -9,6 +9,7 @@ Three clip windows on screen:
 Learn: set_clip, clear_clip, get_clip, how all draw calls respect clip
 """
 import math
+
 import pyezgame as g
 
 
@@ -30,12 +31,12 @@ def create_star_sprite(game):
     return sid
 
 
-def draw_window_border(game, x, y, w, h, title, border_color):
+def draw_window_border(game, x, y, w, h, title, border_color) -> None:
     game.draw_rect(x - 1, y - 1, w + 2, h + 2, border_color)
     game.draw_text(x + 6, y + 4, title, g.COLOR_WHITE)
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "13 - Clip Rectangle Demo", True)
 

@@ -6,7 +6,7 @@ Learn: open, clear, draw_text, draw_text_scale, update, wait_frame, is_closed
 import pyezgame as g
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "01 - Hello World", True)
 

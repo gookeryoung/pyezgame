@@ -6,6 +6,7 @@ Learn: draw_grid, fill_cell, is_key_pressed, game state machine, timed movement,
        load_sprite, draw_sprite_scaled, play_wav
 """
 import os
+
 import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +31,7 @@ def choose_existing_path(path_a, path_b):
     return path_a
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
 
     grid_w = GRID_COLS * CELL_SIZE
@@ -41,14 +42,14 @@ def main():
 
     # Load sprite assets
     food_path = choose_existing_path(
-        "../clib/assets/fruit_apple.png", "assets/fruit_apple.png"
+        "../clib/assets/fruit_apple.png", "assets/fruit_apple.png",
     )
     spr_food = game.load_sprite(food_path)
 
     # Load sound assets
     eat_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
     game_over_sfx = choose_existing_path(
-        "../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav"
+        "../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav",
     )
 
     grid_x, grid_y = 10, 30
@@ -161,7 +162,7 @@ def main():
             fx = grid_x + food_c * CELL_SIZE + 1
             fy = grid_y + food_r * CELL_SIZE + 1
             game.draw_sprite_scaled(
-                spr_food, fx, fy, CELL_SIZE - 2, CELL_SIZE - 2, g.SPRITE_COLORKEY
+                spr_food, fx, fy, CELL_SIZE - 2, CELL_SIZE - 2, g.SPRITE_COLORKEY,
             )
         else:
             game.fill_cell(grid_x, grid_y, food_r, food_c, CELL_SIZE, g.COLOR_RED)

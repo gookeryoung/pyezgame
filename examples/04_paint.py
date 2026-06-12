@@ -6,7 +6,7 @@ Learn: get_mouse_x/y, is_mouse_down, is_mouse_released, get_mouse_wheel_delta, i
 import pyezgame as g
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "04 - Paint", True, True)
 

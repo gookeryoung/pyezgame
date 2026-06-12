@@ -9,7 +9,7 @@ Learn: is_key_down, fill_rect, fill_circle, draw_circle, draw_printf,
 import pyezgame as g
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(640, 480, "02 - Movement and Physics", True)
 

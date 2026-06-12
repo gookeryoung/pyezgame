@@ -12,6 +12,7 @@ Learn: create_tilemap, fill_tile_rect, clear_tilemap, world_to_tile_col/row,
        SPRITE_COLORKEY, SPRITE_FLIP_H, parallax scrolling
 """
 import os
+
 import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -48,7 +49,7 @@ def choose_existing_path(path_a, path_b):
     return path_a
 
 
-def sprite_fill(game, sid, x0, y0, w, h, c):
+def sprite_fill(game, sid, x0, y0, w, h, c) -> None:
     for y in range(y0, y0 + h):
         for x in range(x0, x0 + w):
             game.set_sprite_pixel(sid, x, y, c)
@@ -82,7 +83,7 @@ def make_bg_tileset(game):
     return sid
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     SW, SH = 640, 480
     game.open(SW, SH, "10 - Tilemap Two-Layer Scrolling", True)

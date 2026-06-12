@@ -7,6 +7,7 @@ Features: asset-based player/bullets/explosions, scrolling starfield background,
 Learn: comprehensive use of all core GameLib APIs
 """
 import os
+
 import pyezgame as g
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,18 +21,18 @@ MAX_ENEMY_BULLETS = 20
 
 
 class Star:
-    def __init__(self, x, y, speed, color):
+    def __init__(self, x, y, speed, color) -> None:
         self.x, self.y, self.speed, self.color = x, y, speed, color
 
 
 class Bullet:
-    def __init__(self):
+    def __init__(self) -> None:
         self.x = self.y = 0.0
         self.active = False
 
 
 class Enemy:
-    def __init__(self):
+    def __init__(self) -> None:
         self.x = self.y = self.vx = self.vy = 0.0
         self.hp = 0
         self.active = False
@@ -39,14 +40,14 @@ class Enemy:
 
 
 class Explosion:
-    def __init__(self):
+    def __init__(self) -> None:
         self.x = self.y = 0.0
         self.timer = 0
         self.active = False
 
 
 class EnemyBullet:
-    def __init__(self):
+    def __init__(self) -> None:
         self.x = self.y = self.vy = 0.0
         self.active = False
 
@@ -65,7 +66,7 @@ def choose_existing_path(a, b):
     return a
 
 
-def spawn_explosion(explosions, x, y, timer):
+def spawn_explosion(explosions, x, y, timer) -> None:
     for e in explosions:
         if not e.active:
             e.active = True
@@ -122,7 +123,7 @@ def create_enemy_sprite(game, body_color):
     return sid
 
 
-def main():
+def main() -> None:
     game = g.GameLib()
     game.open(W, H, "14 - Space Shooter", True)
 
@@ -197,7 +198,7 @@ def main():
         if game.is_key_pressed(g.KEY_ESCAPE):
             break
 
-        def queue_sound(candidate, priority):
+        def queue_sound(candidate, priority) -> None:
             nonlocal sfx_to_play, sfx_priority
             if candidate and priority >= sfx_priority:
                 sfx_to_play = candidate
