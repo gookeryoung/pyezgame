@@ -7,7 +7,7 @@ window creation, graphics, sprites, sound, input, and more.
 
 from ._pyezgame import *  # noqa: F403
 from ._pyezgame import GameLib
-from ._utils import get_resource_path
+from ._utils import get_respath
 
 __version__ = "0.1.2"
-__all__ = ["GameLib", "get_resource_path"]
+__all__ = ["GameLib", "get_respath"]

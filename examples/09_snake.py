@@ -29,12 +29,12 @@ def main() -> None:
     game.open(win_w, win_h, "09 - Snake", True)
 
     # Load sprite assets
-    food_path = g.get_resource_path("../clib/assets/fruit_apple.png")
+    food_path = g.get_respath("../clib/assets/fruit_apple.png")
     spr_food = game.load_sprite(food_path)
 
     # Load sound assets
-    eat_sfx = g.get_resource_path("../clib/assets/sound/coin.wav")
-    game_over_sfx = g.get_resource_path("../clib/assets/sound/game_over.wav")
+    eat_sfx = g.get_respath("../clib/assets/sound/coin.wav")
+    game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
 
     grid_x, grid_y = 10, 30
 

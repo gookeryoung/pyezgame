@@ -2,7 +2,7 @@ from pathlib import Path
 
 ROOT_PATH = Path(__file__).parent
 
-def get_resource_path(resource: str) -> Path:
+def get_respath(resource: str) -> Path:
     """Get the absolute path to a resource.
 
     Args:
