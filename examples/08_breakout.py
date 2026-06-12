@@ -35,20 +35,20 @@ def main():
     game = g.GameLib()
     game.open(640, 480, "08 - Breakout", True)
 
-    launch_sfx = choose_existing_path("../assets/sound/jump.wav", "assets/sound/jump.wav")
-    bounce_sfx = choose_existing_path("../assets/sound/hit.wav", "assets/sound/hit.wav")
+    launch_sfx = choose_existing_path("../clib/assets/sound/jump.wav", "assets/sound/jump.wav")
+    bounce_sfx = choose_existing_path("../clib/assets/sound/hit.wav", "assets/sound/hit.wav")
     brick_row_sfx = [
-        choose_existing_path("../assets/sound/note_do_high.wav", "assets/sound/note_do_high.wav"),
-        choose_existing_path("../assets/sound/note_si.wav", "assets/sound/note_si.wav"),
-        choose_existing_path("../assets/sound/note_la.wav", "assets/sound/note_la.wav"),
-        choose_existing_path("../assets/sound/note_sol.wav", "assets/sound/note_sol.wav"),
-        choose_existing_path("../assets/sound/note_fa.wav", "assets/sound/note_fa.wav"),
-        choose_existing_path("../assets/sound/note_mi.wav", "assets/sound/note_mi.wav"),
+        choose_existing_path("../clib/assets/sound/note_do_high.wav", "assets/sound/note_do_high.wav"),
+        choose_existing_path("../clib/assets/sound/note_si.wav", "assets/sound/note_si.wav"),
+        choose_existing_path("../clib/assets/sound/note_la.wav", "assets/sound/note_la.wav"),
+        choose_existing_path("../clib/assets/sound/note_sol.wav", "assets/sound/note_sol.wav"),
+        choose_existing_path("../clib/assets/sound/note_fa.wav", "assets/sound/note_fa.wav"),
+        choose_existing_path("../clib/assets/sound/note_mi.wav", "assets/sound/note_mi.wav"),
     ]
-    lose_life_sfx = choose_existing_path("../assets/sound/explosion.wav", "assets/sound/explosion.wav")
-    restart_sfx = choose_existing_path("../assets/sound/click.wav", "assets/sound/click.wav")
-    game_over_sfx = choose_existing_path("../assets/sound/game_over.wav", "assets/sound/game_over.wav")
-    win_sfx = choose_existing_path("../assets/sound/victory.wav", "assets/sound/victory.wav")
+    lose_life_sfx = choose_existing_path("../clib/assets/sound/explosion.wav", "assets/sound/explosion.wav")
+    restart_sfx = choose_existing_path("../clib/assets/sound/click.wav", "assets/sound/click.wav")
+    game_over_sfx = choose_existing_path("../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav")
+    win_sfx = choose_existing_path("../clib/assets/sound/victory.wav", "assets/sound/victory.wav")
 
     brick_colors = [g.COLOR_RED, g.COLOR_ORANGE, g.COLOR_YELLOW,
                     g.COLOR_GREEN, g.COLOR_CYAN, g.COLOR_PURPLE]

@@ -88,9 +88,9 @@ def main():
     game.open(SW, SH, "10 - Tilemap Two-Layer Scrolling", True)
     game.show_fps(True)
 
-    tileset_path = choose_existing_path("../assets/tileset.png", "assets/tileset.png")
-    char_path = choose_existing_path("../assets/character.png", "assets/character.png")
-    tree_path = choose_existing_path("../assets/tree.png", "assets/tree.png")
+    tileset_path = choose_existing_path("../clib/assets/tileset.png", "assets/tileset.png")
+    char_path = choose_existing_path("../clib/assets/character.png", "assets/character.png")
+    tree_path = choose_existing_path("../clib/assets/tree.png", "assets/tree.png")
 
     fg_ts = game.load_sprite(tileset_path)
     bg_ts = make_bg_tileset(game)

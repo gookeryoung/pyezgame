@@ -57,16 +57,16 @@ def main():
 
     # Load sprite assets
     player_path = choose_existing_path(
-        "../assets/player_ship.png", "assets/player_ship.png"
+        "../clib/assets/player_ship.png", "assets/player_ship.png"
     )
     enemy_path = choose_existing_path(
-        "../assets/enemy_ship.png", "assets/enemy_ship.png"
+        "../clib/assets/enemy_ship.png", "assets/enemy_ship.png"
     )
-    bullet_path = choose_existing_path("../assets/bullet.png", "assets/bullet.png")
+    bullet_path = choose_existing_path("../clib/assets/bullet.png", "assets/bullet.png")
     explosion_path = choose_existing_path(
-        "../assets/explosion.png", "assets/explosion.png"
+        "../clib/assets/explosion.png", "assets/explosion.png"
     )
-    star_path = choose_existing_path("../assets/star.png", "assets/star.png")
+    star_path = choose_existing_path("../clib/assets/star.png", "assets/star.png")
 
     spr_player = game.load_sprite(player_path)
     spr_enemy = game.load_sprite(enemy_path)
@@ -76,12 +76,12 @@ def main():
 
     # Load sound assets
     shoot_sfx = choose_existing_path(
-        "../assets/sound/click.wav", "assets/sound/click.wav"
+        "../clib/assets/sound/click.wav", "assets/sound/click.wav"
     )
-    hit_sfx = choose_existing_path("../assets/sound/hit.wav", "assets/sound/hit.wav")
-    coin_sfx = choose_existing_path("../assets/sound/coin.wav", "assets/sound/coin.wav")
+    hit_sfx = choose_existing_path("../clib/assets/sound/hit.wav", "assets/sound/hit.wav")
+    coin_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
     game_over_sfx = choose_existing_path(
-        "../assets/sound/game_over.wav", "assets/sound/game_over.wav"
+        "../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav"
     )
 
     # Player ship

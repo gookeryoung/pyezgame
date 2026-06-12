@@ -41,14 +41,14 @@ def main():
 
     # Load sprite assets
     food_path = choose_existing_path(
-        "../assets/fruit_apple.png", "assets/fruit_apple.png"
+        "../clib/assets/fruit_apple.png", "assets/fruit_apple.png"
     )
     spr_food = game.load_sprite(food_path)
 
     # Load sound assets
-    eat_sfx = choose_existing_path("../assets/sound/coin.wav", "assets/sound/coin.wav")
+    eat_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
     game_over_sfx = choose_existing_path(
-        "../assets/sound/game_over.wav", "assets/sound/game_over.wav"
+        "../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav"
     )
 
     grid_x, grid_y = 10, 30

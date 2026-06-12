@@ -30,9 +30,9 @@ def main():
 
     last_wav_channel = -1
     last_music_ok = True
-    wav_effect = choose_existing_path("../assets/sound/explosion.wav",
+    wav_effect = choose_existing_path("../clib/assets/sound/explosion.wav",
                                       "assets/sound/explosion.wav")
-    music_file = choose_existing_path("../assets/music/battle1.mid",
+    music_file = choose_existing_path("../clib/assets/music/battle1.mid",
                                       "assets/music/battle1.mid")
     music_label = "Background Music (MCI MIDI):"
     music_hint = "(uses assets/music/battle1.mid via MCI sequencer)"

@@ -126,17 +126,17 @@ def main():
     game = g.GameLib()
     game.open(W, H, "14 - Space Shooter", True)
 
-    player_path = choose_existing_path("../assets/plane0.png", "assets/plane0.png")
-    bullet_path = choose_existing_path("../assets/bullet.png", "assets/bullet.png")
-    explosion_path = choose_existing_path("../assets/explosion.png", "assets/explosion.png")
+    player_path = choose_existing_path("../clib/assets/plane0.png", "assets/plane0.png")
+    bullet_path = choose_existing_path("../clib/assets/bullet.png", "assets/bullet.png")
+    explosion_path = choose_existing_path("../clib/assets/explosion.png", "assets/explosion.png")
 
-    shoot_sfx = choose_existing_path("../assets/sound/click.wav", "assets/sound/click.wav")
-    enemy_hit_sfx = choose_existing_path("../assets/sound/hit.wav", "assets/sound/hit.wav")
-    enemy_down_sfx = choose_existing_path("../assets/sound/coin.wav", "assets/sound/coin.wav")
-    level_up_sfx = choose_existing_path("../assets/sound/note_do_high.wav", "assets/sound/note_do_high.wav")
-    player_hit_sfx = choose_existing_path("../assets/sound/explosion.wav", "assets/sound/explosion.wav")
-    game_over_sfx = choose_existing_path("../assets/sound/game_over.wav", "assets/sound/game_over.wav")
-    restart_sfx = choose_existing_path("../assets/sound/click.wav", "assets/sound/click.wav")
+    shoot_sfx = choose_existing_path("../clib/assets/sound/click.wav", "assets/sound/click.wav")
+    enemy_hit_sfx = choose_existing_path("../clib/assets/sound/hit.wav", "assets/sound/hit.wav")
+    enemy_down_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
+    level_up_sfx = choose_existing_path("../clib/assets/sound/note_do_high.wav", "assets/sound/note_do_high.wav")
+    player_hit_sfx = choose_existing_path("../clib/assets/sound/explosion.wav", "assets/sound/explosion.wav")
+    game_over_sfx = choose_existing_path("../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav")
+    restart_sfx = choose_existing_path("../clib/assets/sound/click.wav", "assets/sound/click.wav")
 
     spr_player = game.load_sprite(player_path)
     if spr_player >= 0:

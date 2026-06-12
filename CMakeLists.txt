@@ -21,4 +21,4 @@ install(FILES pyezgame/__init__.pyi DESTINATION pyezgame)
 # Install Python examples and their assets under pyezgame/
 file(GLOB EXAMPLE_PY_FILES ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.py)
 install(FILES ${EXAMPLE_PY_FILES} DESTINATION pyezgame/examples)
-install(DIRECTORY examples/assets DESTINATION pyezgame/examples)
+install(DIRECTORY clib/assets DESTINATION pyezgame/examples)
