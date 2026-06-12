@@ -6,7 +6,7 @@
 // Copyright (c) 2026 skywind3000 (Lin Wei)
 //
 // Based on Win32 GDI, no SDL or other third-party libraries needed.
-// Works with Dev C++ (GCC 4.9.2+), can make shooting games, Tetris, 
+// Works with Dev C++ (GCC 4.9.2+), can make shooting games, Tetris,
 // maze games, etc.
 //
 // How to use (single file project, most common):
@@ -383,7 +383,7 @@ public:
     int GetSpriteHeight(int id) const;
     void SetSpriteColorKey(int id, uint32_t color);
     uint32_t GetSpriteColorKey(int id) const;
-	
+
     // -------- Tilemap System --------
     int CreateTilemap(int cols, int rows, int tileSize, int tilesetId);
     bool SaveTilemap(const char *filename, int mapId) const;
@@ -400,11 +400,11 @@ public:
     void FillTileRect(int mapId, int col, int row, int cols, int rows, int tileId);
     void ClearTilemap(int mapId, int tileId = -1);
     void DrawTilemap(int mapId, int x, int y, int flags = 0);
-	
+
     // -------- Grid Helpers --------
     void DrawGrid(int x, int y, int rows, int cols, int cellSize, uint32_t color);
     void FillCell(int gridX, int gridY, int row, int col, int cellSize, uint32_t color);
-	
+
     // -------- Input --------
     bool IsKeyDown(int key) const;
     bool IsKeyPressed(int key) const;
