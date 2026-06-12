@@ -260,9 +260,15 @@ def main() -> None:
             game.clear(g.COLOR_RGB(18, 22, 36))
             game.fill_rect(0, 0, SW, 56, g.COLOR_RGB(10, 14, 24))
             game.draw_text(20, 8, "MODE B: ROTATION", g.COLOR_CYAN)
-            game.draw_text(20, 24, "Wheel/Q/E speed  A/D frame  F flip  SPACE pause  R reset  TAB switch  ESC quit", g.COLOR_WHITE)
-            game.draw_printf(20, 40, g.COLOR_LIGHT_GRAY,
-                             f"Angle: {angle:.1f}   Speed: {angle_speed}   Frame: {frame}   Flip: {flip_text}   {spin_text}")
+            game.draw_text(
+                20, 24, "Wheel/Q/E speed  A/D frame  F flip  SPACE pause  R reset  TAB switch  ESC quit", g.COLOR_WHITE
+            )
+            game.draw_printf(
+                20,
+                40,
+                g.COLOR_LIGHT_GRAY,
+                f"Angle: {angle:.1f}   Speed: {angle_speed}   Frame: {frame}   Flip: {flip_text}   {spin_text}",
+            )
 
             # Source panel
             draw_panel(game, 20, 66, 200, 494, "Source Sprites")

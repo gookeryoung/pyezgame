@@ -37,7 +37,7 @@ dev = [
 
 
 [tool.ruff]
-line-length    = 88
+line-length    = 120
 src            = ["src"]
 target-version = "py38"
 unsafe-fixes   = true
