@@ -21,19 +21,19 @@ MAX_ENEMY_BULLETS = 20
 
 
 class Star:
-    def __init__(self, x, y, speed, color) -> None:
-        self.x, self.y, self.speed, self.color = x, y, speed, color
+    def __init__(self, x: float, y: float, speed: float, color: int) -> None:
+        self.x, self.y, self.speed, self.color = float(x), float(y), float(speed), int(color)
 
 
 class Bullet:
     def __init__(self) -> None:
-        self.x = self.y = 0.0
+        self.x, self.y = 0.0, 0.0
         self.active = False
 
 
 class Enemy:
     def __init__(self) -> None:
-        self.x = self.y = self.vx = self.vy = 0.0
+        self.x, self.y, self.vx, self.vy = 0.0, 0.0, 0.0, 0.0
         self.hp = 0
         self.active = False
         self.type = 0
@@ -41,14 +41,14 @@ class Enemy:
 
 class Explosion:
     def __init__(self) -> None:
-        self.x = self.y = 0.0
+        self.x, self.y = 0.0, 0.0
         self.timer = 0
         self.active = False
 
 
 class EnemyBullet:
     def __init__(self) -> None:
-        self.x = self.y = self.vy = 0.0
+        self.x, self.y, self.vy = 0.0, 0.0, 0.0
         self.active = False
 
 
@@ -66,7 +66,7 @@ def choose_existing_path(a, b):
     return a
 
 
-def spawn_explosion(explosions, x, y, timer) -> None:
+def spawn_explosion(explosions: list[Explosion], x: float, y: float, timer: int) -> None:
     for e in explosions:
         if not e.active:
             e.active = True
@@ -74,7 +74,7 @@ def spawn_explosion(explosions, x, y, timer) -> None:
             return
 
 
-def create_player_sprite(game):
+def create_player_sprite(game: g.GameLib) -> int:
     sid = game.create_sprite(24, 24)
     if sid < 0:
         return -1
@@ -103,7 +103,7 @@ def create_player_sprite(game):
     return sid
 
 
-def create_enemy_sprite(game, body_color):
+def create_enemy_sprite(game: g.GameLib, body_color: int) -> int:
     sid = game.create_sprite(20, 20)
     if sid < 0:
         return -1
@@ -198,7 +198,7 @@ def main() -> None:
         if game.is_key_pressed(g.KEY_ESCAPE):
             break
 
-        def queue_sound(candidate, priority) -> None:
+        def queue_sound(candidate: str, priority: int) -> None:
             nonlocal sfx_to_play, sfx_priority
             if candidate and priority >= sfx_priority:
                 sfx_to_play = candidate

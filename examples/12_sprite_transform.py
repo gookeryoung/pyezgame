@@ -261,7 +261,7 @@ def main() -> None:
             game.fill_rect(0, 0, SW, 56, g.COLOR_RGB(10, 14, 24))
             game.draw_text(20, 8, "MODE B: ROTATION", g.COLOR_CYAN)
             game.draw_text(
-                20, 24, "Wheel/Q/E speed  A/D frame  F flip  SPACE pause  R reset  TAB switch  ESC quit", g.COLOR_WHITE
+                20, 24, "Wheel/Q/E speed  A/D frame  F flip  SPACE pause  R reset  TAB switch  ESC quit", g.COLOR_WHITE,
             )
             game.draw_printf(
                 20,

@@ -14,14 +14,14 @@ Learn: button, checkbox, radio_box, toggle_button,
 import pyezgame as g
 
 
-def draw_panel(game, x, y, w, h, title) -> None:
+def draw_panel(game: g.GameLib, x: int, y: int, w: int, h: int, title: str) -> None:
     game.fill_rect(x, y, w, h, g.COLOR_RGB(28, 34, 50))
     game.draw_rect(x, y, w, h, g.COLOR_RGB(84, 94, 120))
     game.fill_rect(x + 1, y + 1, w - 2, 22, g.COLOR_RGB(38, 48, 72))
     game.draw_text(x + 8, y + 7, title, g.COLOR_WHITE)
 
 
-def draw_backdrop(game, show_grid) -> None:
+def draw_backdrop(game: g.GameLib, show_grid: bool) -> None:
     game.clear(g.COLOR_RGB(18, 22, 34))
 
     for y in range(0, game.get_height(), 40):
