@@ -17,18 +17,6 @@ CELL_SIZE = 22
 MAX_SNAKE = 400
 
 
-def choose_existing_path(path_a, path_b):
-    if os.path.isfile(path_a):
-        return path_a
-    if os.path.isfile(path_b):
-        return path_b
-    abs_a = os.path.join(SCRIPT_DIR, path_a)
-    abs_b = os.path.join(SCRIPT_DIR, path_b)
-    if os.path.isfile(abs_a):
-        return abs_a
-    if os.path.isfile(abs_b):
-        return abs_b
-    return path_a
 
 
 def main() -> None:
@@ -41,16 +29,12 @@ def main() -> None:
     game.open(win_w, win_h, "09 - Snake", True)
 
     # Load sprite assets
-    food_path = choose_existing_path(
-        "../clib/assets/fruit_apple.png", "assets/fruit_apple.png",
-    )
+    food_path = g.get_resource_path("../clib/assets/fruit_apple.png")
     spr_food = game.load_sprite(food_path)
 
     # Load sound assets
-    eat_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
-    game_over_sfx = choose_existing_path(
-        "../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav",
-    )
+    eat_sfx = g.get_resource_path("../clib/assets/sound/coin.wav")
+    game_over_sfx = g.get_resource_path("../clib/assets/sound/game_over.wav")
 
     grid_x, grid_y = 10, 30
 
