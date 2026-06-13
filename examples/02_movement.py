@@ -99,7 +99,7 @@ def main() -> None:
             game.draw_circle(int(ball_x), int(ball_y), ball_r, g.COLOR_WHITE)
             game.draw_text(10, 10, "Mode B: Bouncing Ball", g.COLOR_WHITE)
             game.draw_printf(
-                10, 25, g.COLOR_GRAY, f"Ball: {ball_x:.0f}, {ball_y:.0f}  Speed: {ball_vx:.0f}, {ball_vy:.0f}"
+                10, 25, g.COLOR_GRAY, f"Ball: {ball_x:.0f}, {ball_y:.0f}  Speed: {ball_vx:.0f}, {ball_vy:.0f}",
             )
 
         # Common HUD

@@ -257,7 +257,7 @@ def main() -> None:
             # Character
             frame_index = char_dir * 3 + char_frame
             game.draw_sprite_frame_scaled(
-                char_sheet, int(px), int(py), fw, fh, frame_index, fw * char_scale, fh * char_scale
+                char_sheet, int(px), int(py), fw, fh, frame_index, fw * char_scale, fh * char_scale,
             )
 
             # Sheet preview (top right)

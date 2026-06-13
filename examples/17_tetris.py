@@ -285,7 +285,7 @@ def main() -> None:
     das_active = False
     down_held = False
 
-    def spawn() -> None:
+    def spawn() -> tuple[Piece, Piece]:
         nonlocal current, next_piece, can_hold, is_locking, lock_timer
         nonlocal fall_timer, fall_speed, das_dir, das_timer, das_active, down_held
         gen.refill(5)
@@ -300,7 +300,7 @@ def main() -> None:
             next_piece = Piece(next_ptype, 0, 3, 0, PIECE_COLORS[next_ptype])
         can_hold = True
         is_locking = False
-        lock_timer = 0
+        lock_timer = 0.0
         # reset fall state so new piece gets a fresh start
         fall_speed = get_fall_speed(level)
         fall_timer = 0.0
@@ -314,10 +314,11 @@ def main() -> None:
             if y < 0 or x < 0 or x >= COLS or y >= ROWS:
                 nonlocal game_over
                 game_over = True
-                return
+                return current, next_piece
             if board[y][x] is not None:
                 game_over = True
-                return
+                return current, next_piece
+        return current, next_piece
 
     def is_valid(piece: Piece, xo: int = 0, yo: int = 0, rot: int | None = None) -> bool:
         if rot is not None:
@@ -386,9 +387,9 @@ def main() -> None:
         do_lock()
 
     def do_lock() -> None:
-        assert current is not None
-        nonlocal score, level, lines, combo, clearing, clear_timer
+        nonlocal current, next_piece, score, level, lines, combo, clearing, clear_timer
         nonlocal clear_rows, notif_text, notif_timer
+        assert current is not None
         for x, y in current.cells():
             if 0 <= y < ROWS and 0 <= x < COLS:
                 board[y][x] = current.type
@@ -414,19 +415,20 @@ def main() -> None:
                 notif_timer = 1.5
         else:
             combo = 0
-            spawn()
+            current, next_piece = spawn()
 
     def remove_cleared() -> None:
-        nonlocal clearing, clear_rows
-        for row in sorted(clear_rows, reverse=True):
-            del board[row]
-            board.insert(0, [None] * COLS)
+        nonlocal current, next_piece, clearing, clear_rows, board
+        cleared_set = set(clear_rows)
+        remaining = [board[r] for r in range(ROWS) if r not in cleared_set]
+        empty: list[str | None] = [None] * COLS
+        board = [list(empty) for _ in range(len(clear_rows))] + remaining
         clear_rows.clear()
         clearing = False
-        spawn()
+        current, next_piece = spawn()
 
     def do_hold() -> None:
-        nonlocal current, held, can_hold, is_locking, lock_timer
+        nonlocal current, next_piece, held, can_hold, is_locking, lock_timer
         assert current is not None
         if not can_hold:
             return
@@ -435,14 +437,14 @@ def main() -> None:
         lock_timer = 0.0
         if held is None:
             held = Piece(current.type, 0, 3, 0, current.colors)
-            spawn()
+            current, next_piece = spawn()
         else:
             old = held.type
             held = Piece(current.type, 0, 3, 0, current.colors)
             current = Piece(old, 0, 3, 0, PIECE_COLORS[old])
 
     def reset() -> None:
-        nonlocal board, current, next_piece, held, can_hold
+        nonlocal current, board, next_piece, held, can_hold
         nonlocal score, level, lines, game_over, paused
         nonlocal fall_timer, fall_speed, lock_timer, is_locking
         nonlocal combo, notif_text, notif_timer
@@ -473,10 +475,10 @@ def main() -> None:
         das_active = False
         down_held = False
         gen.clear()
-        spawn()
+        current, next_piece = spawn()
 
     # initial spawn
-    spawn()
+    current, next_piece = spawn()
 
     # === Main Loop ===
     while not game.is_closed():
@@ -554,7 +556,7 @@ def main() -> None:
                         is_locking = True
                         lock_timer = 0.0
 
-            if is_locking and current is not None:
+            if is_locking:
                 lock_timer += dt
                 if is_valid(current, 0, 1):
                     is_locking = False
@@ -605,7 +607,7 @@ def main() -> None:
                             game.fill_cell(BOARD_X, BOARD_Y, r, c, CELL, GARBAGE_COL)
 
         # ghost piece
-        if current and not game_over and not clearing:
+        if not game_over and not clearing:
             gy = ghost_y()
             _m, _l, _d, ghost_col = PIECE_COLORS[current.type]
             for dx, dy in SHAPES[current.type][current.rot]:
@@ -615,7 +617,7 @@ def main() -> None:
                 game.draw_rect(gx + 1, gyy + 1, CELL - 2, CELL - 2, g.COLOR_ARGB(80, 200, 200, 220))
 
         # current piece
-        if current and not game_over and not clearing:
+        if not game_over and not clearing:
             for dx, dy in SHAPES[current.type][current.rot]:
                 px = BOARD_X + (current.x + dx) * CELL
                 py = BOARD_Y + (current.y + dy) * CELL
@@ -654,16 +656,15 @@ def main() -> None:
         game.draw_text(sx + 5, yp, "NEXT", DIM_TEXT)
         game.fill_rect(sx + 5, yp + 12, SIDEBAR - 20, 48, BOARD_BG)
         game.draw_rect(sx + 5, yp + 12, SIDEBAR - 20, 48, BORDER)
-        if next_piece:
-            draw_mini_piece(game, next_piece.type, sx + 5 + (SIDEBAR - 20) // 2, yp + 36)
+        draw_mini_piece(game, next_piece.type, sx + 5 + (SIDEBAR - 20) // 2, yp + 36)
 
         # hold
         yp += 68
         game.draw_text(sx + 5, yp, "HOLD", DIM_TEXT)
         game.fill_rect(sx + 5, yp + 12, SIDEBAR - 20, 48, BOARD_BG)
         game.draw_rect(sx + 5, yp + 12, SIDEBAR - 20, 48, BORDER)
-        if held:
-            draw_mini_piece(game, held.type, sx + 5 + (SIDEBAR - 20) // 2, yp + 36)
+        if held is not None:
+            draw_mini_piece(game, held.type, sx + 5 + (SIDEBAR - 20) // 2, yp + 36)  # pyright: ignore[reportUnreachable]
 
         # controls
         yp += 70

@@ -4,7 +4,9 @@ pyezgame - Python bindings for GameLib
 A beginner-friendly game development library with simple API for
 window creation, graphics, sprites, sound, input, and more.
 """
+from __future__ import annotations
 
+from pathlib import Path
 from typing import overload
 
 __version__: str
@@ -844,11 +846,8 @@ class GameLib:
 # ===========================================================================
 # Utility Functions
 # ===========================================================================
-from pathlib import Path
-from typing import Union
 
-
-def get_respath(*parts: Union[str, Path]) -> str:
+def get_respath(*parts: str | Path) -> str:
     """Get the absolute POSIX path to a package resource."""
     ...
 
@@ -858,12 +857,12 @@ def get_asset_path(filename: str) -> str:
     ...
 
 
-def clamp(value, lo, hi):
+def clamp(value: int, lo: int, hi: int) -> int:
     """Clamp *value* into ``[lo, hi]``."""
     ...
 
 
-def safe_dt(game, max_dt: float = 0.05) -> float:
+def safe_dt(game: GameLib, max_dt: float = 0.05) -> float:
     """Return ``game.get_delta_time()`` capped at *max_dt* seconds."""
     ...
 
