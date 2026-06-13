@@ -367,7 +367,7 @@ def main() -> None:
             for dx, dy in SHAPES[current.type][current.rot]:
                 nx = current.x + dx
                 ny = gy + dy + 1
-                if ny >= ROWS or (ny >= 0 and board[ny][nx] is not None):
+                if nx < 0 or nx >= COLS or ny >= ROWS or (ny >= 0 and board[ny][nx] is not None):
                     ok = False
                     break
             if not ok:
@@ -417,48 +417,29 @@ def main() -> None:
             spawn()
 
     def remove_cleared() -> None:
-        nonlocal clearing, combo, score, lines, level, clear_rows
-        nonlocal notif_text, notif_timer, clear_timer
+        nonlocal clearing, clear_rows
         for row in sorted(clear_rows, reverse=True):
             del board[row]
             board.insert(0, [None] * COLS)
         clear_rows.clear()
         clearing = False
-        # cascade check: after shifting, detect any new full rows
-        full = [r for r in range(ROWS) if all(board[r][c] is not None for c in range(COLS))]
-        if full:
-            clear_rows = full
-            clear_timer = 0.0
-            clearing = True
-            combo += 1
-            n = len(full)
-            base = {1: 100, 2: 300, 3: 500, 4: 800}.get(n, 0)
-            bonus = combo * 50 if combo > 1 else 0
-            score += (base + bonus) * level
-            lines += n
-            level = lines // 10 + 1
-            if n == 4:
-                notif_text = "QUAD!"
-                notif_timer = 1.5
-            elif combo >= 3:
-                notif_text = f"COMBO x{combo}"
-                notif_timer = 1.5
-            return
         spawn()
 
     def do_hold() -> None:
-        nonlocal current, held, can_hold
+        nonlocal current, held, can_hold, is_locking, lock_timer
         assert current is not None
         if not can_hold:
             return
         can_hold = False
+        is_locking = False
+        lock_timer = 0.0
         if held is None:
             held = Piece(current.type, 0, 3, 0, current.colors)
             spawn()
         else:
             old = held.type
             held = Piece(current.type, 0, 3, 0, current.colors)
-            current = Piece(old, 0, 3, 0, held.colors)
+            current = Piece(old, 0, 3, 0, PIECE_COLORS[old])
 
     def reset() -> None:
         nonlocal board, current, next_piece, held, can_hold
@@ -557,7 +538,7 @@ def main() -> None:
             if game.is_key_pressed(g.KEY_SPACE) and not clearing:
                 hard_drop()
 
-            if game.is_key_pressed(g.KEY_C):
+            if game.is_key_pressed(g.KEY_C) and not clearing:
                 do_hold()
 
         # --- Update ---
