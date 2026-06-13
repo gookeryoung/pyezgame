@@ -6,6 +6,7 @@ Tab key to switch between two modes:
 Learn: create_sprite, set_sprite_pixel, draw_sprite, draw_sprite_ex, draw_sprite_scaled,
        draw_sprite_frame_scaled, free_sprite, get_delta_time
 """
+
 import pyezgame as g
 
 
@@ -255,9 +256,9 @@ def main() -> None:
 
             # Character
             frame_index = char_dir * 3 + char_frame
-            game.draw_sprite_frame_scaled(char_sheet, int(px), int(py),
-                                          fw, fh, frame_index,
-                                          fw * char_scale, fh * char_scale)
+            game.draw_sprite_frame_scaled(
+                char_sheet, int(px), int(py), fw, fh, frame_index, fw * char_scale, fh * char_scale
+            )
 
             # Sheet preview (top right)
             game.draw_text(470, 10, "Sprite Sheet:", g.COLOR_WHITE)
@@ -265,8 +266,13 @@ def main() -> None:
             pv_x, pv_y = 470, 25
             game.draw_sprite_scaled(char_sheet, pv_x, pv_y, fw * 3 * pv_scale, fh * 4 * pv_scale)
             game.draw_rect(pv_x, pv_y, fw * 3 * pv_scale, fh * 4 * pv_scale, g.COLOR_GRAY)
-            game.draw_rect(pv_x + char_frame * fw * pv_scale, pv_y + char_dir * fh * pv_scale,
-                           fw * pv_scale, fh * pv_scale, g.COLOR_YELLOW)
+            game.draw_rect(
+                pv_x + char_frame * fw * pv_scale,
+                pv_y + char_dir * fh * pv_scale,
+                fw * pv_scale,
+                fh * pv_scale,
+                g.COLOR_YELLOW,
+            )
 
             dir_names = ["Down", "Left", "Right", "Up"]
             game.draw_text(10, 10, "WASD / Arrow keys to move", g.COLOR_WHITE)

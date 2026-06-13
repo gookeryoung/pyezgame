@@ -1,17 +1,15 @@
 from pathlib import Path
+from typing import Union
 
 ROOT_PATH = Path(__file__).parent
 
-def get_respath(resource: str) -> Path:
-    """Get the absolute path to a resource.
+def get_respath(*parts: Union[str, Path]) -> str:
+    """Get the absolute path to a resource (POSIX format).
 
     Args:
-        resource (str): The name of the resource.
+        *parts: Path components relative to the package root.
 
     Returns:
-        Path: The absolute path to the resource.
+        str: The absolute POSIX path to the resource.
     """
-    resource_path = ROOT_PATH / resource
-    if resource_path.exists():
-        return resource_path.as_posix()
-    return resource_path.as_posix()
+    return (ROOT_PATH / Path(*parts)).as_posix()

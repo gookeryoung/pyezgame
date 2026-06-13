@@ -3,6 +3,7 @@
 The simplest GameLib program: create a window and display text.
 Learn: open, clear, draw_text, draw_text_scale, update, wait_frame, is_closed
 """
+
 import pyezgame as g
 
 

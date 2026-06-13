@@ -4,6 +4,7 @@ Demo GameLib sound features: beep, multi-channel WAV, background music.
 Learn: play_beep, play_wav, stop_wav, is_playing, set_volume, stop_all,
        set_master_volume, get_master_volume, play_music, stop_music
 """
+
 import os
 
 import pyezgame as g
@@ -31,10 +32,8 @@ def main() -> None:
 
     last_wav_channel = -1
     last_music_ok = True
-    wav_effect = choose_existing_path("../clib/assets/sound/explosion.wav",
-                                      "assets/sound/explosion.wav")
-    music_file = choose_existing_path("../clib/assets/music/battle1.mid",
-                                      "assets/music/battle1.mid")
+    wav_effect = choose_existing_path("../clib/assets/sound/explosion.wav", "assets/sound/explosion.wav")
+    music_file = choose_existing_path("../clib/assets/music/battle1.mid", "assets/music/battle1.mid")
     music_label = "Background Music (MCI MIDI):"
     music_hint = "(uses assets/music/battle1.mid via MCI sequencer)"
 
@@ -56,8 +55,7 @@ def main() -> None:
         game.draw_text(40, 85, "Non-blocking, returns channel ID", g.COLOR_GREEN)
 
         active_note = -1
-        key_map = [g.KEY_1, g.KEY_2, g.KEY_3, g.KEY_4,
-                   g.KEY_5, g.KEY_6, g.KEY_7, g.KEY_8]
+        key_map = [g.KEY_1, g.KEY_2, g.KEY_3, g.KEY_4, g.KEY_5, g.KEY_6, g.KEY_7, g.KEY_8]
         for i in range(8):
             bx = 40 + i * 70
             by = 105
@@ -113,8 +111,7 @@ def main() -> None:
 
         music_playing = game.is_music_playing()
 
-        game.fill_rect(40, 400, 200, 30,
-                        g.COLOR_DARK_GREEN if music_playing else g.COLOR_GREEN)
+        game.fill_rect(40, 400, 200, 30, g.COLOR_DARK_GREEN if music_playing else g.COLOR_GREEN)
         game.draw_text(55, 408, "M - Play Music", g.COLOR_BLACK)
         if game.is_key_pressed(g.KEY_M) and not music_playing:
             last_music_ok = game.play_music(music_file)

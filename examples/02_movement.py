@@ -6,6 +6,7 @@ Two modes (press TAB to switch):
 Learn: is_key_down, fill_rect, fill_circle, draw_circle, draw_printf,
        get_fps, get_delta_time, float physics, wall collision
 """
+
 import pyezgame as g
 
 
@@ -97,12 +98,12 @@ def main() -> None:
             game.fill_circle(int(ball_x), int(ball_y), ball_r, g.COLOR_RED)
             game.draw_circle(int(ball_x), int(ball_y), ball_r, g.COLOR_WHITE)
             game.draw_text(10, 10, "Mode B: Bouncing Ball", g.COLOR_WHITE)
-            game.draw_printf(10, 25, g.COLOR_GRAY,
-                             f"Ball: {ball_x:.0f}, {ball_y:.0f}  Speed: {ball_vx:.0f}, {ball_vy:.0f}")
+            game.draw_printf(
+                10, 25, g.COLOR_GRAY, f"Ball: {ball_x:.0f}, {ball_y:.0f}  Speed: {ball_vx:.0f}, {ball_vy:.0f}"
+            )
 
         # Common HUD
-        game.draw_printf(10, 460, g.COLOR_LIGHT_GRAY,
-                         f"FPS: {game.get_fps():.0f}  |  TAB: Switch Mode  |  ESC: Quit")
+        game.draw_printf(10, 460, g.COLOR_LIGHT_GRAY, f"FPS: {game.get_fps():.0f}  |  TAB: Switch Mode  |  ESC: Quit")
 
         game.update()
         game.wait_frame(60)

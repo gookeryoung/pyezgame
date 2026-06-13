@@ -6,6 +6,7 @@ Learn: set_pixel, draw_line, draw_rect, fill_rect, draw_circle,
        fill_circle, draw_ellipse, fill_ellipse, draw_triangle,
        fill_triangle, COLOR_ARGB
 """
+
 import math
 
 import pyezgame as g
@@ -45,15 +46,11 @@ def main() -> None:
         for py_ in range(88):
             for px in range(88):
                 if ((px + py_) % 11) == 0:
-                    game.set_pixel(20 + px, 62 + py_,
-                                   g.COLOR_RGB(80 + (px * 2) % 175,
-                                               80 + (py_ * 2) % 175,
-                                               220))
+                    game.set_pixel(20 + px, 62 + py_, g.COLOR_RGB(80 + (px * 2) % 175, 80 + (py_ * 2) % 175, 220))
         game.fill_rect(120, 62, 76, 88, g.COLOR_RGB(18, 22, 30))
         for i in range(10):
             y = 70 + i * 7
-            game.draw_line(124, 106 + swing // 2, 188, y,
-                           g.COLOR_ARGB(255, 255 - i * 18, 90 + i * 12, 80 + i * 10))
+            game.draw_line(124, 106 + swing // 2, 188, y, g.COLOR_ARGB(255, 255 - i * 18, 90 + i * 12, 80 + i * 10))
         game.draw_line(124, 146, 188, 76, g.COLOR_ARGB(110, 255, 255, 255))
         game.draw_text(26, 162, "SetPixel pattern", g.COLOR_LIGHT_GRAY)
         game.draw_text(26, 174, "DrawLine fan", g.COLOR_LIGHT_GRAY)

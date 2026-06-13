@@ -839,3 +839,40 @@ class GameLib:
     def distance(x1: int, y1: int, x2: int, y2: int) -> float:
         """Calculate distance between two points."""
         ...
+
+
+# ===========================================================================
+# Utility Functions
+# ===========================================================================
+from pathlib import Path
+from typing import Union
+
+
+def get_respath(*parts: Union[str, Path]) -> str:
+    """Get the absolute POSIX path to a package resource."""
+    ...
+
+
+def get_asset_path(filename: str) -> str:
+    """Get the absolute POSIX path to a file inside clib/assets/."""
+    ...
+
+
+def clamp(value, lo, hi):
+    """Clamp *value* into ``[lo, hi]``."""
+    ...
+
+
+def safe_dt(game, max_dt: float = 0.05) -> float:
+    """Return ``game.get_delta_time()`` capped at *max_dt* seconds."""
+    ...
+
+
+def draw_checkerboard(game: GameLib, x: int, y: int, w: int, h: int, cell: int) -> None:
+    """Draw a checkerboard pattern inside the rectangle (*x*, *y*, *w*, *h*)."""
+    ...
+
+
+def draw_panel(game: GameLib, x: int, y: int, w: int, h: int, title: str) -> None:
+    """Draw a panel with a title bar."""
+    ...

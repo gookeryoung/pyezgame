@@ -3,6 +3,7 @@
 A simple paint program: draw with mouse, change color/brush/clear with keyboard.
 Learn: get_mouse_x/y, is_mouse_down, is_mouse_released, get_mouse_wheel_delta, is_active
 """
+
 import pyezgame as g
 
 
@@ -11,8 +12,14 @@ def main() -> None:
     game.open(640, 480, "04 - Paint", True, True)
 
     palette = [
-        g.COLOR_WHITE, g.COLOR_RED, g.COLOR_GREEN, g.COLOR_BLUE,
-        g.COLOR_YELLOW, g.COLOR_CYAN, g.COLOR_ORANGE, g.COLOR_PINK,
+        g.COLOR_WHITE,
+        g.COLOR_RED,
+        g.COLOR_GREEN,
+        g.COLOR_BLUE,
+        g.COLOR_YELLOW,
+        g.COLOR_CYAN,
+        g.COLOR_ORANGE,
+        g.COLOR_PINK,
     ]
     color_index = 0
     brush_size = 4
@@ -26,8 +33,7 @@ def main() -> None:
         wheel_steps = game.get_mouse_wheel_delta() // 120
 
         # Switch color: 1-8 number keys
-        key_map = [g.KEY_1, g.KEY_2, g.KEY_3, g.KEY_4,
-                   g.KEY_5, g.KEY_6, g.KEY_7, g.KEY_8]
+        key_map = [g.KEY_1, g.KEY_2, g.KEY_3, g.KEY_4, g.KEY_5, g.KEY_6, g.KEY_7, g.KEY_8]
         for i, key in enumerate(key_map):
             if game.is_key_pressed(key):
                 color_index = i

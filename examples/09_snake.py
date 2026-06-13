@@ -5,6 +5,7 @@ game over if you hit the wall or yourself.
 Learn: draw_grid, fill_cell, is_key_pressed, game state machine, timed movement,
        load_sprite, draw_sprite_scaled, play_wav
 """
+
 import os
 
 import pyezgame as g
@@ -15,8 +16,6 @@ GRID_ROWS = 20
 GRID_COLS = 20
 CELL_SIZE = 22
 MAX_SNAKE = 400
-
-
 
 
 def main() -> None:
@@ -103,7 +102,7 @@ def main() -> None:
                             game.play_wav(game_over_sfx, 1, 1000)
 
                     if not game_over:
-                        ate = (head_r == food_r and head_c == food_c)
+                        ate = head_r == food_r and head_c == food_c
 
                         if not ate:
                             # Move: shift body, drop tail
@@ -146,7 +145,12 @@ def main() -> None:
             fx = grid_x + food_c * CELL_SIZE + 1
             fy = grid_y + food_r * CELL_SIZE + 1
             game.draw_sprite_scaled(
-                spr_food, fx, fy, CELL_SIZE - 2, CELL_SIZE - 2, g.SPRITE_COLORKEY,
+                spr_food,
+                fx,
+                fy,
+                CELL_SIZE - 2,
+                CELL_SIZE - 2,
+                g.SPRITE_COLORKEY,
             )
         else:
             game.fill_cell(grid_x, grid_y, food_r, food_c, CELL_SIZE, g.COLOR_RED)
@@ -169,10 +173,8 @@ def main() -> None:
         game.draw_text(info_x, 172, "P: Pause", g.COLOR_LIGHT_GRAY)
 
         if paused and not game_over:
-            game.fill_rect(grid_x + grid_w // 2 - 50, grid_y + grid_h // 2 - 15,
-                           100, 30, g.COLOR_DARK_GRAY)
-            game.draw_text(grid_x + grid_w // 2 - 30, grid_y + grid_h // 2 - 7,
-                           "PAUSED", g.COLOR_YELLOW)
+            game.fill_rect(grid_x + grid_w // 2 - 50, grid_y + grid_h // 2 - 15, 100, 30, g.COLOR_DARK_GRAY)
+            game.draw_text(grid_x + grid_w // 2 - 30, grid_y + grid_h // 2 - 7, "PAUSED", g.COLOR_YELLOW)
 
         if game_over:
             cx = grid_x + grid_w // 2

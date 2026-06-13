@@ -3,6 +3,7 @@
 Classic Breakout: bounce the ball with paddle, destroy all bricks to win.
 Learn: in-depth collision detection, multi-object management, game state
 """
+
 import os
 
 import pyezgame as g
@@ -51,8 +52,7 @@ def main() -> None:
     game_over_sfx = choose_existing_path("../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav")
     win_sfx = choose_existing_path("../clib/assets/sound/victory.wav", "assets/sound/victory.wav")
 
-    brick_colors = [g.COLOR_RED, g.COLOR_ORANGE, g.COLOR_YELLOW,
-                    g.COLOR_GREEN, g.COLOR_CYAN, g.COLOR_PURPLE]
+    brick_colors = [g.COLOR_RED, g.COLOR_ORANGE, g.COLOR_YELLOW, g.COLOR_GREEN, g.COLOR_CYAN, g.COLOR_PURPLE]
 
     pad_w, pad_h = 80, 12
     pad_x, pad_y = 280, 450
@@ -117,9 +117,12 @@ def main() -> None:
                         sfx_to_play = lose_life_sfx
 
                 # Paddle collision
-                if (ball_vy > 0 and
-                        ball_x + ball_r > pad_x and ball_x - ball_r < pad_x + pad_w and
-                        pad_y <= ball_y + ball_r <= pad_y + pad_h + 4):
+                if (
+                    ball_vy > 0
+                    and ball_x + ball_r > pad_x
+                    and ball_x - ball_r < pad_x + pad_w
+                    and pad_y <= ball_y + ball_r <= pad_y + pad_h + 4
+                ):
                     ball_vy = -ball_vy
                     ball_y = float(pad_y - ball_r)
                     hit_pos = (ball_x - pad_x) / pad_w
@@ -138,8 +141,12 @@ def main() -> None:
                         bx = BRICK_OFFSET_X + c * (BRICK_W + BRICK_GAP)
                         by = BRICK_OFFSET_Y + r * (BRICK_H + BRICK_GAP)
 
-                        if (ball_x + ball_r > bx and ball_x - ball_r < bx + BRICK_W and
-                                ball_y + ball_r > by and ball_y - ball_r < by + BRICK_H):
+                        if (
+                            ball_x + ball_r > bx
+                            and ball_x - ball_r < bx + BRICK_W
+                            and ball_y + ball_r > by
+                            and ball_y - ball_r < by + BRICK_H
+                        ):
                             bricks[r][c] = False
                             total_bricks -= 1
                             score += 10 * (BRICK_ROWS - r)
