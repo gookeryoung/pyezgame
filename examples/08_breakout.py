@@ -19,38 +19,24 @@ BRICK_OFFSET_X = 12
 BRICK_OFFSET_Y = 50
 
 
-def choose_existing_path(path_a, path_b):
-    if os.path.isfile(path_a):
-        return path_a
-    if os.path.isfile(path_b):
-        return path_b
-    abs_a = os.path.join(SCRIPT_DIR, path_a)
-    abs_b = os.path.join(SCRIPT_DIR, path_b)
-    if os.path.isfile(abs_a):
-        return abs_a
-    if os.path.isfile(abs_b):
-        return abs_b
-    return path_a
-
-
 def main() -> None:
     game = g.GameLib()
-    game.open(640, 480, "08 - Breakout", True)
+    _ = game.open(640, 480, "08 - Breakout", True)
 
-    launch_sfx = choose_existing_path("../clib/assets/sound/jump.wav", "assets/sound/jump.wav")
-    bounce_sfx = choose_existing_path("../clib/assets/sound/hit.wav", "assets/sound/hit.wav")
+    launch_sfx = g.get_respath("../clib/assets/sound/jump.wav")
+    bounce_sfx = g.get_respath("../clib/assets/sound/hit.wav")
     brick_row_sfx = [
-        choose_existing_path("../clib/assets/sound/note_do_high.wav", "assets/sound/note_do_high.wav"),
-        choose_existing_path("../clib/assets/sound/note_si.wav", "assets/sound/note_si.wav"),
-        choose_existing_path("../clib/assets/sound/note_la.wav", "assets/sound/note_la.wav"),
-        choose_existing_path("../clib/assets/sound/note_sol.wav", "assets/sound/note_sol.wav"),
-        choose_existing_path("../clib/assets/sound/note_fa.wav", "assets/sound/note_fa.wav"),
-        choose_existing_path("../clib/assets/sound/note_mi.wav", "assets/sound/note_mi.wav"),
+        g.get_respath("../clib/assets/sound/note_do_high.wav"),
+        g.get_respath("../clib/assets/sound/note_si.wav"),
+        g.get_respath("../clib/assets/sound/note_la.wav"),
+        g.get_respath("../clib/assets/sound/note_sol.wav"),
+        g.get_respath("../clib/assets/sound/note_fa.wav"),
+        g.get_respath("../clib/assets/sound/note_mi.wav"),
     ]
-    lose_life_sfx = choose_existing_path("../clib/assets/sound/explosion.wav", "assets/sound/explosion.wav")
-    restart_sfx = choose_existing_path("../clib/assets/sound/click.wav", "assets/sound/click.wav")
-    game_over_sfx = choose_existing_path("../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav")
-    win_sfx = choose_existing_path("../clib/assets/sound/victory.wav", "assets/sound/victory.wav")
+    lose_life_sfx = g.get_respath("../clib/assets/sound/explosion.wav")
+    restart_sfx = g.get_respath("../clib/assets/sound/click.wav")
+    game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
+    win_sfx = g.get_respath("../clib/assets/sound/victory.wav")
 
     brick_colors = [g.COLOR_RED, g.COLOR_ORANGE, g.COLOR_YELLOW, g.COLOR_GREEN, g.COLOR_CYAN, g.COLOR_PURPLE]
 

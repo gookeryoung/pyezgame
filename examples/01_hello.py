@@ -9,7 +9,7 @@ import pyezgame as g
 
 def main() -> None:
     game = g.GameLib()
-    game.open(640, 480, "01 - Hello World", True)
+    _ = game.open(640, 480, "01 - Hello World", True)
 
     while not game.is_closed():
         game.clear(g.COLOR_DARK_BLUE)

@@ -12,28 +12,14 @@ import pyezgame as g
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-def choose_existing_path(path_a, path_b):
-    if os.path.isfile(path_a):
-        return path_a
-    if os.path.isfile(path_b):
-        return path_b
-    abs_a = os.path.join(SCRIPT_DIR, path_a)
-    abs_b = os.path.join(SCRIPT_DIR, path_b)
-    if os.path.isfile(abs_a):
-        return abs_a
-    if os.path.isfile(abs_b):
-        return abs_b
-    return path_a
-
-
 def main() -> None:
     game = g.GameLib()
-    game.open(640, 480, "06 - Sound Demo", True)
+    _ = game.open(640, 480, "06 - Sound Demo", True)
 
     last_wav_channel = -1
     last_music_ok = True
-    wav_effect = choose_existing_path("../clib/assets/sound/explosion.wav", "assets/sound/explosion.wav")
-    music_file = choose_existing_path("../clib/assets/music/battle1.mid", "assets/music/battle1.mid")
+    wav_effect = g.get_respath("../clib/assets/sound/explosion.wav")
+    music_file = g.get_respath("../clib/assets/music/battle1.mid")
     music_label = "Background Music (MCI MIDI):"
     music_hint = "(uses assets/music/battle1.mid via MCI sequencer)"
 

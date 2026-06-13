@@ -15,20 +15,6 @@ MAX_BULLETS = 30
 MAX_ENEMIES = 15
 
 
-def choose_existing_path(path_a, path_b):
-    if os.path.isfile(path_a):
-        return path_a
-    if os.path.isfile(path_b):
-        return path_b
-    abs_a = os.path.join(SCRIPT_DIR, path_a)
-    abs_b = os.path.join(SCRIPT_DIR, path_b)
-    if os.path.isfile(abs_a):
-        return abs_a
-    if os.path.isfile(abs_b):
-        return abs_b
-    return path_a
-
-
 class Bullet:
     def __init__(self) -> None:
         self.x = 0
@@ -54,23 +40,14 @@ class Explosion:
 
 def main() -> None:
     game = g.GameLib()
-    game.open(640, 480, "07 - Shooting Stars", True)
+    _ = game.open(640, 480, "07 - Shooting Stars", True)
 
     # Load sprite assets
-    player_path = choose_existing_path(
-        "../clib/assets/player_ship.png",
-        "assets/player_ship.png",
-    )
-    enemy_path = choose_existing_path(
-        "../clib/assets/enemy_ship.png",
-        "assets/enemy_ship.png",
-    )
-    bullet_path = choose_existing_path("../clib/assets/bullet.png", "assets/bullet.png")
-    explosion_path = choose_existing_path(
-        "../clib/assets/explosion.png",
-        "assets/explosion.png",
-    )
-    star_path = choose_existing_path("../clib/assets/star.png", "assets/star.png")
+    player_path = g.get_respath("../clib/assets/player_ship.png")
+    enemy_path = g.get_respath("../clib/assets/enemy_ship.png")
+    bullet_path = g.get_respath("../clib/assets/bullet.png")
+    explosion_path = g.get_respath("../clib/assets/explosion.png")
+    star_path = g.get_respath("../clib/assets/star.png")
 
     spr_player = game.load_sprite(player_path)
     spr_enemy = game.load_sprite(enemy_path)
@@ -79,16 +56,10 @@ def main() -> None:
     spr_star = game.load_sprite(star_path)
 
     # Load sound assets
-    shoot_sfx = choose_existing_path(
-        "../clib/assets/sound/click.wav",
-        "assets/sound/click.wav",
-    )
-    hit_sfx = choose_existing_path("../clib/assets/sound/hit.wav", "assets/sound/hit.wav")
-    coin_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
-    game_over_sfx = choose_existing_path(
-        "../clib/assets/sound/game_over.wav",
-        "assets/sound/game_over.wav",
-    )
+    shoot_sfx = g.get_respath("../clib/assets/sound/click.wav")
+    hit_sfx = g.get_respath("../clib/assets/sound/hit.wav")
+    coin_sfx = g.get_respath("../clib/assets/sound/coin.wav")
+    game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
 
     # Player ship
     ship_x, ship_y = 300, 420

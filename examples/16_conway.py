@@ -4,6 +4,7 @@ A cellular automaton where cells live or die based on their neighbours.
 Click to toggle cells, press SPACE to step, P to pause, R to reset.
 Learn: draw_grid, fill_cell, mouse input, game state, timer-based updates
 """
+
 from __future__ import annotations
 
 import pyezgame as g

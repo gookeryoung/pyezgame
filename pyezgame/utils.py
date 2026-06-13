@@ -3,6 +3,7 @@ from typing import Union
 
 ROOT_PATH = Path(__file__).parent
 
+
 def get_respath(*parts: Union[str, Path]) -> str:
     """Get the absolute path to a resource (POSIX format).
 

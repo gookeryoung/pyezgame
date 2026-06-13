@@ -12,6 +12,7 @@ Controls:
 Learn: draw_sprite_scaled, draw_sprite_frame_scaled, draw_sprite_rotated,
        draw_sprite_frame_rotated, set_sprite_color_key, SPRITE_COLORKEY
 """
+
 import pyezgame as g
 
 
@@ -175,8 +176,7 @@ def main() -> None:
             game.fill_rect(0, 0, SW, 56, g.COLOR_RGB(10, 14, 24))
             game.draw_text(20, 8, "MODE A: SCALING", g.COLOR_CYAN)
             game.draw_text(20, 24, "Wheel/Q/E scale  A/D frame  F flip  R reset  TAB switch  ESC quit", g.COLOR_WHITE)
-            game.draw_printf(20, 40, g.COLOR_LIGHT_GRAY,
-                             f"Scale: {scale}x   Frame: {frame}   Flip: {flip_text}")
+            game.draw_printf(20, 40, g.COLOR_LIGHT_GRAY, f"Scale: {scale}x   Frame: {frame}   Flip: {flip_text}")
 
             # Source panel
             draw_panel(game, 20, 66, 200, 494, "Source Sprites")
@@ -197,24 +197,21 @@ def main() -> None:
             game.draw_text(256, 98, "Scaled ship", g.COLOR_LIGHT_GRAY)
             draw_checkerboard(game, 256, 116, 280, 160, 10)
             game.draw_rect(256, 116, 280, 160, g.COLOR_RGB(98, 110, 138))
-            game.draw_sprite_scaled(ship,
-                                    256 + (280 - 17 * scale) // 2,
-                                    116 + (160 - 17 * scale) // 2,
-                                    17 * scale, 17 * scale, flags)
+            game.draw_sprite_scaled(
+                ship, 256 + (280 - 17 * scale) // 2, 116 + (160 - 17 * scale) // 2, 17 * scale, 17 * scale, flags
+            )
             game.draw_printf(256, 282, g.COLOR_WHITE, f"17x17 -> {17 * scale}x{17 * scale}")
 
             game.draw_text(560, 98, "Wide stretch", g.COLOR_LIGHT_GRAY)
             draw_checkerboard(game, 560, 116, 120, 72, 10)
             game.draw_rect(560, 116, 120, 72, g.COLOR_RGB(98, 110, 138))
-            game.draw_sprite_scaled(ship, 560 + (120 - 96) // 2, 116 + (72 - 48) // 2,
-                                    96, 48, flags)
+            game.draw_sprite_scaled(ship, 560 + (120 - 96) // 2, 116 + (72 - 48) // 2, 96, 48, flags)
             game.draw_text(560, 196, "96x48", g.COLOR_GRAY)
 
             game.draw_text(700, 98, "Tall stretch", g.COLOR_LIGHT_GRAY)
             draw_checkerboard(game, 700, 116, 120, 160, 10)
             game.draw_rect(700, 116, 120, 160, g.COLOR_RGB(98, 110, 138))
-            game.draw_sprite_scaled(ship, 700 + (120 - 48) // 2, 116 + (160 - 120) // 2,
-                                    48, 120, flags)
+            game.draw_sprite_scaled(ship, 700 + (120 - 48) // 2, 116 + (160 - 120) // 2, 48, 120, flags)
             game.draw_text(700, 282, "48x120", g.COLOR_GRAY)
 
             # Frame scaling panel
@@ -229,11 +226,17 @@ def main() -> None:
             game.draw_text(460, 342, "Current frame scaled", g.COLOR_LIGHT_GRAY)
             draw_checkerboard(game, 460, 360, 360, 180, 10)
             game.draw_rect(460, 360, 360, 180, g.COLOR_RGB(98, 110, 138))
-            game.draw_sprite_frame_scaled(pulse,
-                                          460 + (360 - 16 * scale) // 2,
-                                          360 + (180 - 16 * scale) // 2,
-                                          16, 16, frame,
-                                          16 * scale, 16 * scale, flags)
+            game.draw_sprite_frame_scaled(
+                pulse,
+                460 + (360 - 16 * scale) // 2,
+                360 + (180 - 16 * scale) // 2,
+                16,
+                16,
+                frame,
+                16 * scale,
+                16 * scale,
+                flags,
+            )
             game.draw_printf(460, 546, g.COLOR_WHITE, f"16x16 -> {16 * scale}x{16 * scale}")
 
         else:
@@ -261,7 +264,10 @@ def main() -> None:
             game.fill_rect(0, 0, SW, 56, g.COLOR_RGB(10, 14, 24))
             game.draw_text(20, 8, "MODE B: ROTATION", g.COLOR_CYAN)
             game.draw_text(
-                20, 24, "Wheel/Q/E speed  A/D frame  F flip  SPACE pause  R reset  TAB switch  ESC quit", g.COLOR_WHITE,
+                20,
+                24,
+                "Wheel/Q/E speed  A/D frame  F flip  SPACE pause  R reset  TAB switch  ESC quit",
+                g.COLOR_WHITE,
             )
             game.draw_printf(
                 20,
@@ -293,9 +299,13 @@ def main() -> None:
             game.draw_text(256, 282, "Animated", g.COLOR_LIGHT_GRAY)
 
             # Static angle examples
-            static_angles = [(480, 96, "0 deg", 0.0), (580, 96, "45 deg", 45.0),
-                             (700, 96, "90 deg", 90.0), (530, 198, "135 deg", 135.0),
-                             (650, 198, "180 deg", 180.0)]
+            static_angles = [
+                (480, 96, "0 deg", 0.0),
+                (580, 96, "45 deg", 45.0),
+                (700, 96, "90 deg", 90.0),
+                (530, 198, "135 deg", 135.0),
+                (650, 198, "180 deg", 180.0),
+            ]
             for sx, sy, label, a in static_angles:
                 draw_checkerboard(game, sx, sy, 80, 80, 10)
                 game.draw_rect(sx, sy, 80, 80, g.COLOR_RGB(98, 110, 138))
@@ -317,8 +327,7 @@ def main() -> None:
                 draw_checkerboard(game, bx, by, 80, 72, 10)
                 game.draw_rect(bx, by, 80, 72, g.COLOR_RGB(98, 110, 138))
                 draw_crosshair(game, bx + 40, by + 36, 10, g.COLOR_RGB(120, 138, 168))
-                game.draw_sprite_frame_rotated(pulse, bx + 40, by + 36,
-                                               16, 16, i, angle + i * 30.0, flags)
+                game.draw_sprite_frame_rotated(pulse, bx + 40, by + 36, 16, 16, i, angle + i * 30.0, flags)
                 game.draw_printf(bx, by + 76, g.COLOR_GRAY, f"Frame {i}")
 
             hlx = 460 + frame * 100

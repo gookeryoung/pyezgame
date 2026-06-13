@@ -11,6 +11,7 @@ Controls:
 Learn: button, checkbox, radio_box, toggle_button,
        release-trigger UI, built-in 8x8 UI labels
 """
+
 import pyezgame as g
 
 
@@ -125,23 +126,19 @@ def main() -> None:
         game.draw_text(448, 336, "Circle + dot", g.COLOR_WHITE)
         game.draw_text(448, 352, "instead of box.", g.COLOR_LIGHT_GRAY)
 
-        triggered, paused = game.toggle_button(652, 116, 144, 32, "PAUSE", paused,
-                                                g.COLOR_RGB(180, 76, 76))
+        triggered, paused = game.toggle_button(652, 116, 144, 32, "PAUSE", paused, g.COLOR_RGB(180, 76, 76))
         if triggered:
             last_event = "PAUSED" if paused else "RESUME"
-        triggered, turbo = game.toggle_button(652, 160, 144, 32, "TURBO", turbo,
-                                               g.COLOR_RGB(52, 150, 92))
+        triggered, turbo = game.toggle_button(652, 160, 144, 32, "TURBO", turbo, g.COLOR_RGB(52, 150, 92))
         if triggered:
             last_event = "TURBO ON" if turbo else "TURBO OFF"
 
         game.draw_text(652, 216, "Toggled=ON shows", g.COLOR_WHITE)
         game.draw_text(652, 232, "sunken bevel.", g.COLOR_LIGHT_GRAY)
         game.draw_text(652, 264, "PAUSED:", g.COLOR_WHITE)
-        game.draw_text(652, 280, "YES" if paused else "NO",
-                        g.COLOR_YELLOW if paused else g.COLOR_LIGHT_GRAY)
+        game.draw_text(652, 280, "YES" if paused else "NO", g.COLOR_YELLOW if paused else g.COLOR_LIGHT_GRAY)
         game.draw_text(652, 312, "TURBO:", g.COLOR_WHITE)
-        game.draw_text(652, 328, "YES" if turbo else "NO",
-                        g.COLOR_YELLOW if turbo else g.COLOR_LIGHT_GRAY)
+        game.draw_text(652, 328, "YES" if turbo else "NO", g.COLOR_YELLOW if turbo else g.COLOR_LIGHT_GRAY)
 
         game.draw_text(856, 116, "LAST EVENT", g.COLOR_WHITE)
         game.draw_text(856, 136, last_event, g.COLOR_YELLOW)

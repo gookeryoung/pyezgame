@@ -6,11 +6,7 @@ Learn: draw_grid, fill_cell, is_key_pressed, game state machine, timed movement,
        load_sprite, draw_sprite_scaled, play_wav
 """
 
-import os
-
 import pyezgame as g
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 GRID_ROWS = 20
 GRID_COLS = 20
@@ -25,7 +21,7 @@ def main() -> None:
     grid_h = GRID_ROWS * CELL_SIZE
     win_w = grid_w + 160
     win_h = grid_h + 40
-    game.open(win_w, win_h, "09 - Snake", True)
+    _ = game.open(win_w, win_h, "09 - Snake", True)
 
     # Load sprite assets
     food_path = g.get_respath("../clib/assets/fruit_apple.png")

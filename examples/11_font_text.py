@@ -4,6 +4,7 @@ Demonstrates draw_text_font, draw_printf_font, text measurement,
 show_mouse, and show_message.
 Learn: draw_text_font, draw_printf_font, get_text_width_font, show_mouse, show_message
 """
+
 import pyezgame as g
 
 FONT_MONO = "Consolas"
@@ -35,15 +36,11 @@ def main() -> None:
             game.show_mouse(mouse_visible)
         if game.is_key_pressed(g.KEY_M):
             last_message_result = game.show_message(
-                "GameLib now has DrawPrintfFont, ShowMouse and ShowMessage.",
-                "New UI APIs",
-                g.MESSAGEBOX_OK)
+                "GameLib now has DrawPrintfFont, ShowMouse and ShowMessage.", "New UI APIs", g.MESSAGEBOX_OK
+            )
         if game.is_key_pressed(g.KEY_Y):
-            last_message_result = game.show_message(
-                "Show the mouse cursor?",
-                "ShowMessage YES/NO",
-                g.MESSAGEBOX_YESNO)
-            mouse_visible = (last_message_result != g.MESSAGEBOX_RESULT_NO)
+            last_message_result = game.show_message("Show the mouse cursor?", "ShowMessage YES/NO", g.MESSAGEBOX_YESNO)
+            mouse_visible = last_message_result != g.MESSAGEBOX_RESULT_NO
             game.show_mouse(mouse_visible)
         if game.is_key_pressed(g.KEY_ESCAPE):
             break
@@ -52,8 +49,7 @@ def main() -> None:
 
         game.fill_rect(18, 18, 684, 70, g.COLOR_ARGB(215, 34, 42, 56))
         game.draw_rect(18, 18, 684, 70, g.COLOR_LIGHT_GRAY)
-        game.draw_text_font((game.get_width() - title_w) // 2, 32,
-                            "DrawTextFont + DrawPrintfFont", g.COLOR_WHITE, 30)
+        game.draw_text_font((game.get_width() - title_w) // 2, 32, "DrawTextFont + DrawPrintfFont", g.COLOR_WHITE, 30)
         game.draw_text(30, 74, "Built-in text below is ASCII only. Font text can use Unicode.", g.COLOR_LIGHT_GRAY)
 
         game.fill_rect(18, 104, 420, 214, g.COLOR_ARGB(205, 26, 34, 46))
@@ -69,17 +65,14 @@ def main() -> None:
         game.draw_rect(456, 104, 246, 214, g.COLOR_LIGHT_GRAY)
         game.draw_text(466, 114, "DrawPrintfFont", g.COLOR_WHITE)
         game.draw_printf_font(470, 146, g.COLOR_GOLD, 24, f"Score: {score:05d}")
-        game.draw_printf_font(470, 180, g.COLOR_SKY_BLUE, FONT_MONO, 18,
-                              f"Time: {time_sec:5.1f} s")
-        game.draw_printf_font(470, 206, g.COLOR_WHITE, FONT_MONO, 18,
-                              f"FPS: {game.get_fps():5.1f}")
-        game.draw_printf_font(470, 232, g.COLOR_PINK, FONT_MONO, 18,
-                              f"Mouse: {game.get_mouse_x():3d}, {game.get_mouse_y():3d}")
+        game.draw_printf_font(470, 180, g.COLOR_SKY_BLUE, FONT_MONO, 18, f"Time: {time_sec:5.1f} s")
+        game.draw_printf_font(470, 206, g.COLOR_WHITE, FONT_MONO, 18, f"FPS: {game.get_fps():5.1f}")
+        game.draw_printf_font(
+            470, 232, g.COLOR_PINK, FONT_MONO, 18, f"Mouse: {game.get_mouse_x():3d}, {game.get_mouse_y():3d}"
+        )
         cursor_str = "visible" if mouse_visible else "hidden"
-        game.draw_printf_font(470, 258, g.COLOR_LIGHT_GRAY, FONT_MONO, 18,
-                              f"Cursor: {cursor_str}")
-        game.draw_printf_font(470, 284, g.COLOR_LIGHT_GRAY, FONT_MONO, 18,
-                              f"Last dialog: {result_text}")
+        game.draw_printf_font(470, 258, g.COLOR_LIGHT_GRAY, FONT_MONO, 18, f"Cursor: {cursor_str}")
+        game.draw_printf_font(470, 284, g.COLOR_LIGHT_GRAY, FONT_MONO, 18, f"Last dialog: {result_text}")
 
         game.fill_rect(18, 338, 684, 136, g.COLOR_ARGB(205, 28, 36, 48))
         game.draw_rect(18, 338, 684, 136, g.COLOR_LIGHT_GRAY)

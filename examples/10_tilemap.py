@@ -11,6 +11,7 @@ Learn: create_tilemap, fill_tile_rect, clear_tilemap, world_to_tile_col/row,
        get_tile_at_pixel, draw_tilemap, load_sprite, draw_sprite_ex,
        SPRITE_COLORKEY, SPRITE_FLIP_H, parallax scrolling
 """
+
 import os
 
 import pyezgame as g
@@ -33,20 +34,6 @@ BG_CLOUD_L = 1
 BG_CLOUD_R = 2
 BG_HILL_TOP = 3
 BG_HILL = 4
-
-
-def choose_existing_path(path_a, path_b):
-    if os.path.isfile(path_a):
-        return path_a
-    if os.path.isfile(path_b):
-        return path_b
-    abs_a = os.path.join(SCRIPT_DIR, path_a)
-    abs_b = os.path.join(SCRIPT_DIR, path_b)
-    if os.path.isfile(abs_a):
-        return abs_a
-    if os.path.isfile(abs_b):
-        return abs_b
-    return path_a
 
 
 def sprite_fill(game, sid, x0, y0, w, h, c) -> None:
@@ -86,12 +73,12 @@ def make_bg_tileset(game):
 def main() -> None:
     game = g.GameLib()
     SW, SH = 640, 480
-    game.open(SW, SH, "10 - Tilemap Two-Layer Scrolling", True)
+    _ = game.open(SW, SH, "10 - Tilemap Two-Layer Scrolling", True)
     game.show_fps(True)
 
-    tileset_path = choose_existing_path("../clib/assets/tileset.png", "assets/tileset.png")
-    char_path = choose_existing_path("../clib/assets/character.png", "assets/character.png")
-    tree_path = choose_existing_path("../clib/assets/tree.png", "assets/tree.png")
+    tileset_path = g.get_respath("../clib/assets/tileset.png")
+    char_path = g.get_respath("../clib/assets/character.png")
+    tree_path = g.get_respath("../clib/assets/tree.png")
 
     fg_ts = game.load_sprite(tileset_path)
     bg_ts = make_bg_tileset(game)
@@ -120,8 +107,7 @@ def main() -> None:
     for h_start, h_end, h_top in hills:
         hill_cols = h_end - h_start
         game.fill_tile_rect(bg_map, h_start, h_top, hill_cols, 1, BG_HILL_TOP)
-        game.fill_tile_rect(bg_map, h_start, h_top + 1, hill_cols,
-                            bg_rows - (h_top + 1), BG_HILL)
+        game.fill_tile_rect(bg_map, h_start, h_top + 1, hill_cols, bg_rows - (h_top + 1), BG_HILL)
 
     # Fill foreground
     game.clear_tilemap(fg_map)
@@ -186,10 +172,8 @@ def main() -> None:
 
         game.fill_rect(0, 0, 300, 50, g.COLOR_RGB(15, 15, 25))
         game.draw_text(8, 6, "<- -> / A D Move    ESC Quit", g.COLOR_WHITE)
-        game.draw_printf(8, 20, g.COLOR_LIGHT_GRAY,
-                         f"Camera: {cam_x}   World: {fg_world_width}x{fg_world_height}")
-        game.draw_printf(8, 34, g.COLOR_LIGHT_GRAY,
-                         f"Foot tile: ({foot_col},{foot_row}) = {foot_tile}")
+        game.draw_printf(8, 20, g.COLOR_LIGHT_GRAY, f"Camera: {cam_x}   World: {fg_world_width}x{fg_world_height}")
+        game.draw_printf(8, 34, g.COLOR_LIGHT_GRAY, f"Foot tile: ({foot_col},{foot_row}) = {foot_tile}")
 
         if game.is_key_pressed(g.KEY_ESCAPE):
             break

@@ -6,11 +6,10 @@ Features: asset-based player/bullets/explosions, scrolling starfield background,
           scoring, difficulty scaling.
 Learn: comprehensive use of all core GameLib APIs
 """
-import os
+
+from __future__ import annotations
 
 import pyezgame as g
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 W, H = 480, 640
 MAX_STARS = 80
@@ -50,20 +49,6 @@ class EnemyBullet:
     def __init__(self) -> None:
         self.x, self.y, self.vy = 0.0, 0.0, 0.0
         self.active = False
-
-
-def choose_existing_path(a, b):
-    if os.path.isfile(a):
-        return a
-    if os.path.isfile(b):
-        return b
-    abs_a = os.path.join(SCRIPT_DIR, a)
-    abs_b = os.path.join(SCRIPT_DIR, b)
-    if os.path.isfile(abs_a):
-        return abs_a
-    if os.path.isfile(abs_b):
-        return abs_b
-    return a
 
 
 def spawn_explosion(explosions: list[Explosion], x: float, y: float, timer: int) -> None:
@@ -127,17 +112,17 @@ def main() -> None:
     game = g.GameLib()
     game.open(W, H, "14 - Space Shooter", True)
 
-    player_path = choose_existing_path("../clib/assets/plane0.png", "assets/plane0.png")
-    bullet_path = choose_existing_path("../clib/assets/bullet.png", "assets/bullet.png")
-    explosion_path = choose_existing_path("../clib/assets/explosion.png", "assets/explosion.png")
+    player_path = g.get_respath("../clib/assets/plane0.png")
+    bullet_path = g.get_respath("../clib/assets/bullet.png")
+    explosion_path = g.get_respath("../clib/assets/explosion.png")
 
-    shoot_sfx = choose_existing_path("../clib/assets/sound/click.wav", "assets/sound/click.wav")
-    enemy_hit_sfx = choose_existing_path("../clib/assets/sound/hit.wav", "assets/sound/hit.wav")
-    enemy_down_sfx = choose_existing_path("../clib/assets/sound/coin.wav", "assets/sound/coin.wav")
-    level_up_sfx = choose_existing_path("../clib/assets/sound/note_do_high.wav", "assets/sound/note_do_high.wav")
-    player_hit_sfx = choose_existing_path("../clib/assets/sound/explosion.wav", "assets/sound/explosion.wav")
-    game_over_sfx = choose_existing_path("../clib/assets/sound/game_over.wav", "assets/sound/game_over.wav")
-    restart_sfx = choose_existing_path("../clib/assets/sound/click.wav", "assets/sound/click.wav")
+    shoot_sfx = g.get_respath("../clib/assets/sound/click.wav")
+    enemy_hit_sfx = g.get_respath("../clib/assets/sound/hit.wav")
+    enemy_down_sfx = g.get_respath("../clib/assets/sound/coin.wav")
+    level_up_sfx = g.get_respath("../clib/assets/sound/note_do_high.wav")
+    player_hit_sfx = g.get_respath("../clib/assets/sound/explosion.wav")
+    game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
+    restart_sfx = g.get_respath("../clib/assets/sound/click.wav")
 
     spr_player = game.load_sprite(player_path)
     if spr_player >= 0:
@@ -173,9 +158,14 @@ def main() -> None:
     for _ in range(MAX_STARS):
         spd = g.GameLib.random(1, 4)
         b = min(80 + int(spd * 40), 255)
-        stars.append(Star(float(g.GameLib.random(0, W - 1)),
-                          float(g.GameLib.random(0, H - 1)),
-                          float(spd), g.COLOR_RGB(b, b, b)))
+        stars.append(
+            Star(
+                float(g.GameLib.random(0, W - 1)),
+                float(g.GameLib.random(0, H - 1)),
+                float(spd),
+                g.COLOR_RGB(b, b, b),
+            ),
+        )
 
     px = W / 2.0 - player_w / 2.0
     py = H - player_h - 28.0
@@ -288,8 +278,15 @@ def main() -> None:
                     if not e.active:
                         continue
                     if g.GameLib.rect_overlap(
-                            int(b.x), int(b.y), player_bullet_w, player_bullet_h,
-                            int(e.x), int(e.y), enemy_w, enemy_h):
+                        int(b.x),
+                        int(b.y),
+                        player_bullet_w,
+                        player_bullet_h,
+                        int(e.x),
+                        int(e.y),
+                        enemy_w,
+                        enemy_h,
+                    ):
                         b.active = False
                         e.hp -= 1
                         if e.hp <= 0:
@@ -301,9 +298,7 @@ def main() -> None:
                                 level += 1
                                 kill_count = 0
                                 queue_sound(level_up_sfx, 4)
-                            spawn_explosion(explosions,
-                                            e.x + enemy_w / 2.0,
-                                            e.y + enemy_h / 2.0, explosion_life)
+                            spawn_explosion(explosions, e.x + enemy_w / 2.0, e.y + enemy_h / 2.0, explosion_life)
                         else:
                             queue_sound(enemy_hit_sfx, 2)
                         break
@@ -315,8 +310,15 @@ def main() -> None:
                     if not eb.active:
                         continue
                     if g.GameLib.rect_overlap(
-                            int(eb.x), int(eb.y), enemy_bullet_w, enemy_bullet_h,
-                            int(px) + 6, int(py) + 6, player_w - 12, player_h - 12):
+                        int(eb.x),
+                        int(eb.y),
+                        enemy_bullet_w,
+                        enemy_bullet_h,
+                        int(px) + 6,
+                        int(py) + 6,
+                        player_w - 12,
+                        player_h - 12,
+                    ):
                         eb.active = False
                         lives -= 1
                         invincible = 90
@@ -331,8 +333,15 @@ def main() -> None:
                     if not e.active:
                         continue
                     if g.GameLib.rect_overlap(
-                            int(e.x), int(e.y), enemy_w, enemy_h,
-                            int(px) + 6, int(py) + 6, player_w - 12, player_h - 12):
+                        int(e.x),
+                        int(e.y),
+                        enemy_w,
+                        enemy_h,
+                        int(px) + 6,
+                        int(py) + 6,
+                        player_w - 12,
+                        player_h - 12,
+                    ):
                         e.active = False
                         lives -= 1
                         invincible = 90
@@ -385,17 +394,28 @@ def main() -> None:
         for b in bullets:
             if b.active:
                 if spr_bullet >= 0:
-                    game.draw_sprite_scaled(spr_bullet, int(b.x), int(b.y),
-                                            player_bullet_w, player_bullet_h, g.SPRITE_COLORKEY)
+                    game.draw_sprite_scaled(
+                        spr_bullet,
+                        int(b.x),
+                        int(b.y),
+                        player_bullet_w,
+                        player_bullet_h,
+                        g.SPRITE_COLORKEY,
+                    )
                 else:
                     game.fill_rect(int(b.x), int(b.y), player_bullet_w, player_bullet_h, g.COLOR_YELLOW)
 
         for eb in e_bullets:
             if eb.active:
                 if spr_bullet >= 0:
-                    game.draw_sprite_scaled(spr_bullet, int(eb.x), int(eb.y),
-                                            enemy_bullet_w, enemy_bullet_h,
-                                            g.SPRITE_COLORKEY | g.SPRITE_FLIP_V)
+                    game.draw_sprite_scaled(
+                        spr_bullet,
+                        int(eb.x),
+                        int(eb.y),
+                        enemy_bullet_w,
+                        enemy_bullet_h,
+                        g.SPRITE_COLORKEY | g.SPRITE_FLIP_V,
+                    )
                 else:
                     game.fill_rect(int(eb.x), int(eb.y), enemy_bullet_w, enemy_bullet_h, g.COLOR_RED)
 
@@ -409,8 +429,17 @@ def main() -> None:
                 if spr_explosion >= 0:
                     frame = (explosion_life - ex.timer) // 4
                     frame = max(0, min(3, frame))
-                    game.draw_sprite_frame_scaled(spr_explosion, int(ex.x) - 16, int(ex.y) - 16,
-                                                  32, 32, frame, 32, 32, g.SPRITE_COLORKEY)
+                    game.draw_sprite_frame_scaled(
+                        spr_explosion,
+                        int(ex.x) - 16,
+                        int(ex.y) - 16,
+                        32,
+                        32,
+                        frame,
+                        32,
+                        32,
+                        g.SPRITE_COLORKEY,
+                    )
                 else:
                     r = explosion_life - ex.timer + 5
                     if ex.timer > 10:

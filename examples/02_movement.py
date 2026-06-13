@@ -12,7 +12,7 @@ import pyezgame as g
 
 def main() -> None:
     game = g.GameLib()
-    game.open(640, 480, "02 - Movement and Physics", True)
+    _ = game.open(640, 480, "02 - Movement and Physics", True)
 
     # --- Mode A: Keyboard controlled box ---
     box_x, box_y = 310.0, 230.0
@@ -76,8 +76,8 @@ def main() -> None:
             trail_x.append(ball_x)
             trail_y.append(ball_y)
             if len(trail_x) > 64:
-                trail_x.pop(0)
-                trail_y.pop(0)
+                _ = trail_x.pop(0)
+                _ = trail_y.pop(0)
 
         # --- Drawing ---
         game.clear(g.COLOR_BLACK)
@@ -99,7 +99,10 @@ def main() -> None:
             game.draw_circle(int(ball_x), int(ball_y), ball_r, g.COLOR_WHITE)
             game.draw_text(10, 10, "Mode B: Bouncing Ball", g.COLOR_WHITE)
             game.draw_printf(
-                10, 25, g.COLOR_GRAY, f"Ball: {ball_x:.0f}, {ball_y:.0f}  Speed: {ball_vx:.0f}, {ball_vy:.0f}",
+                10,
+                25,
+                g.COLOR_GRAY,
+                f"Ball: {ball_x:.0f}, {ball_y:.0f}  Speed: {ball_vx:.0f}, {ball_vy:.0f}",
             )
 
         # Common HUD

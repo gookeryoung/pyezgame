@@ -4,6 +4,7 @@ pyezgame - Python bindings for GameLib
 A beginner-friendly game development library with simple API for
 window creation, graphics, sprites, sound, input, and more.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -323,9 +324,12 @@ class GameLib:
 
     def draw_triangle(
         self,
-        x1: int, y1: int,
-        x2: int, y2: int,
-        x3: int, y3: int,
+        x1: int,
+        y1: int,
+        x2: int,
+        y2: int,
+        x3: int,
+        y3: int,
         color: int,
     ) -> None:
         """Draw a triangle outline (supports alpha blending)."""
@@ -333,9 +337,12 @@ class GameLib:
 
     def fill_triangle(
         self,
-        x1: int, y1: int,
-        x2: int, y2: int,
-        x3: int, y3: int,
+        x1: int,
+        y1: int,
+        x2: int,
+        y2: int,
+        x3: int,
+        y3: int,
         color: int,
     ) -> None:
         """Fill a triangle using scanline algorithm (supports alpha blending)."""
@@ -352,7 +359,13 @@ class GameLib:
         ...
 
     def draw_text_scale(
-        self, x: int, y: int, text: str, color: int, w: int, h: int,
+        self,
+        x: int,
+        y: int,
+        text: str,
+        color: int,
+        w: int,
+        h: int,
     ) -> None:
         """Draw text with each character scaled to w x h pixels (max 1024)."""
         ...
@@ -366,7 +379,13 @@ class GameLib:
         ...
 
     def draw_printf_scale(
-        self, x: int, y: int, color: int, w: int, h: int, text: str,
+        self,
+        x: int,
+        y: int,
+        color: int,
+        w: int,
+        h: int,
+        text: str,
     ) -> None:
         """Draw pre-formatted text with scaling.
 
@@ -378,14 +397,25 @@ class GameLib:
 
     @overload
     def draw_text_font(
-        self, x: int, y: int, text: str, color: int, font_name: str, font_size: int,
+        self,
+        x: int,
+        y: int,
+        text: str,
+        color: int,
+        font_name: str,
+        font_size: int,
     ) -> None:
         """Draw text with a named font at the given size (supports UTF-8)."""
         ...
 
     @overload
     def draw_text_font(
-        self, x: int, y: int, text: str, color: int, font_size: int,
+        self,
+        x: int,
+        y: int,
+        text: str,
+        color: int,
+        font_size: int,
     ) -> None:
         """Draw text with the default font at the given size (supports UTF-8)."""
         ...
@@ -412,7 +442,13 @@ class GameLib:
 
     @overload
     def draw_printf_font(
-        self, x: int, y: int, color: int, font_name: str, font_size: int, text: str,
+        self,
+        x: int,
+        y: int,
+        color: int,
+        font_name: str,
+        font_size: int,
+        text: str,
     ) -> None:
         """Draw pre-formatted text with a named font.
 
@@ -422,7 +458,12 @@ class GameLib:
 
     @overload
     def draw_printf_font(
-        self, x: int, y: int, color: int, font_size: int, text: str,
+        self,
+        x: int,
+        y: int,
+        color: int,
+        font_size: int,
+        text: str,
     ) -> None:
         """Draw pre-formatted text with the default font.
 
@@ -457,36 +498,63 @@ class GameLib:
         ...
 
     def draw_sprite_region(
-        self, id: int, x: int, y: int, sx: int, sy: int, sw: int, sh: int,
+        self,
+        id: int,
+        x: int,
+        y: int,
+        sx: int,
+        sy: int,
+        sw: int,
+        sh: int,
     ) -> None:
         """Draw a sub-region of a sprite."""
         ...
 
     def draw_sprite_region_ex(
         self,
-        id: int, x: int, y: int,
-        sx: int, sy: int, sw: int, sh: int,
+        id: int,
+        x: int,
+        y: int,
+        sx: int,
+        sy: int,
+        sw: int,
+        sh: int,
         flags: int = 0,
     ) -> None:
         """Draw a sub-region of a sprite with flags."""
         ...
 
     def draw_sprite_scaled(
-        self, id: int, x: int, y: int, w: int, h: int, flags: int = 0,
+        self,
+        id: int,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        flags: int = 0,
     ) -> None:
         """Draw sprite scaled to target size (nearest-neighbor)."""
         ...
 
     def draw_sprite_rotated(
-        self, id: int, cx: int, cy: int, angle_deg: float, flags: int = 0,
+        self,
+        id: int,
+        cx: int,
+        cy: int,
+        angle_deg: float,
+        flags: int = 0,
     ) -> None:
         """Draw sprite rotated around center point (angle_deg > 0 = clockwise)."""
         ...
 
     def draw_sprite_frame(
         self,
-        id: int, x: int, y: int,
-        frame_w: int, frame_h: int, frame_index: int,
+        id: int,
+        x: int,
+        y: int,
+        frame_w: int,
+        frame_h: int,
+        frame_index: int,
         flags: int = 0,
     ) -> None:
         """Draw a single frame from a sprite sheet."""
@@ -494,9 +562,14 @@ class GameLib:
 
     def draw_sprite_frame_scaled(
         self,
-        id: int, x: int, y: int,
-        frame_w: int, frame_h: int, frame_index: int,
-        w: int, h: int,
+        id: int,
+        x: int,
+        y: int,
+        frame_w: int,
+        frame_h: int,
+        frame_index: int,
+        w: int,
+        h: int,
         flags: int = 0,
     ) -> None:
         """Draw a single frame from a sprite sheet, scaled to target size."""
@@ -504,8 +577,12 @@ class GameLib:
 
     def draw_sprite_frame_rotated(
         self,
-        id: int, cx: int, cy: int,
-        frame_w: int, frame_h: int, frame_index: int,
+        id: int,
+        cx: int,
+        cy: int,
+        frame_w: int,
+        frame_h: int,
+        frame_index: int,
         angle_deg: float,
         flags: int = 0,
     ) -> None:
@@ -588,8 +665,12 @@ class GameLib:
 
     def fill_tile_rect(
         self,
-        map_id: int, col: int, row: int,
-        cols: int, rows: int, tile_id: int,
+        map_id: int,
+        col: int,
+        row: int,
+        cols: int,
+        rows: int,
+        tile_id: int,
     ) -> None:
         """Fill a rectangular area of tiles (auto-clipped to map bounds)."""
         ...
@@ -605,16 +686,25 @@ class GameLib:
     # ---- Grid Helpers ----
 
     def draw_grid(
-        self, x: int, y: int, rows: int, cols: int, cell_size: int, color: int,
+        self,
+        x: int,
+        y: int,
+        rows: int,
+        cols: int,
+        cell_size: int,
+        color: int,
     ) -> None:
         """Draw a grid of cells."""
         ...
 
     def fill_cell(
         self,
-        grid_x: int, grid_y: int,
-        row: int, col: int,
-        cell_size: int, color: int,
+        grid_x: int,
+        grid_y: int,
+        row: int,
+        col: int,
+        cell_size: int,
+        color: int,
     ) -> None:
         """Fill a single grid cell (1px padding to avoid covering grid lines)."""
         ...
@@ -664,13 +754,20 @@ class GameLib:
     # ---- Sound ----
 
     def play_beep(
-        self, frequency: int, duration: int, repeat: int = 1, volume: int = 1000,
+        self,
+        frequency: int,
+        duration: int,
+        repeat: int = 1,
+        volume: int = 1000,
     ) -> int:
         """Play a beep tone. Returns channel ID (>0), or negative on failure."""
         ...
 
     def play_wav(
-        self, filename: str, repeat: int = 1, volume: int = 1000,
+        self,
+        filename: str,
+        repeat: int = 1,
+        volume: int = 1000,
     ) -> int:
         """Play a WAV sound file. Returns channel ID (>0), or negative on failure."""
         ...
@@ -743,7 +840,12 @@ class GameLib:
         ...
 
     def radio_box(
-        self, x: int, y: int, text: str, value: int, index: int,
+        self,
+        x: int,
+        y: int,
+        text: str,
+        value: int,
+        index: int,
     ) -> tuple[bool, int]:
         """Draw an immediate-mode radio button.
 
@@ -753,8 +855,13 @@ class GameLib:
 
     def toggle_button(
         self,
-        x: int, y: int, w: int, h: int,
-        text: str, toggled: bool, color: int,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        text: str,
+        toggled: bool,
+        color: int,
     ) -> tuple[bool, bool]:
         """Draw an immediate-mode toggle button.
 
@@ -818,16 +925,26 @@ class GameLib:
 
     @staticmethod
     def rect_overlap(
-        x1: int, y1: int, w1: int, h1: int,
-        x2: int, y2: int, w2: int, h2: int,
+        x1: int,
+        y1: int,
+        w1: int,
+        h1: int,
+        x2: int,
+        y2: int,
+        w2: int,
+        h2: int,
     ) -> bool:
         """AABB rectangle collision detection."""
         ...
 
     @staticmethod
     def circle_overlap(
-        cx1: int, cy1: int, r1: int,
-        cx2: int, cy2: int, r2: int,
+        cx1: int,
+        cy1: int,
+        r1: int,
+        cx2: int,
+        cy2: int,
+        r2: int,
     ) -> bool:
         """Circle collision detection."""
         ...
@@ -842,7 +959,6 @@ class GameLib:
         """Calculate distance between two points."""
         ...
 
-
 # ===========================================================================
 # Utility Functions
 # ===========================================================================
@@ -851,26 +967,21 @@ def get_respath(*parts: str | Path) -> str:
     """Get the absolute POSIX path to a package resource."""
     ...
 
-
 def get_asset_path(filename: str) -> str:
     """Get the absolute POSIX path to a file inside clib/assets/."""
     ...
-
 
 def clamp(value: int, lo: int, hi: int) -> int:
     """Clamp *value* into ``[lo, hi]``."""
     ...
 
-
 def safe_dt(game: GameLib, max_dt: float = 0.05) -> float:
     """Return ``game.get_delta_time()`` capped at *max_dt* seconds."""
     ...
 
-
 def draw_checkerboard(game: GameLib, x: int, y: int, w: int, h: int, cell: int) -> None:
     """Draw a checkerboard pattern inside the rectangle (*x*, *y*, *w*, *h*)."""
     ...
-
 
 def draw_panel(game: GameLib, x: int, y: int, w: int, h: int, title: str) -> None:
     """Draw a panel with a title bar."""

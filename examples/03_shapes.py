@@ -12,7 +12,7 @@ import math
 import pyezgame as g
 
 
-def draw_checkerboard(game, x, y, w, h, cell) -> None:
+def draw_checkerboard(game: g.GameLib, x: int, y: int, w: int, h: int, cell: int) -> None:
     py_ = 0
     while py_ < h:
         px = 0
@@ -28,7 +28,7 @@ def draw_checkerboard(game, x, y, w, h, cell) -> None:
 
 def main() -> None:
     game = g.GameLib()
-    game.open(640, 480, "03 - Shapes and Alpha", True)
+    _ = game.open(640, 480, "03 - Shapes and Alpha", True)
 
     while not game.is_closed():
         t = game.get_time()

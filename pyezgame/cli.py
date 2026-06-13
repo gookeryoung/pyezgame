@@ -1,4 +1,5 @@
 """pyezgame CLI - Run GameLib examples from the command line."""
+
 from __future__ import annotations
 
 import argparse
@@ -28,6 +29,7 @@ def _discover_examples() -> list[tuple[str, str, str]]:
 
 def _run_example(filepath: str) -> None:
     import os
+
     # Change cwd to the examples directory so relative asset paths work
     prev_cwd = os.getcwd()
     os.chdir(EXAMPLES_DIR)
@@ -87,11 +89,11 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.command == "list": # pyright: ignore[reportAny]
+    if args.command == "list":  # pyright: ignore[reportAny]
         cmd_list(args)
-    elif args.command == "run": # pyright: ignore[reportAny]
+    elif args.command == "run":  # pyright: ignore[reportAny]
         cmd_run(args)
-    elif args.command is None: # pyright: ignore[reportAny]
+    elif args.command is None:  # pyright: ignore[reportAny]
         parser.print_help()
         cmd_list(args)
 

@@ -8,6 +8,7 @@ Three clip windows on screen:
 
 Learn: set_clip, clear_clip, get_clip, how all draw calls respect clip
 """
+
 import math
 
 import pyezgame as g
@@ -43,9 +44,9 @@ def main() -> None:
     star = create_star_sprite(game)
 
     # Window regions
-    w1x, w1y, w1w, w1h = 20, 30, 280, 200    # Shapes
-    w2x, w2y, w2w, w2h = 330, 30, 290, 200   # Text
-    w3x, w3y, w3w, w3h = 20, 260, 600, 190   # Sprites
+    w1x, w1y, w1w, w1h = 20, 30, 280, 200  # Shapes
+    w2x, w2y, w2w, w2h = 330, 30, 290, 200  # Text
+    w3x, w3y, w3w, w3h = 20, 260, 600, 190  # Sprites
 
     while not game.is_closed():
         if game.is_key_pressed(g.KEY_ESCAPE):
@@ -59,23 +60,26 @@ def main() -> None:
         game.set_clip(w1x, w1y, w1w, w1h)
         game.fill_rect(w1x, w1y, w1w, w1h, g.COLOR_RGB(26, 36, 52))
 
-        game.fill_triangle(w1x + w1w // 2, w1y - 30,
-                           w1x + w1w + 60, w1y + w1h + 20,
-                           w1x - 60, w1y + w1h + 20,
-                           g.COLOR_ARGB(100, 255, 180, 40))
+        game.fill_triangle(
+            w1x + w1w // 2,
+            w1y - 30,
+            w1x + w1w + 60,
+            w1y + w1h + 20,
+            w1x - 60,
+            w1y + w1h + 20,
+            g.COLOR_ARGB(100, 255, 180, 40),
+        )
 
         for i in range(6):
             sweep = (int(t * 120.0) + i * 50) % (w1w + 140)
             x0 = w1x - 70 + sweep
-            game.draw_line(x0, w1y - 10, x0 + 100, w1y + w1h + 20,
-                           g.COLOR_ARGB(180, 120 + i * 22, 220 - i * 26, 255))
+            game.draw_line(x0, w1y - 10, x0 + 100, w1y + w1h + 20, g.COLOR_ARGB(180, 120 + i * 22, 220 - i * 26, 255))
 
         cx = w1x + w1w // 2 + int(math.cos(t * 1.7) * (w1w // 2 + 30))
         cy = w1y + w1h // 2 + int(math.sin(t * 2.1) * (w1h // 2 - 10))
         game.fill_circle(cx, cy, 28, g.COLOR_ARGB(200, 255, 90, 120))
 
-        game.draw_ellipse(w1x + w1w // 2, w1y + w1h // 2,
-                          w1w // 2 + 40, w1h // 3, g.COLOR_CYAN)
+        game.draw_ellipse(w1x + w1w // 2, w1y + w1h // 2, w1w // 2 + 40, w1h // 3, g.COLOR_CYAN)
 
         game.clear_clip()
         draw_window_border(game, w1x, w1y, w1w, w1h, "Shape Clip", g.COLOR_WHITE)
@@ -85,21 +89,22 @@ def main() -> None:
         game.fill_rect(w2x, w2y, w2w, w2h, g.COLOR_RGB(44, 30, 22))
 
         marquee_x = w2x + w2w - (int(t * 100.0) % (w2w + 400))
-        game.draw_text(marquee_x, w2y + 30,
-                       "This text scrolls and is clipped at the window boundary...", g.COLOR_GOLD)
+        game.draw_text(marquee_x, w2y + 30, "This text scrolls and is clipped at the window boundary...", g.COLOR_GOLD)
 
         osc_x = w2x - 80 + (int(t * 60.0) % (w2w + 160))
         game.draw_text(osc_x, w2y + 60, "DrawText is also clipped!", g.COLOR_WHITE)
 
         clip_info = game.get_clip()
-        game.draw_printf(w2x + 8, w2y + 100, g.COLOR_LIGHT_GRAY,
-                         f"GetClip: {clip_info[0]},{clip_info[1]} {clip_info[2]}x{clip_info[3]}")
-        game.draw_printf(w2x + 8, w2y + 120, g.COLOR_LIGHT_GRAY,
-                         f"Time: {t:.1f} s")
+        game.draw_printf(
+            w2x + 8,
+            w2y + 100,
+            g.COLOR_LIGHT_GRAY,
+            f"GetClip: {clip_info[0]},{clip_info[1]} {clip_info[2]}x{clip_info[3]}",
+        )
+        game.draw_printf(w2x + 8, w2y + 120, g.COLOR_LIGHT_GRAY, f"Time: {t:.1f} s")
 
         for i in range(8):
-            game.draw_printf(w2x + 8, w2y + 146 + i * 14, g.COLOR_GRAY,
-                             f"Line {i} - clipped at bottom")
+            game.draw_printf(w2x + 8, w2y + 146 + i * 14, g.COLOR_GRAY, f"Line {i} - clipped at bottom")
 
         game.clear_clip()
         draw_window_border(game, w2x, w2y, w2w, w2h, "Text Clip", g.COLOR_WHITE)

@@ -9,7 +9,7 @@ import pyezgame as g
 
 def main() -> None:
     game = g.GameLib()
-    game.open(640, 480, "04 - Paint", True, True)
+    _ = game.open(640, 480, "04 - Paint", True, True)
 
     palette = [
         g.COLOR_WHITE,
