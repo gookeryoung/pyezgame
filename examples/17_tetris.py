@@ -287,6 +287,7 @@ def main() -> None:
 
     def spawn() -> None:
         nonlocal current, next_piece, can_hold, is_locking, lock_timer
+        nonlocal fall_timer, fall_speed, das_dir, das_timer, das_active, down_held
         gen.refill(5)
         if next_piece is None:
             ptype = gen.pop()
@@ -300,6 +301,14 @@ def main() -> None:
         can_hold = True
         is_locking = False
         lock_timer = 0
+        # reset fall state so new piece gets a fresh start
+        fall_speed = get_fall_speed(level)
+        fall_timer = 0.0
+        # reset DAS / soft-drop state
+        das_dir = 0
+        das_timer = 0.0
+        das_active = False
+        down_held = False
         # check game over
         for x, y in current.cells():
             if y < 0 or x < 0 or x >= COLS or y >= ROWS:
@@ -408,12 +417,33 @@ def main() -> None:
             spawn()
 
     def remove_cleared() -> None:
-        nonlocal clearing
+        nonlocal clearing, combo, score, lines, level, clear_rows
+        nonlocal notif_text, notif_timer, clear_timer
         for row in sorted(clear_rows, reverse=True):
             del board[row]
             board.insert(0, [None] * COLS)
         clear_rows.clear()
         clearing = False
+        # cascade check: after shifting, detect any new full rows
+        full = [r for r in range(ROWS) if all(board[r][c] is not None for c in range(COLS))]
+        if full:
+            clear_rows = full
+            clear_timer = 0.0
+            clearing = True
+            combo += 1
+            n = len(full)
+            base = {1: 100, 2: 300, 3: 500, 4: 800}.get(n, 0)
+            bonus = combo * 50 if combo > 1 else 0
+            score += (base + bonus) * level
+            lines += n
+            level = lines // 10 + 1
+            if n == 4:
+                notif_text = "QUAD!"
+                notif_timer = 1.5
+            elif combo >= 3:
+                notif_text = f"COMBO x{combo}"
+                notif_timer = 1.5
+            return
         spawn()
 
     def do_hold() -> None:
@@ -580,7 +610,9 @@ def main() -> None:
                 if board[r][c] is not None:
                     if clearing and r in clear_rows:
                         flash = int(clear_timer / clear_dur * 3) % 2
-                        col = g.COLOR_WHITE if flash else PIECE_COLORS.get(board[r][c], (GARBAGE_COL,) * 4)[0]
+                        pt = board[r][c]
+                        clr = PIECE_COLORS[pt][0] if pt and pt in PIECE_COLORS else GARBAGE_COL
+                        col = g.COLOR_WHITE if flash else clr
                         game.fill_cell(BOARD_X, BOARD_Y, r, c, CELL, col)
                     else:
                         pt = board[r][c]
