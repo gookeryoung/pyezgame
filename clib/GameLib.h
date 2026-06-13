@@ -4647,9 +4647,6 @@ unsigned int __stdcall GameLib::_MciWorkerThread(void *param)
     int fadeSteps = 0;
 
     while (self->_mciThreadRunning) {
-        WaitForSingleObject(self->_mciEvent, INFINITE);
-        if (!self->_mciThreadRunning) break;
-
         // Handle crossfade: gradual volume transition
         if (doingFade) {
             doingFade = false;
@@ -4664,9 +4661,13 @@ unsigned int __stdcall GameLib::_MciWorkerThread(void *param)
                 cmd = L"set "; cmd += self->_mciOldAlias;
                 cmd += L" volume to "; cmd += std::to_wstring(oldVol);
                 _gl_mciSendStringW(cmd.c_str(), NULL, 0, NULL);
-                cmd = L"set "; cmd += self->_musicAlias;
-                cmd += L" volume to "; cmd += std::to_wstring(newVol);
-                _gl_mciSendStringW(cmd.c_str(), NULL, 0, NULL);
+                // Only adjust new device volume if it's a different device (crossfade)
+                // Skip when old==new (StopMusic fade-out only)
+                if (self->_mciOldAlias != self->_musicAlias) {
+                    cmd = L"set "; cmd += self->_musicAlias;
+                    cmd += L" volume to "; cmd += std::to_wstring(newVol);
+                    _gl_mciSendStringW(cmd.c_str(), NULL, 0, NULL);
+                }
             }
             // Fade done: stop and close old device
             if (_gl_mciSendStringW && !self->_mciOldAlias.empty()) {
@@ -4681,35 +4682,41 @@ unsigned int __stdcall GameLib::_MciWorkerThread(void *param)
             continue;
         }
 
-        while (true) {
-            _MciQueuedCmd cmd;
-            EnterCriticalSection(&self->_mciLock);
-            if (self->_mciQueue.empty()) {
-                LeaveCriticalSection(&self->_mciLock);
-                break;
-            }
+        // Try to dequeue a command
+        _MciQueuedCmd cmd;
+        bool hasCmd = false;
+        EnterCriticalSection(&self->_mciLock);
+        if (!self->_mciQueue.empty()) {
             cmd = self->_mciQueue.front();
             self->_mciQueue.pop();
-            LeaveCriticalSection(&self->_mciLock);
+            hasCmd = true;
+        }
+        LeaveCriticalSection(&self->_mciLock);
 
-            if (cmd.type == _MCI_CMD_FADE) {
-                doingFade = true;
-                fadeSteps = self->_MUSIC_FADE_MS / fadeStepMs;
-                if (fadeSteps < 1) fadeSteps = 1;
-                break;  // Process fade on next iteration
-            }
+        if (!hasCmd) {
+            // Queue empty: wait for new commands
+            WaitForSingleObject(self->_mciEvent, INFINITE);
+            if (!self->_mciThreadRunning) break;
+            continue;  // Re-check queue after waking
+        }
 
-            // Execute MCI command
-            MCIERROR err = _gl_mciSendStringW(cmd.cmd.c_str(), NULL, 0, NULL);
-            if (err != 0) {
-                // If open or play failed, correct state
-                if (cmd.type == _MCI_CMD_OPEN || cmd.type == _MCI_CMD_PLAY) {
-                    EnterCriticalSection(&self->_mciLock);
-                    self->_musicPlaying = false;
-                    self->_musicLoop = false;
-                    self->_musicIsMidi = false;
-                    LeaveCriticalSection(&self->_mciLock);
-                }
+        if (cmd.type == _MCI_CMD_FADE) {
+            doingFade = true;
+            fadeSteps = self->_MUSIC_FADE_MS / fadeStepMs;
+            if (fadeSteps < 1) fadeSteps = 1;
+            continue;  // Process fade immediately on next iteration
+        }
+
+        // Execute MCI command
+        MCIERROR err = _gl_mciSendStringW(cmd.cmd.c_str(), NULL, 0, NULL);
+        if (err != 0) {
+            // If open or play failed, correct state
+            if (cmd.type == _MCI_CMD_OPEN || cmd.type == _MCI_CMD_PLAY) {
+                EnterCriticalSection(&self->_mciLock);
+                self->_musicPlaying = false;
+                self->_musicLoop = false;
+                self->_musicIsMidi = false;
+                LeaveCriticalSection(&self->_mciLock);
             }
         }
     }
