@@ -31,6 +31,10 @@ def main() -> None:
     eat_sfx = g.get_respath("../clib/assets/sound/coin.wav")
     game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
 
+    # Load music
+    music_file = g.get_respath("../clib/assets/music/battle1.mid")
+    _ = game.play_music(music_file, loop=True)
+
     grid_x, grid_y = 10, 30
 
     # Snake body: list of (row, col) tuples

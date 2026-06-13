@@ -86,6 +86,8 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <queue>
+#include <process.h>
 
 
 //---------------------------------------------------------------------
@@ -473,6 +475,11 @@ private:
     static LRESULT CALLBACK _WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     static int _InitWindowClass();
     void _DispatchMessages();
+    static unsigned int __stdcall _MciWorkerThread(void *param);
+    void _InitMciThread();
+    void _ShutdownMciThread();
+    void _QueueMciCommand(const std::wstring &cmd, int type);
+    void _ProcessMciResults();
     void _InitDIBInfo(void *ptr, int width, int height);
     void _DestroyGraphicsResources();
     void _DestroyTimingResources();
@@ -588,6 +595,26 @@ private:
     bool _musicLoop;
     bool _musicIsMidi;
     std::wstring _musicAlias;
+
+    // MCI async worker thread
+    enum { _MCI_CMD_NONE = 0, _MCI_CMD_OPEN = 1, _MCI_CMD_PLAY = 2,
+           _MCI_CMD_STOP = 3, _MCI_CMD_CLOSE = 4, _MCI_CMD_SEEK = 5,
+           _MCI_CMD_FADE = 6 };
+    struct _MciQueuedCmd {
+        std::wstring cmd;
+        int type;
+        _MciQueuedCmd() : type(0) {}
+        _MciQueuedCmd(const std::wstring &c, int t) : cmd(c), type(t) {}
+    };
+    std::queue<_MciQueuedCmd> _mciQueue;
+    CRITICAL_SECTION _mciLock;
+    HANDLE _mciEvent;       // signal: new commands available
+    HANDLE _mciThread;
+    volatile bool _mciThreadRunning;
+    volatile bool _mciPendingLoop;  // set by MM_MCINOTIFY, handled in Update()
+    volatile bool _mciFadeActive;   // crossfade in progress (suppresses auto-loop)
+    std::wstring _mciOldAlias;      // alias of fading-out music
+    static const int _MUSIC_FADE_MS = 800;  // crossfade duration in milliseconds
 
     // audio mixer state (waveOut software mixer)
     struct _WavData {
@@ -1204,6 +1231,12 @@ GameLib::GameLib()
     _musicPlaying = false;
     _musicLoop = false;
     _musicIsMidi = false;
+    _mciThread = NULL;
+    _mciThreadRunning = false;
+    _mciPendingLoop = false;
+    _mciFadeActive = false;
+    InitializeCriticalSection(&_mciLock);
+    _mciEvent = CreateEventW(NULL, FALSE, FALSE, NULL);
     _next_channel_id = 1;
     _audio_initialized = false;
     _master_volume = 1000;
@@ -1551,13 +1584,17 @@ GameLib::~GameLib()
     _wav_cache.clear();
     DeleteCriticalSection(&_audio_lock);
 
-    // Stop music
+    // Shutdown MCI worker thread and stop/close music
+    _ShutdownMciThread();
     if ((_musicPlaying || _musicIsMidi) && _gl_mciSendStringW) {
         _musicPlaying = false;
         _musicLoop = false;
         _musicIsMidi = false;
         _gamelib_close_music_alias(_musicAlias.c_str());
     }
+    DeleteCriticalSection(&_mciLock);
+    if (_mciEvent) { CloseHandle(_mciEvent); _mciEvent = NULL; }
+
     // Free all sprites
     for (size_t i = 0; i < _sprites.size(); i++) {
         if (_sprites[i].used && _sprites[i].pixels) {
@@ -1661,22 +1698,30 @@ LRESULT CALLBACK GameLib::_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
     case MM_MCINOTIFY:
         if (!self || !self->_musicIsMidi) return 0;
 
+        // During crossfade, suppress auto-loop for both old and new devices
+        if (self->_mciFadeActive) {
+            return 0;
+        }
+
         if (wParam == MCI_NOTIFY_SUCCESSFUL) {
             if (self->_musicLoop) {
-                std::wstring seekCmd = L"seek ";
-                seekCmd += self->_musicAlias;
-                seekCmd += L" to start";
-                if (_gl_mciSendStringW &&
-                    _gl_mciSendStringW(seekCmd.c_str(), NULL, 0, NULL) == 0 &&
-                    _gamelib_mci_play_music_alias(self->_musicAlias.c_str(), hWnd, true, true)) {
-                    return 0;
-                }
+                // Defer seek+play to worker thread via Update() to avoid blocking WndProc
+                self->_mciPendingLoop = true;
+                return 0;
             }
 
             self->_musicPlaying = false;
             self->_musicLoop = false;
             self->_musicIsMidi = false;
-            _gamelib_close_music_alias(self->_musicAlias.c_str());
+            // Queue close to worker thread to avoid blocking
+            if (_gl_mciSendStringW) {
+                std::wstring stopCmd = L"stop ";
+                stopCmd += self->_musicAlias;
+                std::wstring closeCmd = L"close ";
+                closeCmd += self->_musicAlias;
+                self->_QueueMciCommand(stopCmd, self->_MCI_CMD_STOP);
+                self->_QueueMciCommand(closeCmd, self->_MCI_CMD_CLOSE);
+            }
             return 0;
         }
 
@@ -1684,7 +1729,11 @@ LRESULT CALLBACK GameLib::_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
             self->_musicPlaying = false;
             self->_musicLoop = false;
             self->_musicIsMidi = false;
-            _gamelib_close_music_alias(self->_musicAlias.c_str());
+            if (_gl_mciSendStringW) {
+                std::wstring closeCmd = L"close ";
+                closeCmd += self->_musicAlias;
+                self->_QueueMciCommand(closeCmd, self->_MCI_CMD_CLOSE);
+            }
             return 0;
         }
 
@@ -2059,6 +2108,21 @@ void GameLib::Update()
         _hasPendingScene = false;
     } else {
         _sceneChanged = false;
+    }
+
+    // Handle deferred MIDI loop (set by MM_MCINOTIFY to avoid blocking WndProc)
+    if (_mciPendingLoop) {
+        _mciPendingLoop = false;
+        if (_musicIsMidi && _musicLoop && _gl_mciSendStringW) {
+            std::wstring seekCmd = L"seek ";
+            seekCmd += _musicAlias;
+            seekCmd += L" to start";
+            _QueueMciCommand(seekCmd, _MCI_CMD_SEEK);
+            std::wstring playCmd = L"play ";
+            playCmd += _musicAlias;
+            playCmd += L" from 0 notify";
+            _QueueMciCommand(playCmd, _MCI_CMD_PLAY);
+        }
     }
 }
 
@@ -4482,36 +4546,51 @@ bool GameLib::PlayMusic(const char *filename, bool loop)
     wchar_t *wideFilename = _gamelib_utf8_to_wide(filename, NULL);
     if (!wideFilename) return false;
 
-    // Stop previous music first
-    if (_musicPlaying || _musicIsMidi) {
-        _musicPlaying = false;
-        _musicLoop = false;
-        _musicIsMidi = false;
-        _gamelib_close_music_alias(_musicAlias.c_str());
+    // Ensure MCI worker thread is running
+    _InitMciThread();
+
+    // Crossfade: if music is playing, fade it out while new music fades in
+    bool hasOldMusic = (_musicPlaying || _musicIsMidi);
+    if (hasOldMusic) {
+        _mciOldAlias = _musicAlias;
+        _mciFadeActive = true;
     }
 
+    // Build open command with full path embedded
     std::wstring openCmd = L"open \"";
     openCmd += wideFilename;
     openCmd += L"\" type ";
     openCmd += deviceType;
     openCmd += L" alias ";
     openCmd += _musicAlias;
-    if (_gl_mciSendStringW(openCmd.c_str(), NULL, 0, NULL) != 0) {
-        free(wideFilename);
-        return false;
-    }
     free(wideFilename);
 
-    _musicLoop = loop;
-    _musicIsMidi = isMidi;
-
-    if (!_gamelib_mci_play_music_alias(_musicAlias.c_str(), _hwnd, isMidi, loop)) {
-        _gamelib_close_music_alias(_musicAlias.c_str());
-        _musicLoop = false;
-        _musicIsMidi = false;
-        return false;
+    // Build play command
+    std::wstring playCmd = L"play ";
+    playCmd += _musicAlias;
+    if (isMidi) {
+        playCmd += L" from 0 notify";
+    } else if (loop) {
+        playCmd += L" repeat";
     }
 
+    // Queue commands: open+play first, then crossfade
+    // This ensures the new device is ready before fade adjusts its volume
+    _QueueMciCommand(openCmd, _MCI_CMD_OPEN);
+    if (hasOldMusic) {
+        std::wstring volCmd = L"set ";
+        volCmd += _musicAlias;
+        volCmd += L" volume to 0";
+        _QueueMciCommand(volCmd, _MCI_CMD_NONE);
+    }
+    _QueueMciCommand(playCmd, _MCI_CMD_PLAY);
+    if (hasOldMusic) {
+        _QueueMciCommand(L"", _MCI_CMD_FADE);
+    }
+
+    // Set state optimistically (worker thread will correct if open/play fails)
+    _musicLoop = loop;
+    _musicIsMidi = isMidi;
     _musicPlaying = true;
     return true;
 }
@@ -4523,13 +4602,126 @@ void GameLib::StopMusic()
     _musicLoop = false;
     _musicIsMidi = false;
     if (hadMusic) {
-        _gamelib_close_music_alias(_musicAlias.c_str());
+        // Fade out then stop+close (non-blocking)
+        _mciFadeActive = true;
+        _mciOldAlias = _musicAlias;
+        _QueueMciCommand(L"", _MCI_CMD_FADE);
     }
 }
 
 bool GameLib::IsMusicPlaying() const
 {
     return _musicPlaying;
+}
+
+
+//---------------------------------------------------------------------
+// MCI Worker Thread - processes MCI commands asynchronously
+//---------------------------------------------------------------------
+void GameLib::_InitMciThread()
+{
+    if (_mciThreadRunning) return;
+    if (!_gl_mciSendStringW) return;
+    _mciThreadRunning = true;
+    _mciThread = (HANDLE)_beginthreadex(NULL, 0, _MciWorkerThread, this, 0, NULL);
+    if (!_mciThread) {
+        _mciThreadRunning = false;
+    }
+}
+
+void GameLib::_ShutdownMciThread()
+{
+    if (!_mciThreadRunning || !_mciThread) return;
+    _mciThreadRunning = false;
+    SetEvent(_mciEvent);
+    WaitForSingleObject(_mciThread, 5000);
+    CloseHandle(_mciThread);
+    _mciThread = NULL;
+}
+
+unsigned int __stdcall GameLib::_MciWorkerThread(void *param)
+{
+    GameLib *self = (GameLib *)param;
+    bool doingFade = false;
+    int fadeStepMs = 50;
+    int fadeSteps = 0;
+
+    while (self->_mciThreadRunning) {
+        WaitForSingleObject(self->_mciEvent, INFINITE);
+        if (!self->_mciThreadRunning) break;
+
+        // Handle crossfade: gradual volume transition
+        if (doingFade) {
+            doingFade = false;
+            for (int i = 1; i <= fadeSteps; i++) {
+                if (!self->_mciThreadRunning) break;
+                Sleep(fadeStepMs);
+                int oldVol = 1000 - (i * 1000 / fadeSteps);
+                int newVol = i * 1000 / fadeSteps;
+                if (oldVol < 0) oldVol = 0;
+                if (newVol > 1000) newVol = 1000;
+                std::wstring cmd;
+                cmd = L"set "; cmd += self->_mciOldAlias;
+                cmd += L" volume to "; cmd += std::to_wstring(oldVol);
+                _gl_mciSendStringW(cmd.c_str(), NULL, 0, NULL);
+                cmd = L"set "; cmd += self->_musicAlias;
+                cmd += L" volume to "; cmd += std::to_wstring(newVol);
+                _gl_mciSendStringW(cmd.c_str(), NULL, 0, NULL);
+            }
+            // Fade done: stop and close old device
+            if (_gl_mciSendStringW && !self->_mciOldAlias.empty()) {
+                std::wstring cmd = L"stop ";
+                cmd += self->_mciOldAlias;
+                _gl_mciSendStringW(cmd.c_str(), NULL, 0, NULL);
+                cmd = L"close ";
+                cmd += self->_mciOldAlias;
+                _gl_mciSendStringW(cmd.c_str(), NULL, 0, NULL);
+            }
+            self->_mciFadeActive = false;
+            continue;
+        }
+
+        while (true) {
+            _MciQueuedCmd cmd;
+            EnterCriticalSection(&self->_mciLock);
+            if (self->_mciQueue.empty()) {
+                LeaveCriticalSection(&self->_mciLock);
+                break;
+            }
+            cmd = self->_mciQueue.front();
+            self->_mciQueue.pop();
+            LeaveCriticalSection(&self->_mciLock);
+
+            if (cmd.type == _MCI_CMD_FADE) {
+                doingFade = true;
+                fadeSteps = self->_MUSIC_FADE_MS / fadeStepMs;
+                if (fadeSteps < 1) fadeSteps = 1;
+                break;  // Process fade on next iteration
+            }
+
+            // Execute MCI command
+            MCIERROR err = _gl_mciSendStringW(cmd.cmd.c_str(), NULL, 0, NULL);
+            if (err != 0) {
+                // If open or play failed, correct state
+                if (cmd.type == _MCI_CMD_OPEN || cmd.type == _MCI_CMD_PLAY) {
+                    EnterCriticalSection(&self->_mciLock);
+                    self->_musicPlaying = false;
+                    self->_musicLoop = false;
+                    self->_musicIsMidi = false;
+                    LeaveCriticalSection(&self->_mciLock);
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+void GameLib::_QueueMciCommand(const std::wstring &cmd, int type)
+{
+    EnterCriticalSection(&_mciLock);
+    _mciQueue.push(_MciQueuedCmd(cmd, type));
+    LeaveCriticalSection(&_mciLock);
+    if (_mciEvent) SetEvent(_mciEvent);
 }
 
 
