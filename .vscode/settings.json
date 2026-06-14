@@ -5,7 +5,10 @@
     "terminal.integrated.profiles.windows": {
         "cmd": {
             "path": "C:\\WINDOWS\\System32\\cmd.exe",
-            "args": ["/k", "${workspaceFolder}\\.venv\\Scripts\\activate.bat"]
+            "args": [
+                "/k",
+                "${workspaceFolder}\\.venv\\Scripts\\activate.bat"
+            ]
         }
     },
     "python.testing.unittestArgs": [
@@ -15,6 +18,6 @@
         "-p",
         "test_*.py"
     ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false
 }
