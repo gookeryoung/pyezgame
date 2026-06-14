@@ -12,18 +12,32 @@ dependencies = []
 [project.scripts]
 ezgame = "pyezgame.cli:main"
 
+[project.optional-dependencies]
+test = [
+    "pysnooper>=1.2.3",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=5.0.0",
+    "pytest-html>=4.1.1",
+    "pytest-mock>=3.14.0",
+    "pytest-timeout>=2.4.0",
+    "pytest-xdist>=3.6.1",
+    "pytest>=8.3.4",
+    "tox-uv>=1.13.1",
+    "tox>=4.25.0",
+]
+
 [tool.scikit-build]
 cmake.build-type = "Release"
 wheel.packages = ["pyezgame"]
 wheel.py-api = "cp38"
 
 [tool.basedpyright]
-exclude                           = ["**/.git", "**/.venv", "**/__pycache__", "**/build", "**/dist"]
-include                           = ["src"]
-pythonVersion                     = "3.8"
+exclude = ["**/.git", "**/.venv", "**/__pycache__", "**/build", "**/dist"]
+include = ["src"]
+pythonVersion = "3.8"
 reportImplicitStringConcatenation = "error"
-reportMissingTypeStubs            = "none"
-reportUnusedCallResult            = "warning"
+reportMissingTypeStubs = "none"
+reportUnusedCallResult = "warning"
 typeCheckingMode = "recommended"
 
 [[tool.uv.index]]
@@ -31,15 +45,17 @@ url = "https://mirrors.aliyun.com/pypi/simple/"
 default = true
 
 [dependency-groups]
-dev = [
-    "coverage>=7.6.1",
-]
+dev = ["pyezgame[test]"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
-line-length    = 120
-src            = ["src"]
+line-length = 120
+src = ["src"]
 target-version = "py38"
-unsafe-fixes   = true
+unsafe-fixes = true
 
 [tool.ruff.lint]
 select = [
