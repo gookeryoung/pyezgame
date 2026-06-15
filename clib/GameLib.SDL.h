@@ -427,6 +427,11 @@ public:
     bool Checkbox(int x, int y, const char *text, bool *checked);
     bool RadioBox(int x, int y, const char *text, int *value, int index);
     bool ToggleButton(int x, int y, int w, int h, const char *text, bool *toggled, uint32_t color);
+    bool Slider(int x, int y, int w, int *value, int minVal, int maxVal);
+    void ProgressBar(int x, int y, int w, int h, int value, int maxVal, uint32_t color);
+    bool Spinner(int x, int y, int w, int *value, int minVal, int maxVal, int step);
+    void Separator(int x, int y, int w);
+    void Label(int x, int y, int w, int h, const char *text, uint32_t bgColor, uint32_t textColor);
 
     // -------- Scene Management --------
     void SetScene(int scene);
@@ -2825,6 +2830,200 @@ bool GameLib::ToggleButton(int x, int y, int w, int h, const char *text,
         _uiActiveId = 0;
     }
     return changed;
+}
+
+bool GameLib::Slider(int x, int y, int w, int *value, int minVal, int maxVal)
+{
+    if (!value || w <= 0) return false;
+    if (minVal > maxVal) { int t = minVal; minVal = maxVal; maxVal = t; }
+
+    const int trackH = 6;
+    const int handleW = 16;
+    const int handleH = 16;
+    int trackY = y + (handleH - trackH) / 2;
+    int trackW = w - handleW;
+    if (trackW < 1) trackW = 1;
+
+    uint32_t id = _gamelib_ui_make_id(0x534C4431u, x, y, w, handleH, "slider");
+    bool hovered = PointInRect(_mouseX, _mouseY, x, y, w, handleH);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    if (mousePressed && hovered) {
+        _uiActiveId = id;
+    }
+
+    bool dragging = (_uiActiveId == id) && mouseDown;
+    bool changed = false;
+
+    if (dragging) {
+        int range = maxVal - minVal;
+        if (range <= 0) range = 1;
+        int relX = _mouseX - x - handleW / 2;
+        if (relX < 0) relX = 0;
+        if (relX > trackW) relX = trackW;
+        int newVal = minVal + (int)((long long)relX * range / trackW);
+        if (newVal < minVal) newVal = minVal;
+        if (newVal > maxVal) newVal = maxVal;
+        if (newVal != *value) {
+            *value = newVal;
+            changed = true;
+        }
+    }
+
+    // draw track
+    uint32_t trackColor = COLOR_RGB(80, 80, 90);
+    uint32_t trackBorder = COLOR_RGB(50, 50, 60);
+    FillRect(x + handleW / 2, trackY, trackW, trackH, trackColor);
+    DrawRect(x + handleW / 2, trackY, trackW, trackH, trackBorder);
+
+    // compute handle position
+    int range = maxVal - minVal;
+    if (range <= 0) range = 1;
+    int handleX = x + handleW / 2 + (int)((long long)(*value - minVal) * trackW / range) - handleW / 2;
+    if (handleX < x) handleX = x;
+    if (handleX > x + w - handleW) handleX = x + w - handleW;
+
+    // draw handle
+    uint32_t handleColor = hovered || dragging
+        ? _gamelib_ui_lighten(COLOR_RGB(200, 200, 210), 32)
+        : COLOR_RGB(200, 200, 210);
+    if (dragging) handleColor = _gamelib_ui_darken(handleColor, 20);
+    _gamelib_ui_draw_bevel_rect(this, handleX, y, handleW, handleH, handleColor, dragging);
+
+    if (mouseReleased && _uiActiveId == id) {
+        _uiActiveId = 0;
+    }
+    return changed;
+}
+
+void GameLib::ProgressBar(int x, int y, int w, int h, int value, int maxVal, uint32_t color)
+{
+    if (w <= 0 || h <= 0) return;
+    if (maxVal <= 0) maxVal = 1;
+    if (value < 0) value = 0;
+    if (value > maxVal) value = maxVal;
+
+    // background
+    uint32_t bgColor = COLOR_RGB(40, 44, 56);
+    FillRect(x, y, w, h, bgColor);
+
+    // filled portion
+    int fillW = (int)((long long)value * (w - 2) / maxVal);
+    if (fillW > 0) {
+        FillRect(x + 1, y + 1, fillW, h - 2, color);
+        // highlight stripe
+        uint32_t highlight = _gamelib_ui_lighten(color, 60);
+        FillRect(x + 1, y + 1, fillW, 2, highlight);
+    }
+
+    // border
+    DrawRect(x, y, w, h, COLOR_RGB(84, 94, 120));
+
+    // percentage text
+    int pct = (int)((long long)value * 100 / maxVal);
+    char buf[8];
+    snprintf(buf, sizeof(buf), "%d%%", pct);
+    int tw = _gamelib_ui_text_width(buf);
+    int th = _gamelib_ui_text_height(buf);
+    int tx = x + (w - tw) / 2;
+    int ty = y + (h - th) / 2;
+    uint32_t textColor = (pct >= 50) ? COLOR_WHITE : COLOR_LIGHT_GRAY;
+    _gamelib_ui_draw_text_with_shadow(this, tx, ty, buf, textColor, COLOR_ARGB(160, 0, 0, 0));
+}
+
+bool GameLib::Spinner(int x, int y, int w, int *value, int minVal, int maxVal, int step)
+{
+    if (!value || w <= 0) return false;
+    if (minVal > maxVal) { int t = minVal; minVal = maxVal; maxVal = t; }
+    if (step <= 0) step = 1;
+
+    const int btnW = 24;
+    const int h = 24;
+    int midW = w - btnW * 2;
+    if (midW < 16) midW = 16;
+
+    // draw minus button
+    uint32_t minusId = _gamelib_ui_make_id(0x53504E31u, x, y, btnW, h, "-");
+    bool minusHov = PointInRect(_mouseX, _mouseY, x, y, btnW, h);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    if (mousePressed && minusHov) _uiActiveId = minusId;
+    bool minusDown = (_uiActiveId == minusId) && mouseDown && minusHov;
+    uint32_t minusFace = minusHov ? _gamelib_ui_lighten(COLOR_RGB(120, 120, 140), 32) : COLOR_RGB(120, 120, 140);
+    if (minusDown) minusFace = _gamelib_ui_darken(minusFace, 28);
+    _gamelib_ui_draw_bevel_rect(this, x, y, btnW, h, minusFace, minusDown);
+    // draw "-" symbol
+    int dashY = y + h / 2;
+    FillRect(x + 6, dashY - 1, btnW - 12, 2, COLOR_WHITE);
+
+    // draw plus button
+    int plusX = x + btnW + midW;
+    uint32_t plusId = _gamelib_ui_make_id(0x53504E31u, plusX, y, btnW, h, "+");
+    bool plusHov = PointInRect(_mouseX, _mouseY, plusX, y, btnW, h);
+    if (mousePressed && plusHov) _uiActiveId = plusId;
+    bool plusDown = (_uiActiveId == plusId) && mouseDown && plusHov;
+    uint32_t plusFace = plusHov ? _gamelib_ui_lighten(COLOR_RGB(120, 120, 140), 32) : COLOR_RGB(120, 120, 140);
+    if (plusDown) plusFace = _gamelib_ui_darken(plusFace, 28);
+    _gamelib_ui_draw_bevel_rect(this, plusX, y, btnW, h, plusFace, plusDown);
+    // draw "+" symbol
+    int plusCX = plusX + btnW / 2;
+    int plusCY = y + h / 2;
+    FillRect(plusCX - 5, plusCY - 1, 10, 2, COLOR_WHITE);
+    FillRect(plusCX - 1, plusCY - 5, 2, 10, COLOR_WHITE);
+
+    // draw value display
+    int midX = x + btnW;
+    FillRect(midX, y, midW, h, COLOR_RGB(28, 32, 44));
+    DrawRect(midX, y, midW, h, COLOR_RGB(60, 66, 80));
+    char buf[16];
+    snprintf(buf, sizeof(buf), "%d", *value);
+    int tw = _gamelib_ui_text_width(buf);
+    int th = _gamelib_ui_text_height(buf);
+    _gamelib_ui_draw_text_with_shadow(this, midX + (midW - tw) / 2, y + (h - th) / 2,
+                                      buf, COLOR_WHITE, COLOR_ARGB(160, 0, 0, 0));
+
+    bool changed = false;
+    if (mouseReleased) {
+        if (_uiActiveId == minusId && minusHov) {
+            int nv = *value - step;
+            if (nv < minVal) nv = minVal;
+            if (nv != *value) { *value = nv; changed = true; }
+        }
+        if (_uiActiveId == plusId && plusHov) {
+            int nv = *value + step;
+            if (nv > maxVal) nv = maxVal;
+            if (nv != *value) { *value = nv; changed = true; }
+        }
+        if (_uiActiveId == minusId || _uiActiveId == plusId) {
+            _uiActiveId = 0;
+        }
+    }
+    return changed;
+}
+
+void GameLib::Separator(int x, int y, int w)
+{
+    if (w <= 0) return;
+    _DrawHLine(x, x + w - 1, y, COLOR_RGB(60, 66, 80));
+    _DrawHLine(x, x + w - 1, y + 1, COLOR_RGB(110, 118, 140));
+}
+
+void GameLib::Label(int x, int y, int w, int h, const char *text, uint32_t bgColor, uint32_t textColor)
+{
+    if (w <= 0 || h <= 0) return;
+    FillRect(x, y, w, h, bgColor);
+    DrawRect(x, y, w, h, _gamelib_ui_lighten(bgColor, 30));
+    if (text && text[0]) {
+        int tw = _gamelib_ui_text_width(text);
+        int th = _gamelib_ui_text_height(text);
+        int tx = x + ((w - tw) > 0 ? (w - tw) / 2 : 4);
+        int ty = y + ((h - th) > 0 ? (h - th) / 2 : 2);
+        DrawText(tx, ty, text, textColor);
+    }
 }
 
 void GameLib::DrawTextFont(int x, int y, const char *text, uint32_t color, const char *fontName, int fontSize)

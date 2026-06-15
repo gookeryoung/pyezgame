@@ -869,6 +869,67 @@ class GameLib:
         """
         ...
 
+    def slider(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        value: int,
+        min_val: int,
+        max_val: int,
+    ) -> tuple[bool, int]:
+        """Draw an immediate-mode horizontal slider.
+
+        Returns (changed, value) where changed is True when value was modified.
+        """
+        ...
+
+    def progress_bar(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        value: int,
+        max_val: int,
+        color: int,
+    ) -> None:
+        """Draw a progress bar showing current value as a percentage of max_val."""
+        ...
+
+    def spinner(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        value: int,
+        min_val: int,
+        max_val: int,
+        step: int,
+    ) -> tuple[bool, int]:
+        """Draw an immediate-mode numeric spinner with -/+ buttons.
+
+        Returns (changed, value) where changed is True when value was modified.
+        """
+        ...
+
+    def separator(self, x: int, y: int, w: int) -> None:
+        """Draw a horizontal separator line with 3D effect."""
+        ...
+
+    def label(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        text: str,
+        bg_color: int,
+        text_color: int,
+    ) -> None:
+        """Draw a centered text label with a filled background rectangle."""
+        ...
+
     # ---- Static Methods: Save/Load ----
 
     @staticmethod

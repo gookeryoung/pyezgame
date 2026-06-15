@@ -1,14 +1,16 @@
-"""15_ui_controls.py - Basic UI Controls Demo
+"""15_ui_controls.py - Enhanced UI Controls Demo
 
-Demonstrates the immediate-mode button, checkbox, radio_box
-and toggle_button helpers.
+Demonstrates the immediate-mode UI helpers:
+  button, checkbox, radio_box, toggle_button,
+  slider, spinner, progress_bar, separator, label.
 Labels use the built-in 8x8 bitmap font, so keep them ASCII.
 
 Controls:
-  Mouse left button : interact with buttons and checkboxes
+  Mouse left button : interact with all UI controls
   ESC               : quit
 
 Learn: button, checkbox, radio_box, toggle_button,
+       slider, spinner, progress_bar, separator, label,
        release-trigger UI, built-in 8x8 UI labels
 """
 
@@ -41,8 +43,9 @@ def draw_backdrop(game: g.GameLib, show_grid: bool) -> None:
 
 def main() -> None:
     game = g.GameLib()
-    game.open(960, 520, "15 - UI Controls", True)
+    game.open(1100, 620, "15 - UI Controls", True)
 
+    # --- State variables ---
     music_on = True
     sfx_on = True
     show_grid = False
@@ -54,108 +57,189 @@ def main() -> None:
     reset_count = 0
     last_event = "NONE"
 
+    # --- New widget states ---
+    volume = 75
+    brightness = 50
+    speed = 30
+    hp = 100
+    level = 1
+    score_mult = 1
+
     while not game.is_closed():
         if game.is_key_pressed(g.KEY_ESCAPE):
             break
 
         draw_backdrop(game, show_grid)
 
-        game.fill_rect(0, 0, 960, 56, g.COLOR_RGB(10, 14, 24))
+        # === Top bar ===
+        game.fill_rect(0, 0, 1100, 56, g.COLOR_RGB(10, 14, 24))
         game.draw_text_scale(20, 14, "UI CONTROLS", g.COLOR_WHITE, 16, 16)
-        game.draw_text(20, 40, "Mouse: press inside, release inside to trigger. ESC quits.", g.COLOR_LIGHT_GRAY)
+        game.draw_text(20, 40, "Mouse: press/release inside to trigger. ESC quits.", g.COLOR_LIGHT_GRAY)
 
-        draw_panel(game, 20, 76, 184, 420, "Buttons")
-        draw_panel(game, 224, 76, 184, 420, "Checkboxes")
-        draw_panel(game, 428, 76, 184, 420, "RadioBox")
-        draw_panel(game, 632, 76, 184, 420, "Toggle")
-        draw_panel(game, 836, 76, 104, 420, "Status")
+        # =================================================================
+        # ROW 1 - Original controls (y=70 .. y=296)
+        # =================================================================
 
-        if game.button(40, 116, 144, 32, "START", g.COLOR_RGB(52, 150, 92)):
+        draw_panel(game, 20, 70, 180, 230, "Buttons")
+        draw_panel(game, 216, 70, 180, 230, "Checkboxes")
+        draw_panel(game, 412, 70, 180, 230, "RadioBox")
+        draw_panel(game, 608, 70, 180, 230, "Toggle")
+
+        # --- Buttons ---
+        if game.button(40, 108, 140, 28, "START", g.COLOR_RGB(52, 150, 92)):
             start_count += 1
             last_event = "START"
-        if game.button(40, 160, 144, 32, "RESET", g.COLOR_RGB(196, 142, 46)):
+        if game.button(40, 148, 140, 28, "RESET", g.COLOR_RGB(196, 142, 46)):
             music_on = True
             sfx_on = True
             show_grid = False
             hard_mode = False
+            volume = 75
+            brightness = 50
+            speed = 30
+            hp = 100
+            level = 1
+            score_mult = 1
             reset_count += 1
             last_event = "RESET"
-        if game.button(40, 204, 144, 32, "QUIT", g.COLOR_RGB(180, 76, 76)):
+        if game.button(40, 188, 140, 28, "QUIT", g.COLOR_RGB(180, 76, 76)):
             break
 
-        game.draw_text(40, 264, "The button label uses", g.COLOR_LIGHT_GRAY)
-        game.draw_text(40, 280, "the built-in 8x8 font.", g.COLOR_LIGHT_GRAY)
-        game.draw_text(40, 320, "Visual states:", g.COLOR_WHITE)
-        game.draw_text(40, 340, "NORMAL / HOVER / PRESSED", g.COLOR_LIGHT_GRAY)
+        game.separator(40, 228, 140)
+        game.draw_text(40, 240, "States: NORMAL", g.COLOR_LIGHT_GRAY)
+        game.draw_text(40, 256, " HOVER / PRESSED", g.COLOR_LIGHT_GRAY)
 
-        triggered, music_on = game.checkbox(244, 116, "MUSIC", music_on)
+        # --- Checkboxes ---
+        triggered, music_on = game.checkbox(236, 108, "MUSIC", music_on)
         if triggered:
             last_event = "MUSIC ON" if music_on else "MUSIC OFF"
-        triggered, sfx_on = game.checkbox(244, 152, "SFX", sfx_on)
+        triggered, sfx_on = game.checkbox(236, 140, "SFX", sfx_on)
         if triggered:
             last_event = "SFX ON" if sfx_on else "SFX OFF"
-        triggered, show_grid = game.checkbox(244, 188, "SHOW GRID", show_grid)
+        triggered, show_grid = game.checkbox(236, 172, "SHOW GRID", show_grid)
         if triggered:
             last_event = "GRID ON" if show_grid else "GRID OFF"
-        triggered, hard_mode = game.checkbox(244, 224, "HARD MODE", hard_mode)
+        triggered, hard_mode = game.checkbox(236, 204, "HARD MODE", hard_mode)
         if triggered:
             last_event = "HARD ON" if hard_mode else "HARD OFF"
 
-        game.draw_text(244, 276, "Click covers box", g.COLOR_WHITE)
-        game.draw_text(244, 292, "and label.", g.COLOR_LIGHT_GRAY)
-        game.draw_text(244, 324, "4 states:", g.COLOR_WHITE)
-        game.draw_text(244, 340, "CHK/UNCHK", g.COLOR_LIGHT_GRAY)
-        game.draw_text(244, 356, "+ hover.", g.COLOR_LIGHT_GRAY)
+        game.separator(236, 236, 140)
+        game.draw_text(236, 248, "Click toggles the", g.COLOR_LIGHT_GRAY)
+        game.draw_text(236, 264, "checkbox on/off.", g.COLOR_LIGHT_GRAY)
 
-        triggered, difficulty = game.radio_box(448, 116, "EASY", difficulty, 0)
+        # --- RadioBox ---
+        triggered, difficulty = game.radio_box(432, 108, "EASY", difficulty, 0)
         if triggered:
             last_event = "EASY"
-        triggered, difficulty = game.radio_box(448, 152, "MEDIUM", difficulty, 1)
+        triggered, difficulty = game.radio_box(432, 140, "MEDIUM", difficulty, 1)
         if triggered:
             last_event = "MEDIUM"
-        triggered, difficulty = game.radio_box(448, 188, "HARD", difficulty, 2)
+        triggered, difficulty = game.radio_box(432, 172, "HARD", difficulty, 2)
         if triggered:
             last_event = "HARD"
 
         diff_names = ["EASY", "MEDIUM", "HARD"]
 
-        game.draw_text(448, 232, "Same group shares", g.COLOR_WHITE)
-        game.draw_text(448, 248, "one int value.", g.COLOR_LIGHT_GRAY)
-        game.draw_text(448, 280, "Selected:", g.COLOR_WHITE)
-        game.draw_text(448, 296, diff_names[difficulty], g.COLOR_YELLOW)
-        game.draw_text(448, 336, "Circle + dot", g.COLOR_WHITE)
-        game.draw_text(448, 352, "instead of box.", g.COLOR_LIGHT_GRAY)
+        game.separator(432, 208, 140)
+        game.draw_text(432, 220, "Selected:", g.COLOR_WHITE)
+        game.draw_text(432, 236, diff_names[difficulty], g.COLOR_YELLOW)
+        game.draw_text(432, 260, "Group shares one", g.COLOR_LIGHT_GRAY)
+        game.draw_text(432, 276, "int value.", g.COLOR_LIGHT_GRAY)
 
-        triggered, paused = game.toggle_button(652, 116, 144, 32, "PAUSE", paused, g.COLOR_RGB(180, 76, 76))
+        # --- Toggle ---
+        triggered, paused = game.toggle_button(628, 108, 140, 28, "PAUSE", paused, g.COLOR_RGB(180, 76, 76))
         if triggered:
             last_event = "PAUSED" if paused else "RESUME"
-        triggered, turbo = game.toggle_button(652, 160, 144, 32, "TURBO", turbo, g.COLOR_RGB(52, 150, 92))
+        triggered, turbo = game.toggle_button(628, 148, 140, 28, "TURBO", turbo, g.COLOR_RGB(52, 150, 92))
         if triggered:
             last_event = "TURBO ON" if turbo else "TURBO OFF"
 
-        game.draw_text(652, 216, "Toggled=ON shows", g.COLOR_WHITE)
-        game.draw_text(652, 232, "sunken bevel.", g.COLOR_LIGHT_GRAY)
-        game.draw_text(652, 264, "PAUSED:", g.COLOR_WHITE)
-        game.draw_text(652, 280, "YES" if paused else "NO", g.COLOR_YELLOW if paused else g.COLOR_LIGHT_GRAY)
-        game.draw_text(652, 312, "TURBO:", g.COLOR_WHITE)
-        game.draw_text(652, 328, "YES" if turbo else "NO", g.COLOR_YELLOW if turbo else g.COLOR_LIGHT_GRAY)
+        game.separator(628, 188, 140)
+        game.draw_text(628, 200, "Toggled=ON shows", g.COLOR_WHITE)
+        game.draw_text(628, 216, "sunken bevel.", g.COLOR_LIGHT_GRAY)
+        game.draw_text(628, 244, "PAUSED:", g.COLOR_WHITE)
+        game.draw_text(628, 260, "YES" if paused else "NO", g.COLOR_YELLOW if paused else g.COLOR_LIGHT_GRAY)
 
-        game.draw_text(856, 116, "LAST EVENT", g.COLOR_WHITE)
-        game.draw_text(856, 136, last_event, g.COLOR_YELLOW)
-        game.draw_text(856, 176, "COUNTS", g.COLOR_WHITE)
-        game.draw_printf(856, 196, g.COLOR_LIGHT_GRAY, f"START: {start_count}")
-        game.draw_printf(856, 212, g.COLOR_LIGHT_GRAY, f"RESET: {reset_count}")
+        # =================================================================
+        # ROW 2 - New controls (y=316 .. y=600)
+        # =================================================================
 
-        game.draw_text(856, 252, "FLAGS", g.COLOR_WHITE)
-        game.draw_printf(856, 272, g.COLOR_LIGHT_GRAY, f"MUSIC: {'ON' if music_on else 'OFF'}")
-        game.draw_printf(856, 288, g.COLOR_LIGHT_GRAY, f"SFX: {'ON' if sfx_on else 'OFF'}")
-        game.draw_printf(856, 304, g.COLOR_LIGHT_GRAY, f"GRID: {'ON' if show_grid else 'OFF'}")
-        game.draw_printf(856, 320, g.COLOR_LIGHT_GRAY, f"HARD: {'ON' if hard_mode else 'OFF'}")
+        draw_panel(game, 20, 316, 260, 290, "Sliders")
+        draw_panel(game, 296, 316, 260, 290, "Spinners")
+        draw_panel(game, 572, 316, 260, 290, "Progress Bars")
+        draw_panel(game, 848, 316, 232, 290, "Status")
 
-        game.draw_text(856, 352, "DIFF:", g.COLOR_WHITE)
-        game.draw_text(856, 368, diff_names[difficulty], g.COLOR_YELLOW)
-        game.draw_printf(856, 384, g.COLOR_LIGHT_GRAY, f"PAUSE:{'Y' if paused else 'N'}")
-        game.draw_printf(856, 400, g.COLOR_LIGHT_GRAY, f"TURBO:{'Y' if turbo else 'N'}")
+        # --- Sliders ---
+        game.draw_text(40, 354, "VOLUME:", g.COLOR_WHITE)
+        game.draw_printf(160, 354, g.COLOR_YELLOW, f"{volume}")
+        _, volume = game.slider(40, 370, 220, volume, 0, 100)
+
+        game.draw_text(40, 402, "BRIGHTNESS:", g.COLOR_WHITE)
+        game.draw_printf(160, 402, g.COLOR_YELLOW, f"{brightness}")
+        _, brightness = game.slider(40, 418, 220, brightness, 0, 100)
+
+        game.draw_text(40, 450, "SPEED:", g.COLOR_WHITE)
+        game.draw_printf(160, 450, g.COLOR_YELLOW, f"{speed}")
+        _, speed = game.slider(40, 466, 220, speed, 0, 100)
+
+        game.separator(40, 498, 220)
+        game.draw_text(40, 510, "Drag the handle to", g.COLOR_LIGHT_GRAY)
+        game.draw_text(40, 526, "adjust the value.", g.COLOR_LIGHT_GRAY)
+        game.draw_text(40, 556, "Range: 0 ~ 100", g.COLOR_LIGHT_GRAY)
+
+        # --- Spinners ---
+        game.draw_text(316, 354, "HP:", g.COLOR_WHITE)
+        _, hp = game.spinner(370, 350, 120, hp, 0, 999, 10)
+
+        game.draw_text(316, 402, "LEVEL:", g.COLOR_WHITE)
+        _, level = game.spinner(370, 398, 120, level, 1, 99, 1)
+
+        game.draw_text(316, 450, "SCORE MULT:", g.COLOR_WHITE)
+        _, score_mult = game.spinner(420, 446, 70, score_mult, 1, 10, 1)
+
+        game.separator(316, 498, 220)
+        game.draw_text(316, 510, "Click -/+ buttons", g.COLOR_LIGHT_GRAY)
+        game.draw_text(316, 526, "to change value.", g.COLOR_LIGHT_GRAY)
+        game.draw_text(316, 556, "Step is configurable.", g.COLOR_LIGHT_GRAY)
+
+        # --- Progress Bars ---
+        game.draw_text(592, 354, "VOLUME BAR:", g.COLOR_WHITE)
+        game.progress_bar(592, 370, 220, 18, volume, 100, g.COLOR_RGB(52, 150, 92))
+
+        game.draw_text(592, 402, "BRIGHTNESS BAR:", g.COLOR_WHITE)
+        game.progress_bar(592, 418, 220, 18, brightness, 100, g.COLOR_RGB(70, 130, 200))
+
+        game.draw_text(592, 450, "LOADING BAR:", g.COLOR_WHITE)
+        game.progress_bar(592, 466, 220, 18, speed, 100, g.COLOR_RGB(196, 142, 46))
+
+        game.separator(592, 498, 220)
+        game.draw_text(592, 510, "Bars are driven by", g.COLOR_LIGHT_GRAY)
+        game.draw_text(592, 526, "slider values above.", g.COLOR_LIGHT_GRAY)
+
+        # HP progress bar
+        game.draw_text(592, 554, "HP:", g.COLOR_WHITE)
+        hp_color = g.COLOR_RGB(52, 180, 92) if hp > 50 else g.COLOR_RGB(200, 76, 76)
+        game.progress_bar(620, 550, 192, 18, hp, 999, hp_color)
+
+        # --- Status panel ---
+        # Labels at the top of status panel
+        game.label(858, 350, 212, 20, "LAST EVENT", g.COLOR_RGB(38, 48, 72), g.COLOR_WHITE)
+        game.label(858, 376, 212, 20, last_event, g.COLOR_RGB(52, 60, 82), g.COLOR_YELLOW)
+
+        game.draw_text(858, 410, "COUNTS", g.COLOR_WHITE)
+        game.draw_printf(858, 426, g.COLOR_LIGHT_GRAY, f"START: {start_count}")
+        game.draw_printf(858, 442, g.COLOR_LIGHT_GRAY, f"RESET: {reset_count}")
+
+        game.separator(858, 462, 212)
+
+        game.draw_text(858, 474, "FLAGS", g.COLOR_WHITE)
+        game.draw_printf(858, 490, g.COLOR_LIGHT_GRAY, f"MUSIC:{'ON' if music_on else 'OFF'}")
+        game.draw_printf(858, 506, g.COLOR_LIGHT_GRAY, f"SFX:  {'ON' if sfx_on else 'OFF'}")
+        game.draw_printf(858, 522, g.COLOR_LIGHT_GRAY, f"GRID: {'ON' if show_grid else 'OFF'}")
+        game.draw_printf(858, 538, g.COLOR_LIGHT_GRAY, f"HARD: {'ON' if hard_mode else 'OFF'}")
+
+        game.draw_printf(858, 558, g.COLOR_LIGHT_GRAY, f"DIFF:{diff_names[difficulty]}")
+        game.draw_printf(858, 574, g.COLOR_LIGHT_GRAY, f"PAUSE:{'Y' if paused else 'N'} TURBO:{'Y' if turbo else 'N'}")
 
         game.update()
         game.wait_frame(60)

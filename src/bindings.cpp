@@ -375,6 +375,25 @@ PYBIND11_MODULE(_pyezgame, m) {
             return py::make_tuple(result, toggled);
         }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
            py::arg("text"), py::arg("toggled"), py::arg("color"))
+        .def("slider", [](GameLib& self, int x, int y, int w, int value, int min_val, int max_val) {
+            bool result = self.Slider(x, y, w, &value, min_val, max_val);
+            return py::make_tuple(result, value);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("value"),
+           py::arg("min_val"), py::arg("max_val"))
+        .def("progress_bar", &GameLib::ProgressBar,
+             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
+             py::arg("value"), py::arg("max_val"), py::arg("color"))
+        .def("spinner", [](GameLib& self, int x, int y, int w, int value,
+                            int min_val, int max_val, int step) {
+            bool result = self.Spinner(x, y, w, &value, min_val, max_val, step);
+            return py::make_tuple(result, value);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("value"),
+           py::arg("min_val"), py::arg("max_val"), py::arg("step"))
+        .def("separator", &GameLib::Separator,
+             py::arg("x"), py::arg("y"), py::arg("w"))
+        .def("label", &GameLib::Label,
+             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
+             py::arg("text"), py::arg("bg_color"), py::arg("text_color"))
 
         // ---- Static Methods: Save/Load ----
         .def_static("save_int", &GameLib::SaveInt,

@@ -1,14 +1,16 @@
-// 15_ui_controls.cpp - Basic UI Controls Demo
+// 15_ui_controls.cpp - Enhanced UI Controls Demo
 //
-// Demonstrates the immediate-mode Button, Checkbox, RadioBox
-// and ToggleButton helpers.
+// Demonstrates the immediate-mode UI helpers:
+//   Button, Checkbox, RadioBox, ToggleButton,
+//   Slider, Spinner, ProgressBar, Separator, Label.
 // Labels use the built-in 8x8 bitmap font, so keep them ASCII.
 //
 // Controls:
-//   Mouse left button : interact with buttons and checkboxes
+//   Mouse left button : interact with all UI controls
 //   ESC               : quit
 //
 // Learn: Button, Checkbox, RadioBox, ToggleButton,
+//        Slider, Spinner, ProgressBar, Separator, Label,
 //        release-trigger UI, built-in 8x8 UI labels
 //
 // Compile (Win32): g++ -o 15_ui_controls.exe 15_ui_controls.cpp -mwindows
@@ -49,98 +51,177 @@ static void DrawBackdrop(GameLib &game, bool showGrid)
 int main()
 {
     GameLib game;
-    game.Open(960, 520, "15 - UI Controls", true);
+    game.Open(1100, 620, "15 - UI Controls", true);
 
+    // --- State variables ---
     bool musicOn = true, sfxOn = true, showGrid = false, hardMode = false;
     int difficulty = 0;
     bool paused = false, turbo = false;
     int startCount = 0, resetCount = 0;
     const char *lastEvent = "NONE";
 
+    // --- New widget states ---
+    int volume = 75;
+    int brightness = 50;
+    int speed = 30;
+    int hp = 100;
+    int level = 1;
+    int scoreMult = 1;
+
+    const char *diffNames[] = {"EASY", "MEDIUM", "HARD"};
+
     while (!game.IsClosed()) {
         if (game.IsKeyPressed(KEY_ESCAPE)) break;
 
         DrawBackdrop(game, showGrid);
 
-        game.FillRect(0, 0, 960, 56, COLOR_RGB(10, 14, 24));
+        // === Top bar ===
+        game.FillRect(0, 0, 1100, 56, COLOR_RGB(10, 14, 24));
         game.DrawTextScale(20, 14, "UI CONTROLS", COLOR_WHITE, 16, 16);
-        game.DrawText(20, 40, "Mouse: press inside, release inside to trigger. ESC quits.", COLOR_LIGHT_GRAY);
+        game.DrawText(20, 40, "Mouse: press/release inside to trigger. ESC quits.", COLOR_LIGHT_GRAY);
 
-        DrawPanel(game, 20, 76, 184, 420, "Buttons");
-        DrawPanel(game, 224, 76, 184, 420, "Checkboxes");
-        DrawPanel(game, 428, 76, 184, 420, "RadioBox");
-        DrawPanel(game, 632, 76, 184, 420, "Toggle");
-        DrawPanel(game, 836, 76, 104, 420, "Status");
+        // =================================================================
+        // ROW 1 - Original controls (y=70 .. y=300)
+        // =================================================================
 
-        if (game.Button(40, 116, 144, 32, "START", COLOR_RGB(52, 150, 92))) {
+        DrawPanel(game, 20, 70, 180, 230, "Buttons");
+        DrawPanel(game, 216, 70, 180, 230, "Checkboxes");
+        DrawPanel(game, 412, 70, 180, 230, "RadioBox");
+        DrawPanel(game, 608, 70, 180, 230, "Toggle");
+
+        // --- Buttons ---
+        if (game.Button(40, 108, 140, 28, "START", COLOR_RGB(52, 150, 92))) {
             startCount++; lastEvent = "START";
         }
-        if (game.Button(40, 160, 144, 32, "RESET", COLOR_RGB(196, 142, 46))) {
+        if (game.Button(40, 148, 140, 28, "RESET", COLOR_RGB(196, 142, 46))) {
             musicOn = true; sfxOn = true; showGrid = false; hardMode = false;
+            volume = 75; brightness = 50; speed = 30;
+            hp = 100; level = 1; scoreMult = 1;
             resetCount++; lastEvent = "RESET";
         }
-        if (game.Button(40, 204, 144, 32, "QUIT", COLOR_RGB(180, 76, 76))) break;
+        if (game.Button(40, 188, 140, 28, "QUIT", COLOR_RGB(180, 76, 76))) break;
 
-        game.DrawText(40, 264, "The button label uses", COLOR_LIGHT_GRAY);
-        game.DrawText(40, 280, "the built-in 8x8 font.", COLOR_LIGHT_GRAY);
-        game.DrawText(40, 320, "Visual states:", COLOR_WHITE);
-        game.DrawText(40, 340, "NORMAL / HOVER / PRESSED", COLOR_LIGHT_GRAY);
+        game.Separator(40, 228, 140);
+        game.DrawText(40, 240, "States: NORMAL", COLOR_LIGHT_GRAY);
+        game.DrawText(40, 256, " HOVER / PRESSED", COLOR_LIGHT_GRAY);
 
-        if (game.Checkbox(244, 116, "MUSIC", &musicOn))
+        // --- Checkboxes ---
+        if (game.Checkbox(236, 108, "MUSIC", &musicOn))
             lastEvent = musicOn ? "MUSIC ON" : "MUSIC OFF";
-        if (game.Checkbox(244, 152, "SFX", &sfxOn))
+        if (game.Checkbox(236, 140, "SFX", &sfxOn))
             lastEvent = sfxOn ? "SFX ON" : "SFX OFF";
-        if (game.Checkbox(244, 188, "SHOW GRID", &showGrid))
+        if (game.Checkbox(236, 172, "SHOW GRID", &showGrid))
             lastEvent = showGrid ? "GRID ON" : "GRID OFF";
-        if (game.Checkbox(244, 224, "HARD MODE", &hardMode))
+        if (game.Checkbox(236, 204, "HARD MODE", &hardMode))
             lastEvent = hardMode ? "HARD ON" : "HARD OFF";
 
-        game.DrawText(244, 276, "Click covers box", COLOR_WHITE);
-        game.DrawText(244, 292, "and label.", COLOR_LIGHT_GRAY);
-        game.DrawText(244, 324, "4 states:", COLOR_WHITE);
-        game.DrawText(244, 340, "CHK/UNCHK", COLOR_LIGHT_GRAY);
-        game.DrawText(244, 356, "+ hover.", COLOR_LIGHT_GRAY);
+        game.Separator(236, 236, 140);
+        game.DrawText(236, 248, "Click toggles the", COLOR_LIGHT_GRAY);
+        game.DrawText(236, 264, "checkbox on/off.", COLOR_LIGHT_GRAY);
 
-        if (game.RadioBox(448, 116, "EASY", &difficulty, 0)) lastEvent = "EASY";
-        if (game.RadioBox(448, 152, "MEDIUM", &difficulty, 1)) lastEvent = "MEDIUM";
-        if (game.RadioBox(448, 188, "HARD", &difficulty, 2)) lastEvent = "HARD";
+        // --- RadioBox ---
+        if (game.RadioBox(432, 108, "EASY", &difficulty, 0)) lastEvent = "EASY";
+        if (game.RadioBox(432, 140, "MEDIUM", &difficulty, 1)) lastEvent = "MEDIUM";
+        if (game.RadioBox(432, 172, "HARD", &difficulty, 2)) lastEvent = "HARD";
 
-        game.DrawText(448, 232, "Same group shares", COLOR_WHITE);
-        game.DrawText(448, 248, "one int *value.", COLOR_LIGHT_GRAY);
-        game.DrawText(448, 280, "Selected:", COLOR_WHITE);
-        const char *diffNames[] = {"EASY", "MEDIUM", "HARD"};
-        game.DrawText(448, 296, diffNames[difficulty], COLOR_YELLOW);
-        game.DrawText(448, 336, "Circle + dot", COLOR_WHITE);
-        game.DrawText(448, 352, "instead of box.", COLOR_LIGHT_GRAY);
+        game.Separator(432, 208, 140);
+        game.DrawText(432, 220, "Selected:", COLOR_WHITE);
+        game.DrawText(432, 236, diffNames[difficulty], COLOR_YELLOW);
+        game.DrawText(432, 260, "Group shares one", COLOR_LIGHT_GRAY);
+        game.DrawText(432, 276, "int value.", COLOR_LIGHT_GRAY);
 
-        if (game.ToggleButton(652, 116, 144, 32, "PAUSE", &paused, COLOR_RGB(180, 76, 76)))
+        // --- Toggle ---
+        if (game.ToggleButton(628, 108, 140, 28, "PAUSE", &paused, COLOR_RGB(180, 76, 76)))
             lastEvent = paused ? "PAUSED" : "RESUME";
-        if (game.ToggleButton(652, 160, 144, 32, "TURBO", &turbo, COLOR_RGB(52, 150, 92)))
+        if (game.ToggleButton(628, 148, 140, 28, "TURBO", &turbo, COLOR_RGB(52, 150, 92)))
             lastEvent = turbo ? "TURBO ON" : "TURBO OFF";
 
-        game.DrawText(652, 216, "Toggled=ON shows", COLOR_WHITE);
-        game.DrawText(652, 232, "sunken bevel.", COLOR_LIGHT_GRAY);
-        game.DrawText(652, 264, "PAUSED:", COLOR_WHITE);
-        game.DrawText(652, 280, paused ? "YES" : "NO", paused ? COLOR_YELLOW : COLOR_LIGHT_GRAY);
-        game.DrawText(652, 312, "TURBO:", COLOR_WHITE);
-        game.DrawText(652, 328, turbo ? "YES" : "NO", turbo ? COLOR_YELLOW : COLOR_LIGHT_GRAY);
+        game.Separator(628, 188, 140);
+        game.DrawText(628, 200, "Toggled=ON shows", COLOR_WHITE);
+        game.DrawText(628, 216, "sunken bevel.", COLOR_LIGHT_GRAY);
+        game.DrawText(628, 244, "PAUSED:", COLOR_WHITE);
+        game.DrawText(628, 260, paused ? "YES" : "NO", paused ? COLOR_YELLOW : COLOR_LIGHT_GRAY);
 
-        game.DrawText(856, 116, "LAST EVENT", COLOR_WHITE);
-        game.DrawText(856, 136, lastEvent, COLOR_YELLOW);
-        game.DrawText(856, 176, "COUNTS", COLOR_WHITE);
-        game.DrawPrintf(856, 196, COLOR_LIGHT_GRAY, "START: %d", startCount);
-        game.DrawPrintf(856, 212, COLOR_LIGHT_GRAY, "RESET: %d", resetCount);
+        // =================================================================
+        // ROW 2 - New controls (y=316 .. y=606)
+        // =================================================================
 
-        game.DrawText(856, 252, "FLAGS", COLOR_WHITE);
-        game.DrawPrintf(856, 272, COLOR_LIGHT_GRAY, "MUSIC: %s", musicOn ? "ON" : "OFF");
-        game.DrawPrintf(856, 288, COLOR_LIGHT_GRAY, "SFX: %s", sfxOn ? "ON" : "OFF");
-        game.DrawPrintf(856, 304, COLOR_LIGHT_GRAY, "GRID: %s", showGrid ? "ON" : "OFF");
-        game.DrawPrintf(856, 320, COLOR_LIGHT_GRAY, "HARD: %s", hardMode ? "ON" : "OFF");
+        DrawPanel(game, 20, 316, 260, 290, "Sliders");
+        DrawPanel(game, 296, 316, 260, 290, "Spinners");
+        DrawPanel(game, 572, 316, 260, 290, "Progress Bars");
+        DrawPanel(game, 848, 316, 232, 290, "Status");
 
-        game.DrawText(856, 352, "DIFF:", COLOR_WHITE);
-        game.DrawText(856, 368, diffNames[difficulty], COLOR_YELLOW);
-        game.DrawPrintf(856, 384, COLOR_LIGHT_GRAY, "PAUSE:%s", paused ? "Y" : "N");
-        game.DrawPrintf(856, 400, COLOR_LIGHT_GRAY, "TURBO:%s", turbo ? "Y" : "N");
+        // --- Sliders ---
+        game.DrawText(40, 354, "VOLUME:", COLOR_WHITE);
+        game.DrawPrintf(160, 354, COLOR_YELLOW, "%d", volume);
+        game.Slider(40, 370, 220, &volume, 0, 100);
+
+        game.DrawText(40, 402, "BRIGHTNESS:", COLOR_WHITE);
+        game.DrawPrintf(160, 402, COLOR_YELLOW, "%d", brightness);
+        game.Slider(40, 418, 220, &brightness, 0, 100);
+
+        game.DrawText(40, 450, "SPEED:", COLOR_WHITE);
+        game.DrawPrintf(160, 450, COLOR_YELLOW, "%d", speed);
+        game.Slider(40, 466, 220, &speed, 0, 100);
+
+        game.Separator(40, 498, 220);
+        game.DrawText(40, 510, "Drag the handle to", COLOR_LIGHT_GRAY);
+        game.DrawText(40, 526, "adjust the value.", COLOR_LIGHT_GRAY);
+        game.DrawText(40, 556, "Range: 0 ~ 100", COLOR_LIGHT_GRAY);
+
+        // --- Spinners ---
+        game.DrawText(316, 354, "HP:", COLOR_WHITE);
+        game.Spinner(370, 350, 120, &hp, 0, 999, 10);
+
+        game.DrawText(316, 402, "LEVEL:", COLOR_WHITE);
+        game.Spinner(370, 398, 120, &level, 1, 99, 1);
+
+        game.DrawText(316, 450, "SCORE MULT:", COLOR_WHITE);
+        game.Spinner(420, 446, 70, &scoreMult, 1, 10, 1);
+
+        game.Separator(316, 498, 220);
+        game.DrawText(316, 510, "Click -/+ buttons", COLOR_LIGHT_GRAY);
+        game.DrawText(316, 526, "to change value.", COLOR_LIGHT_GRAY);
+        game.DrawText(316, 556, "Step is configurable.", COLOR_LIGHT_GRAY);
+
+        // --- Progress Bars ---
+        game.DrawText(592, 354, "VOLUME BAR:", COLOR_WHITE);
+        game.ProgressBar(592, 370, 220, 18, volume, 100, COLOR_RGB(52, 150, 92));
+
+        game.DrawText(592, 402, "BRIGHTNESS BAR:", COLOR_WHITE);
+        game.ProgressBar(592, 418, 220, 18, brightness, 100, COLOR_RGB(70, 130, 200));
+
+        game.DrawText(592, 450, "LOADING BAR:", COLOR_WHITE);
+        game.ProgressBar(592, 466, 220, 18, speed, 100, COLOR_RGB(196, 142, 46));
+
+        game.Separator(592, 498, 220);
+        game.DrawText(592, 510, "Bars are driven by", COLOR_LIGHT_GRAY);
+        game.DrawText(592, 526, "slider values above.", COLOR_LIGHT_GRAY);
+
+        // HP progress bar
+        game.DrawText(592, 554, "HP:", COLOR_WHITE);
+        uint32_t hpColor = (hp > 50) ? COLOR_RGB(52, 180, 92) : COLOR_RGB(200, 76, 76);
+        game.ProgressBar(620, 550, 192, 18, hp, 999, hpColor);
+
+        // --- Status panel ---
+        game.Label(858, 350, 212, 20, "LAST EVENT", COLOR_RGB(38, 48, 72), COLOR_WHITE);
+        game.Label(858, 376, 212, 20, lastEvent, COLOR_RGB(52, 60, 82), COLOR_YELLOW);
+
+        game.DrawText(858, 410, "COUNTS", COLOR_WHITE);
+        game.DrawPrintf(858, 426, COLOR_LIGHT_GRAY, "START: %d", startCount);
+        game.DrawPrintf(858, 442, COLOR_LIGHT_GRAY, "RESET: %d", resetCount);
+
+        game.Separator(858, 462, 212);
+
+        game.DrawText(858, 474, "FLAGS", COLOR_WHITE);
+        game.DrawPrintf(858, 490, COLOR_LIGHT_GRAY, "MUSIC:%s", musicOn ? "ON" : "OFF");
+        game.DrawPrintf(858, 506, COLOR_LIGHT_GRAY, "SFX:  %s", sfxOn ? "ON" : "OFF");
+        game.DrawPrintf(858, 522, COLOR_LIGHT_GRAY, "GRID: %s", showGrid ? "ON" : "OFF");
+        game.DrawPrintf(858, 538, COLOR_LIGHT_GRAY, "HARD: %s", hardMode ? "ON" : "OFF");
+
+        game.DrawPrintf(858, 558, COLOR_LIGHT_GRAY, "DIFF:%s", diffNames[difficulty]);
+        game.DrawPrintf(858, 574, COLOR_LIGHT_GRAY, "PAUSE:%s TURBO:%s",
+                        paused ? "Y" : "N", turbo ? "Y" : "N");
 
         game.Update();
         game.WaitFrame(60);
