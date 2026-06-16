@@ -31,13 +31,15 @@ jobs:
       - name: Build sdist
         run: pipx run build --sdist
 
-      - name: Collect artifacts
-        run: cp dist/*.tar.gz wheelhouse/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-sdist
+          path: dist/*.tar.gz
 
       - uses: actions/upload-artifact@v4
         with:
           name: dist-linux
-          path: wheelhouse/*
+          path: wheelhouse/*.whl
 
   build-windows:
     name: Windows wheels
