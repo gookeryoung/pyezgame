@@ -5,7 +5,8 @@ Demonstrates ALL immediate-mode UI helpers organized in tab pages:
   Tab 2 VALUES   : slider, spinner, progress_bar, knob, v_separator
   Tab 3 INPUT    : text_input, dropdown, tab_bar, tooltip
   Tab 4 ADVANCED : list_box, color_picker, collapsible, image_button, menu
-  Tab 5 STATUS   : status dashboard (last event, counts, flags)
+
+  Persistent status bar at bottom shows all control states.
 
 Controls:
   Mouse left button : interact with all UI controls
@@ -338,58 +339,70 @@ def draw_advanced_tab(game: g.GameLib, cx: int, cy: int, state: dict[str, Any]) 
     game.draw_text(ibx, iby + 178, "dismiss menu.", g.COLOR_LIGHT_GRAY)
 
 
-def draw_status_tab(game: g.GameLib, cx: int, cy: int, state: dict[str, Any]) -> None:
-    pw = 240
-    gap = 8
-    px = cx + 4
+def draw_status_bar(game: g.GameLib, state: dict[str, Any]) -> None:
+    """Draw persistent status bar below the tab panel."""
+    bar_h = 96
+    bar_y = WIN_H - bar_h - 6
+    bar_x = 20
+    bar_w = WIN_W - 40
 
-    draw_panel(game, px, cy, pw, 280, "Events")
-    draw_panel(game, px + pw + gap, cy, pw, 280, "Counts & Flags")
-    draw_panel(game, px + 2 * (pw + gap), cy, pw + 50, 280, "All States")
+    # Background
+    game.fill_rect(bar_x, bar_y, bar_w, bar_h, g.COLOR_RGB(22, 26, 40))
+    game.draw_rect(bar_x, bar_y, bar_w, bar_h, g.COLOR_RGB(64, 72, 96))
 
-    # Events
-    ex, ey = px + 10, cy + 28
-    game.label(ex, ey, 218, 20, "LAST EVENT", g.COLOR_RGB(38, 48, 72), g.COLOR_WHITE)
-    game.label(ex, ey + 28, 218, 20, state["last_event"], g.COLOR_RGB(52, 60, 82), g.COLOR_YELLOW)
-    game.separator(ex, ey + 60, 218)
-    game.draw_text(ex, ey + 72, "Interact with any", g.COLOR_LIGHT_GRAY)
-    game.draw_text(ex, ey + 86, "control to see its", g.COLOR_LIGHT_GRAY)
-    game.draw_text(ex, ey + 100, "event name here.", g.COLOR_LIGHT_GRAY)
-
-    # Counts & Flags
-    fx, fy = px + pw + gap + 10, cy + 28
-    game.draw_text(fx, fy, "COUNTS", g.COLOR_WHITE)
-    game.draw_printf(fx, fy + 16, g.COLOR_LIGHT_GRAY, f"START: {state['start_count']}")
-    game.draw_printf(fx, fy + 32, g.COLOR_LIGHT_GRAY, f"RESET: {state['reset_count']}")
-
-    game.separator(fx, fy + 56, 218)
-    game.draw_text(fx, fy + 68, "FLAGS", g.COLOR_WHITE)
-    game.draw_printf(fx, fy + 84, g.COLOR_LIGHT_GRAY, f"MUSIC: {'ON' if state['music_on'] else 'OFF'}")
-    game.draw_printf(fx, fy + 100, g.COLOR_LIGHT_GRAY, f"SFX:   {'ON' if state['sfx_on'] else 'OFF'}")
-    game.draw_printf(fx, fy + 116, g.COLOR_LIGHT_GRAY, f"GRID:  {'ON' if state['show_grid'] else 'OFF'}")
-    game.draw_printf(fx, fy + 132, g.COLOR_LIGHT_GRAY, f"HARD:  {'ON' if state['hard_mode'] else 'OFF'}")
-
-    # All States
-    sx, sy = px + 2 * (pw + gap) + 10, cy + 28
     diff_names = ["EASY", "MEDIUM", "HARD"]
-    game.draw_text(sx, sy, "CURRENT VALUES", g.COLOR_WHITE)
-    game.draw_printf(sx, sy + 16, g.COLOR_LIGHT_GRAY, f"Volume:     {state['volume']}")
-    game.draw_printf(sx, sy + 32, g.COLOR_LIGHT_GRAY, f"Brightness: {state['brightness']}")
-    game.draw_printf(sx, sy + 48, g.COLOR_LIGHT_GRAY, f"Speed:      {state['speed']}")
-    game.draw_printf(sx, sy + 64, g.COLOR_LIGHT_GRAY, f"HP:         {state['hp']}")
-    game.draw_printf(sx, sy + 80, g.COLOR_LIGHT_GRAY, f"Level:      {state['level']}")
-    game.draw_printf(sx, sy + 96, g.COLOR_LIGHT_GRAY, f"ScoreMult:  {state['score_mult']}")
-    game.draw_printf(sx, sy + 112, g.COLOR_LIGHT_GRAY, f"Knob:       {state['knob_val']}")
-    game.separator(sx, sy + 136, 260)
-    game.draw_printf(sx, sy + 148, g.COLOR_LIGHT_GRAY, f"Diff:  {diff_names[state['difficulty']]}")
-    game.draw_printf(
-        sx,
-        sy + 164,
+    y1 = bar_y + 8
+    y2 = bar_y + 26
+    y3 = bar_y + 44
+    y4 = bar_y + 62
+    bar_y + 80
+
+    # Column 1: Event + counts
+    c1x = bar_x + 12
+    game.draw_text(c1x, y1, f"EVENT: {state['last_event']}", g.COLOR_YELLOW)
+    game.draw_text(c1x, y2, f"Start: {state['start_count']}   Reset: {state['reset_count']}", g.COLOR_LIGHT_GRAY)
+
+    # Separator
+    game.v_separator(bar_x + 250, bar_y + 6, bar_h - 12)
+
+    # Column 2: Flags
+    c2x = bar_x + 264
+    game.draw_text(c2x, y1, "FLAGS", g.COLOR_WHITE)
+    game.draw_text(
+        c2x,
+        y2,
+        f"Music:{'ON' if state['music_on'] else 'OFF'}  Sfx:{'ON' if state['sfx_on'] else 'OFF'}"
+        + f"  Grid:{'ON' if state['show_grid'] else 'OFF'}  Hard:{'ON' if state['hard_mode'] else 'OFF'}",
         g.COLOR_LIGHT_GRAY,
-        f"Pause: {'Y' if state['paused'] else 'N'} Turbo: {'Y' if state['turbo'] else 'N'}",
     )
-    game.draw_printf(sx, sy + 180, g.COLOR_LIGHT_GRAY, f"Res:   {state['resolutions'][state['resolution_idx']]}")
-    game.draw_printf(sx, sy + 196, g.COLOR_LIGHT_GRAY, f"Name:  {state['player_name']}")
+    game.draw_text(
+        c2x,
+        y3,
+        f"Pause:{'Y' if state['paused'] else 'N'}  Turbo:{'Y' if state['turbo'] else 'N'}"
+        + f"  Diff:{diff_names[state['difficulty']]}",
+        g.COLOR_LIGHT_GRAY,
+    )
+
+    # Separator
+    game.v_separator(bar_x + 560, bar_y + 6, bar_h - 12)
+
+    # Column 3: Values
+    c3x = bar_x + 574
+    game.draw_text(c3x, y1, "VALUES", g.COLOR_WHITE)
+    game.draw_text(
+        c3x,
+        y2,
+        f"Vol:{state['volume']}  Bri:{state['brightness']}  Spd:{state['speed']}  Knob:{state['knob_val']}",
+        g.COLOR_LIGHT_GRAY,
+    )
+    game.draw_text(
+        c3x,
+        y3,
+        f"HP:{state['hp']}  Lv:{state['level']}"
+        + f"  Mult:{state['score_mult']}  Res:{state['resolutions'][state['resolution_idx']]}",
+        g.COLOR_LIGHT_GRAY,
+    )
+    game.draw_text(c3x, y4, f"Name: {state['player_name']}", g.COLOR_LIGHT_GRAY)
 
 
 def _reset_all(state: dict[str, Any]) -> None:
@@ -509,7 +522,8 @@ def main() -> None:
     }
 
     active_tab = 0
-    tab_names = ["BASIC", "VALUES", "INPUT", "ADVANCED", "STATUS"]
+    tab_names = ["BASIC", "VALUES", "INPUT", "ADVANCED"]
+    tab_h = WIN_H - 62 - 108  # leave room for status bar
 
     while not game.is_closed():
         if game.is_key_pressed(g.KEY_ESCAPE):
@@ -525,7 +539,7 @@ def main() -> None:
         game.draw_text(16, 30, f"Tab: {tab_names[active_tab]}  |  ESC quits", g.COLOR_LIGHT_GRAY)
 
         # Main TabPanel
-        active_tab, cx, cy, cw, ch = game.tab_panel(20, 52, WIN_W - 40, WIN_H - 62, tab_names, active_tab)
+        active_tab, cx, cy, cw, ch = game.tab_panel(20, 52, WIN_W - 40, tab_h, tab_names, active_tab)
 
         if active_tab == 0:
             draw_basic_tab(game, cx, cy, state)
@@ -535,8 +549,9 @@ def main() -> None:
             draw_input_tab(game, cx, cy, state)
         elif active_tab == 3:
             draw_advanced_tab(game, cx, cy, state)
-        elif active_tab == 4:
-            draw_status_tab(game, cx, cy, state)
+
+        # Persistent status bar (always visible)
+        draw_status_bar(game, state)
 
         game.update()
         game.wait_frame(60)

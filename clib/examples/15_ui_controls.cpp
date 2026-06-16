@@ -5,7 +5,8 @@
 //   Tab 2 VALUES   : Slider, Spinner, ProgressBar, Knob, VSeparator
 //   Tab 3 INPUT    : TextInput, Dropdown, TabBar, Tooltip
 //   Tab 4 ADVANCED : ListBox, ColorPicker, Collapsible, ImageButton, Menu
-//   Tab 5 STATUS   : status dashboard
+//
+//   Persistent status bar at bottom shows all control states.
 //
 // Controls:
 //   Mouse left button : interact with all UI controls
@@ -336,51 +337,45 @@ static void DrawAdvancedTab(GameLib &game, int cx, int cy, UIState &s)
     game.DrawText(ibx, iby+178, "dismiss menu.", COLOR_LIGHT_GRAY);
 }
 
-static void DrawStatusTab(GameLib &game, int cx, int cy, UIState &s)
+static void DrawStatusBar(GameLib &game, UIState &s)
 {
-    int pw = 240, gap = 8, px = cx + 4;
-    DrawPanel(game, px, cy, pw, 280, "Events");
-    DrawPanel(game, px+pw+gap, cy, pw, 280, "Counts & Flags");
-    DrawPanel(game, px+2*(pw+gap), cy, pw+50, 280, "All States");
+    const int barH = 96;
+    const int barY = WIN_H - barH - 6;
+    const int barX = 20;
+    const int barW = WIN_W - 40;
 
-    // Events
-    int ex = px+10, ey = cy+28;
-    game.Label(ex, ey, 218, 20, "LAST EVENT", COLOR_RGB(38,48,72), COLOR_WHITE);
-    game.Label(ex, ey+28, 218, 20, s.lastEvent, COLOR_RGB(52,60,82), COLOR_YELLOW);
-    game.Separator(ex, ey+60, 218);
-    game.DrawText(ex, ey+72, "Interact with any", COLOR_LIGHT_GRAY);
-    game.DrawText(ex, ey+86, "control to see its", COLOR_LIGHT_GRAY);
-    game.DrawText(ex, ey+100, "event name here.", COLOR_LIGHT_GRAY);
+    game.FillRect(barX, barY, barW, barH, COLOR_RGB(22, 26, 40));
+    game.DrawRect(barX, barY, barW, barH, COLOR_RGB(64, 72, 96));
 
-    // Counts & Flags
-    int fx = px+pw+gap+10, fy = cy+28;
-    game.DrawText(fx, fy, "COUNTS", COLOR_WHITE);
-    game.DrawPrintf(fx, fy+16, COLOR_LIGHT_GRAY, "START: %d", s.startCount);
-    game.DrawPrintf(fx, fy+32, COLOR_LIGHT_GRAY, "RESET: %d", s.resetCount);
-    game.Separator(fx, fy+56, 218);
-    game.DrawText(fx, fy+68, "FLAGS", COLOR_WHITE);
-    game.DrawPrintf(fx, fy+84, COLOR_LIGHT_GRAY, "MUSIC: %s", s.musicOn ? "ON" : "OFF");
-    game.DrawPrintf(fx, fy+100, COLOR_LIGHT_GRAY, "SFX:   %s", s.sfxOn ? "ON" : "OFF");
-    game.DrawPrintf(fx, fy+116, COLOR_LIGHT_GRAY, "GRID:  %s", s.showGrid ? "ON" : "OFF");
-    game.DrawPrintf(fx, fy+132, COLOR_LIGHT_GRAY, "HARD:  %s", s.hardMode ? "ON" : "OFF");
-
-    // All States
-    int sx = px+2*(pw+gap)+10, sy = cy+28;
     const char *diffNames[] = {"EASY","MEDIUM","HARD"};
-    game.DrawText(sx, sy, "CURRENT VALUES", COLOR_WHITE);
-    game.DrawPrintf(sx, sy+16, COLOR_LIGHT_GRAY, "Volume:     %d", s.volume);
-    game.DrawPrintf(sx, sy+32, COLOR_LIGHT_GRAY, "Brightness: %d", s.brightness);
-    game.DrawPrintf(sx, sy+48, COLOR_LIGHT_GRAY, "Speed:      %d", s.speed);
-    game.DrawPrintf(sx, sy+64, COLOR_LIGHT_GRAY, "HP:         %d", s.hp);
-    game.DrawPrintf(sx, sy+80, COLOR_LIGHT_GRAY, "Level:      %d", s.level);
-    game.DrawPrintf(sx, sy+96, COLOR_LIGHT_GRAY, "ScoreMult:  %d", s.scoreMult);
-    game.DrawPrintf(sx, sy+112, COLOR_LIGHT_GRAY, "Knob:       %d", s.knobVal);
-    game.Separator(sx, sy+136, 260);
-    game.DrawPrintf(sx, sy+148, COLOR_LIGHT_GRAY, "Diff:  %s", diffNames[s.difficulty]);
-    game.DrawPrintf(sx, sy+164, COLOR_LIGHT_GRAY, "Pause: %s Turbo: %s",
-                    s.paused ? "Y" : "N", s.turbo ? "Y" : "N");
-    game.DrawPrintf(sx, sy+180, COLOR_LIGHT_GRAY, "Res:   %s", s.resolutions[s.resolutionIdx]);
-    game.DrawPrintf(sx, sy+196, COLOR_LIGHT_GRAY, "Name:  %s", s.playerName);
+    int y1 = barY + 8, y2 = barY + 26, y3 = barY + 44, y4 = barY + 62;
+
+    // Column 1: Event + counts
+    int c1x = barX + 12;
+    game.DrawPrintf(c1x, y1, COLOR_YELLOW, "EVENT: %s", s.lastEvent);
+    game.DrawPrintf(c1x, y2, COLOR_LIGHT_GRAY, "Start: %d   Reset: %d", s.startCount, s.resetCount);
+
+    game.VSeparator(barX + 250, barY + 6, barH - 12);
+
+    // Column 2: Flags
+    int c2x = barX + 264;
+    game.DrawText(c2x, y1, "FLAGS", COLOR_WHITE);
+    game.DrawPrintf(c2x, y2, COLOR_LIGHT_GRAY, "Music:%s  Sfx:%s  Grid:%s  Hard:%s",
+        s.musicOn?"ON":"OFF", s.sfxOn?"ON":"OFF",
+        s.showGrid?"ON":"OFF", s.hardMode?"ON":"OFF");
+    game.DrawPrintf(c2x, y3, COLOR_LIGHT_GRAY, "Pause:%s  Turbo:%s  Diff:%s",
+        s.paused?"Y":"N", s.turbo?"Y":"N", diffNames[s.difficulty]);
+
+    game.VSeparator(barX + 560, barY + 6, barH - 12);
+
+    // Column 3: Values
+    int c3x = barX + 574;
+    game.DrawText(c3x, y1, "VALUES", COLOR_WHITE);
+    game.DrawPrintf(c3x, y2, COLOR_LIGHT_GRAY, "Vol:%d  Bri:%d  Spd:%d  Knob:%d",
+        s.volume, s.brightness, s.speed, s.knobVal);
+    game.DrawPrintf(c3x, y3, COLOR_LIGHT_GRAY, "HP:%d  Lv:%d  Mult:%d  Res:%s",
+        s.hp, s.level, s.scoreMult, s.resolutions[s.resolutionIdx]);
+    game.DrawPrintf(c3x, y4, COLOR_LIGHT_GRAY, "Name: %s", s.playerName);
 }
 
 int main()
@@ -398,8 +393,9 @@ int main()
             game.SetSpritePixel(state.iconId, px, py, c);
         }
 
-    const char *tabNames[] = {"BASIC","VALUES","INPUT","ADVANCED","STATUS"};
+    const char *tabNames[] = {"BASIC","VALUES","INPUT","ADVANCED"};
     int activeTab = 0;
+    int tabH = WIN_H - 62 - 108;  // leave room for status bar
 
     while (!game.IsClosed()) {
         if (game.IsKeyPressed(KEY_ESCAPE)) break;
@@ -413,7 +409,7 @@ int main()
         game.DrawPrintf(16, 30, COLOR_LIGHT_GRAY, "Tab: %s  |  ESC quits", tabNames[activeTab]);
 
         // Main TabPanel
-        activeTab = game.TabPanel(20, 52, WIN_W - 40, WIN_H - 62, tabNames, 5, activeTab);
+        activeTab = game.TabPanel(20, 52, WIN_W - 40, tabH, tabNames, 4, activeTab);
 
         int cx = 24, cy = 82;  // content area approx
 
@@ -421,7 +417,9 @@ int main()
         else if (activeTab == 1) DrawValuesTab(game, cx, cy, state);
         else if (activeTab == 2) DrawInputTab(game, cx, cy, state);
         else if (activeTab == 3) DrawAdvancedTab(game, cx, cy, state);
-        else if (activeTab == 4) DrawStatusTab(game, cx, cy, state);
+
+        // Persistent status bar (always visible)
+        DrawStatusBar(game, state);
 
         game.Update();
         game.WaitFrame(60);
