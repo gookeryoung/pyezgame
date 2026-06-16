@@ -16,8 +16,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache pip (in-container)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: linux-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: linux-pip-
+
       - name: Build wheels (cibuildwheel)
         uses: pypa/cibuildwheel@v2.23
+        env:
+          CIBW_ENVIRONMENT: "PIP_CACHE_DIR=/host/home/runner/.cache/pip"
 
       - name: Build sdist
         run: pipx run build --sdist
@@ -35,6 +44,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: windows-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: windows-pip-
+
       - name: Build wheels (cibuildwheel)
         uses: pypa/cibuildwheel@v2.23
 
@@ -48,6 +64,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache Homebrew
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/Homebrew/downloads
+          key: macos-brew-${{ hashFiles('pyproject.toml') }}
+          restore-keys: macos-brew-
 
       - name: Build wheels (cibuildwheel)
         uses: pypa/cibuildwheel@v2.23
