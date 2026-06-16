@@ -57,6 +57,19 @@ stages:
           - path: /root/.cache/cibuildwheel
             key: cibw-${{hashFiles('pyproject.toml')}}
         steps:
+          install_docker_step:
+            step: PythonBuild
+            name: 安装 Docker
+            with:
+              run: |
+                yum install -y yum-utils || true
+                yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo || true
+                yum install -y docker-ce docker-ce-cli containerd.io || \
+                dnf install -y dnf-plugins-core && \
+                dnf config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo && \
+                dnf install -y docker-ce docker-ce-cli containerd.io
+                systemctl start docker
+                docker info
           build_step:
             step: PythonBuild
             name: cibuildwheel 构建
