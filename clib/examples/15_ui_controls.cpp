@@ -25,7 +25,7 @@
 #include <cstring>
 #include <cstdio>
 
-#define WIN_W 800
+#define WIN_W 860
 #define WIN_H 620
 
 static void DrawPanel(GameLib &g, int x, int y, int w, int h, const char *title)
@@ -183,20 +183,20 @@ static void DrawValuesTab(GameLib &game, int cx, int cy, UIState &s)
 
     // Spinners & Knob
     int sx2 = px+pw+gap+10;
-    game.DrawText(sx2, sy, "HP:", COLOR_WHITE);
-    game.Spinner(sx2+80, sy-4, 120, &s.hp, 0, 999, 10);
-    game.DrawText(sx2, sy+44, "LEVEL:", COLOR_WHITE);
-    game.Spinner(sx2+80, sy+40, 120, &s.level, 1, 99, 1);
-    game.DrawText(sx2, sy+88, "MULT:", COLOR_WHITE);
-    game.Spinner(sx2+80, sy+84, 120, &s.scoreMult, 1, 10, 1);
-    game.VSeparator(sx2+110, sy+124, 120);
+    game.DrawText(sx2, sy+4, "HP:", COLOR_WHITE);
+    game.Spinner(sx2+60, sy, 60, &s.hp, 0, 999, 10);
+    game.DrawText(sx2, sy+48, "LEVEL:", COLOR_WHITE);
+    game.Spinner(sx2+60, sy+44, 60, &s.level, 1, 99, 1);
+    game.DrawText(sx2, sy+92, "MULT:", COLOR_WHITE);
+    game.Spinner(sx2+60, sy+88, 60, &s.scoreMult, 1, 10, 1);
+    game.VSeparator(sx2+140, sy, 130);
 
-    game.DrawText(sx2+130, sy, "KNOB:", COLOR_WHITE);
-    game.DrawPrintf(sx2+180, sy, COLOR_YELLOW, "%d", s.knobVal);
-    game.Knob(sx2+140, sy+20, 56, &s.knobVal, 0, 100);
-    game.ProgressBar(sx2+130, sy+84, 80, 12, s.knobVal, 100, COLOR_RGB(70,130,200));
+    game.DrawText(sx2+155, sy+4, "KNOB:", COLOR_WHITE);
+    game.DrawPrintf(sx2+210, sy+4, COLOR_YELLOW, "%d", s.knobVal);
+    game.Knob(sx2+162, sy+24, 56, &s.knobVal, 0, 100);
+    game.ProgressBar(sx2+155, sy+88, 72, 12, s.knobVal, 100, COLOR_RGB(70,130,200));
 
-    game.Separator(sx2, sy+150, 218);
+    game.Separator(sx2, sy+150, 228);
     game.DrawText(sx2, sy+162, "Spinner: click -/+", COLOR_LIGHT_GRAY);
     game.DrawText(sx2, sy+176, "Knob: drag up/down", COLOR_LIGHT_GRAY);
 

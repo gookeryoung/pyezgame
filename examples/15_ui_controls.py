@@ -26,7 +26,7 @@ from typing import Any
 
 import pyezgame as g
 
-WIN_W, WIN_H = 800, 620
+WIN_W, WIN_H = 860, 620
 
 
 def draw_panel(game: g.GameLib, x: int, y: int, w: int, h: int, title: str) -> None:
@@ -136,24 +136,24 @@ def draw_values_tab(game: g.GameLib, cx: int, cy: int, state: dict[str, Any]) ->
 
     # Spinners & Knob
     sx2 = px + pw + gap + 10
-    game.draw_text(sx2, sy, "HP:", g.COLOR_WHITE)
-    _, state["hp"] = game.spinner(sx2 + 80, sy - 4, 120, state["hp"], 0, 999, 10)
+    game.draw_text(sx2, sy + 4, "HP:", g.COLOR_WHITE)
+    _, state["hp"] = game.spinner(sx2 + 60, sy, 60, state["hp"], 0, 999, 10)
 
-    game.draw_text(sx2, sy + 44, "LEVEL:", g.COLOR_WHITE)
-    _, state["level"] = game.spinner(sx2 + 80, sy + 40, 120, state["level"], 1, 99, 1)
+    game.draw_text(sx2, sy + 48, "LEVEL:", g.COLOR_WHITE)
+    _, state["level"] = game.spinner(sx2 + 60, sy + 44, 60, state["level"], 1, 99, 1)
 
-    game.draw_text(sx2, sy + 88, "MULT:", g.COLOR_WHITE)
-    _, state["score_mult"] = game.spinner(sx2 + 80, sy + 84, 120, state["score_mult"], 1, 10, 1)
+    game.draw_text(sx2, sy + 92, "MULT:", g.COLOR_WHITE)
+    _, state["score_mult"] = game.spinner(sx2 + 60, sy + 88, 60, state["score_mult"], 1, 10, 1)
 
-    game.v_separator(sx2 + 110, sy + 124, 120)
+    game.v_separator(sx2 + 140, sy, 130)
 
     # Knob
-    game.draw_text(sx2 + 130, sy, "KNOB:", g.COLOR_WHITE)
-    game.draw_printf(sx2 + 180, sy, g.COLOR_YELLOW, f"{state['knob_val']}")
-    _, state["knob_val"] = game.knob(sx2 + 140, sy + 20, 56, state["knob_val"], 0, 100)
-    game.progress_bar(sx2 + 130, sy + 84, 80, 12, state["knob_val"], 100, g.COLOR_RGB(70, 130, 200))
+    game.draw_text(sx2 + 155, sy + 4, "KNOB:", g.COLOR_WHITE)
+    game.draw_printf(sx2 + 210, sy + 4, g.COLOR_YELLOW, f"{state['knob_val']}")
+    _, state["knob_val"] = game.knob(sx2 + 162, sy + 24, 56, state["knob_val"], 0, 100)
+    game.progress_bar(sx2 + 155, sy + 88, 72, 12, state["knob_val"], 100, g.COLOR_RGB(70, 130, 200))
 
-    game.separator(sx2, sy + 150, 218)
+    game.separator(sx2, sy + 150, 228)
     game.draw_text(sx2, sy + 162, "Spinner: click -/+", g.COLOR_LIGHT_GRAY)
     game.draw_text(sx2, sy + 176, "Knob: drag up/down", g.COLOR_LIGHT_GRAY)
 

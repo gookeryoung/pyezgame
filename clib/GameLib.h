@@ -5516,8 +5516,18 @@ bool GameLib::TabBar(int x, int y, int w, const char **tabs, int tabCount, int *
         }
     }
 
-    if (mouseReleased) {
-        _uiActiveId = 0;
+    if (mouseReleased && _uiActiveId != 0) {
+        // Only clear _uiActiveId if it belongs to this TabBar
+        for (int i = 0; i < tabCount; i++) {
+            int tx2 = x + i * tabW;
+            int tw2 = tabW;
+            if (i == tabCount - 1) tw2 = w - i * tabW;
+            uint32_t tid = _gamelib_ui_make_id(0x54414231u, tx2, y, tw2, tabH, tabs[i] ? tabs[i] : "");
+            if (_uiActiveId == tid) {
+                _uiActiveId = 0;
+                break;
+            }
+        }
     }
 
     // draw bottom border line (connecting bar)
