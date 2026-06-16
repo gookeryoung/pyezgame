@@ -9,5 +9,5 @@ from ._pyezgame import *  # noqa: F403
 from ._pyezgame import GameLib
 from .utils import get_respath
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 __all__ = ["GameLib", "get_respath"]
