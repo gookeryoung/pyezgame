@@ -1071,6 +1071,23 @@ class GameLib:
         """
         ...
 
+    def tab_panel(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        tabs: list[str],
+        selected_tab: int,
+    ) -> tuple[int, int, int, int, int]:
+        """Draw a tabbed panel with tab headers and a content area.
+
+        Returns (active_tab, cx, cy, cw, ch) where active_tab is the currently
+        selected tab index, and (cx, cy, cw, ch) describes the content area
+        rectangle inside the panel for placing child controls.
+        """
+        ...
+
     # ---- Static Methods: Save/Load ----
 
     @staticmethod

@@ -472,6 +472,16 @@ PYBIND11_MODULE(_pyezgame, m) {
             int result = self.Menu(x, y, ptrs.data(), (int)ptrs.size(), &open);
             return py::make_tuple(result, open);
         }, py::arg("x"), py::arg("y"), py::arg("items"), py::arg("open"))
+        .def("tab_panel", [](GameLib& self, int x, int y, int w, int h,
+                              const std::vector<std::string>& tabs, int selected_tab) {
+            std::vector<const char*> ptrs;
+            ptrs.reserve(tabs.size());
+            for (auto& s : tabs) ptrs.push_back(s.c_str());
+            int result = self.TabPanel(x, y, w, h, ptrs.data(), (int)ptrs.size(), selected_tab);
+            const int tabH = 26;
+            return py::make_tuple(result, x + 4, y + tabH + 4, w - 8, h - tabH - 8);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
+           py::arg("tabs"), py::arg("selected_tab"))
 
         // ---- Static Methods: Save/Load ----
         .def_static("save_int", &GameLib::SaveInt,

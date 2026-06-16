@@ -443,6 +443,7 @@ public:
     bool ColorPicker(int x, int y, const uint32_t *colors, int colorCount, int *selectedIndex);
     bool Knob(int x, int y, int size, int *value, int minVal, int maxVal);
     int Menu(int x, int y, const char **items, int itemCount, bool *open);
+    int TabPanel(int x, int y, int w, int h, const char **tabs, int tabCount, int selectedTab);
 
     // -------- Scene Management --------
     void SetScene(int scene);
@@ -3630,6 +3631,99 @@ int GameLib::Menu(int x, int y, const char **items, int itemCount, bool *open)
     }
 
     return result;
+}
+
+int GameLib::TabPanel(int x, int y, int w, int h, const char **tabs, int tabCount, int selectedTab)
+{
+    if (!tabs || tabCount <= 0 || w <= 0 || h <= 0) return selectedTab;
+
+    const int tabH = 26;
+    int tabW = w / tabCount;
+    if (tabW < 40) tabW = 40;
+
+    if (selectedTab < 0) selectedTab = 0;
+    if (selectedTab >= tabCount) selectedTab = tabCount - 1;
+
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    for (int i = 0; i < tabCount; i++) {
+        int tx = x + i * tabW;
+        int tw = tabW;
+        if (i == tabCount - 1) tw = w - i * tabW;
+        bool tabHov = PointInRect(_mouseX, _mouseY, tx, y, tw, tabH);
+
+        if (mousePressed && tabHov) {
+            _uiActiveId = _gamelib_ui_make_id(0x54504C31u, tx, y, tw, tabH, tabs[i] ? tabs[i] : "");
+        }
+
+        bool isActive = (i == selectedTab);
+        uint32_t tabId = _gamelib_ui_make_id(0x54504C31u, tx, y, tw, tabH, tabs[i] ? tabs[i] : "");
+        bool isPressed = (_uiActiveId == tabId) && mouseDown && tabHov;
+
+        uint32_t face;
+        if (isActive)       face = COLOR_RGB(48, 58, 82);
+        else if (tabHov)    face = COLOR_RGB(58, 68, 96);
+        else                face = COLOR_RGB(38, 44, 62);
+        if (isPressed) face = _gamelib_ui_darken(face, 20);
+
+        FillRect(tx, y, tw, tabH, face);
+
+        if (isActive) {
+            FillRect(tx, y, tw, 3, COLOR_RGB(90, 140, 220));
+            FillRect(tx + 1, y + tabH - 1, tw - 2, 1, face);
+        }
+
+        DrawLine(tx, y, tx, y + tabH - 1, COLOR_RGB(84, 94, 120));
+        DrawLine(tx + tw - 1, y, tx + tw - 1, y + tabH - 1, COLOR_RGB(84, 94, 120));
+        DrawLine(tx, y, tx + tw - 1, y, COLOR_RGB(84, 94, 120));
+
+        const char *label = tabs[i] ? tabs[i] : "";
+        int lw = _gamelib_ui_text_width(label);
+        int lh = _gamelib_ui_text_height(label);
+        int lx = tx + ((tw - lw) > 0 ? (tw - lw) / 2 : 4);
+        int ly = y + ((tabH - lh) > 0 ? (tabH - lh) / 2 : 4);
+        uint32_t textColor = isActive ? COLOR_WHITE : (tabHov ? COLOR_LIGHT_GRAY : COLOR_GRAY);
+        _gamelib_ui_draw_text_with_shadow(this, lx, ly, label, textColor, COLOR_ARGB(120, 0, 0, 0));
+
+        if (mouseReleased && tabHov && _uiActiveId == tabId) {
+            selectedTab = i;
+        }
+    }
+
+    if (mouseReleased && _uiActiveId != 0) {
+        // Only clear _uiActiveId if it belongs to this TabPanel
+        for (int i = 0; i < tabCount; i++) {
+            int tx2 = x + i * tabW;
+            int tw2 = tabW;
+            if (i == tabCount - 1) tw2 = w - i * tabW;
+            uint32_t tid = _gamelib_ui_make_id(0x54504C31u, tx2, y, tw2, tabH, tabs[i] ? tabs[i] : "");
+            if (_uiActiveId == tid) {
+                _uiActiveId = 0;
+                break;
+            }
+        }
+    }
+
+    int cy = y + tabH;
+    int ch = h - tabH;
+
+    FillRect(x, cy, w, ch, COLOR_RGB(48, 58, 82));
+    DrawLine(x, cy, x + w - 1, cy, COLOR_RGB(84, 94, 120));
+    DrawLine(x, cy + ch - 1, x + w - 1, cy + ch - 1, COLOR_RGB(84, 94, 120));
+    DrawLine(x, cy, x, cy + ch - 1, COLOR_RGB(84, 94, 120));
+    DrawLine(x + w - 1, cy, x + w - 1, cy + ch - 1, COLOR_RGB(84, 94, 120));
+
+    {
+        int atx = x + selectedTab * tabW;
+        int atw = tabW;
+        if (selectedTab == tabCount - 1) atw = w - selectedTab * tabW;
+        uint32_t activeFace = COLOR_RGB(48, 58, 82);
+        FillRect(atx + 1, cy, atw - 2, 1, activeFace);
+    }
+
+    return selectedTab;
 }
 
 void GameLib::DrawTextFont(int x, int y, const char *text, uint32_t color, const char *fontName, int fontSize)

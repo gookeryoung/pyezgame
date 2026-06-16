@@ -22,7 +22,13 @@ test = [
     "pytest-xdist>=3.6.1",
     "pytest>=8.3.4",
 ]
-dev = ["hatch>=1.14.2", "tox>=4.25.0", "tox-uv>=1.13.1"]
+dev = [
+    "hatch>=1.14.2",
+    "pybind11>=3.0.4",
+    "scikit-build-core>=0.12.2",
+    "tox>=4.25.0",
+    "tox-uv>=1.13.1",
+]
 
 [[tool.uv.index]]
 url = "https://mirrors.aliyun.com/pypi/simple/"
@@ -43,7 +49,7 @@ reportUnusedCallResult = "warning"
 typeCheckingMode = "recommended"
 
 [dependency-groups]
-dev = ["pyezgame[test]"]
+dev = ["pyezgame[dev]"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

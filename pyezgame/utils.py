@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Union
 
 ROOT_PATH = Path(__file__).parent
 
 
-def get_respath(*parts: Union[str, Path]) -> str:
+def get_respath(*parts: str | Path) -> str:
     """Get the absolute path to a resource (POSIX format).
 
     Args:
