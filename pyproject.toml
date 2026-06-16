@@ -14,18 +14,16 @@ ezgame = "pyezgame.cli:main"
 
 [project.optional-dependencies]
 test = [
-    "pysnooper>=1.2.3",
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=5.0.0",
     "pytest-html>=4.1.1",
     "pytest-mock>=3.14.0",
-    "pytest-timeout>=2.4.0",
     "pytest-xdist>=3.6.1",
     "pytest>=8.3.4",
     "tox-uv>=1.13.1",
     "tox>=4.25.0",
 ]
-dev = ["bitool>=0.1.19", "hatch>=1.14.2"]
+dev = ["hatch>=1.14.2"]
 
 [[tool.uv.index]]
 url = "https://mirrors.aliyun.com/pypi/simple/"
