@@ -1,10 +1,17 @@
 /**
  * GameLib Python Bindings
- * pybind11 wrapper for GameLib.h (Win32)
+ * pybind11 wrapper for GameLib
+ * - Windows: uses GameLib.h (Win32 GDI backend)
+ * - Linux/macOS: uses GameLib.SDL.h (SDL2 backend)
  */
 
-#define GAMELIB_IMPLEMENTATION
-#include "../clib/GameLib.h"
+#ifdef _WIN32
+    #define GAMELIB_IMPLEMENTATION
+    #include "../clib/GameLib.h"
+#else
+    #define GAMELIB_SDL_IMPLEMENTATION
+    #include "../clib/GameLib.SDL.h"
+#endif
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
