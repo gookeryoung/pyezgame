@@ -25,6 +25,11 @@ test = [
     "tox-uv>=1.13.1",
     "tox>=4.25.0",
 ]
+dev = ["bitool>=0.1.19", "hatch>=1.14.2"]
+
+[[tool.uv.index]]
+url = "https://mirrors.aliyun.com/pypi/simple/"
+default = true
 
 [tool.scikit-build]
 cmake.build-type = "Release"
@@ -39,10 +44,6 @@ reportImplicitStringConcatenation = "error"
 reportMissingTypeStubs = "none"
 reportUnusedCallResult = "warning"
 typeCheckingMode = "recommended"
-
-[[tool.uv.index]]
-url = "https://mirrors.aliyun.com/pypi/simple/"
-default = true
 
 [dependency-groups]
 dev = ["pyezgame[test]"]
