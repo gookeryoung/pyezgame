@@ -280,11 +280,11 @@ def generate_floor(floor_num: int) -> tuple[list[list[int]], dict[tuple[int, int
         return game_map, monsters
 
     # Get available empty positions
-    empty_positions = []
+    empty_positions: list[tuple[int, int]] = []
     for y in range(1, MAP_ROWS - 1):
         for x in range(1, MAP_COLS - 1):
             if game_map[y][x] == TILE_EMPTY and not ((x == 6 and y == 12) or (x == 6 and y == 0)):
-                empty_positions.append((x, y))
+                empty_positions.append((x, y))  # noqa: PERF401
     # Shuffle positions
     for i in range(len(empty_positions) - 1, 0, -1):
         j = g.GameLib.random(0, i)
@@ -986,8 +986,8 @@ def main() -> None:
             game.fill_rect(cx - 80, cy - 35, 160, 70, g.COLOR_ARGB(200, 0, 0, 0))
             game.draw_rect(cx - 80, cy - 35, 160, 70, g.COLOR_RED)
             game.draw_text_scale(cx - 48, cy - 28, "GAME OVER", g.COLOR_RGB(255, 80, 80), 10, 10)
-            game.draw_text(cx - 45, cy + 0, TEXT_COLOR, f"Reached Floor {game_state.player.floor}")
-            game.draw_text(cx - 45, cy + 18, g.COLOR_YELLOW, "R to restart")
+            game.draw_text(cx - 45, cy + 0, f"Reached Floor {game_state.player.floor}", TEXT_COLOR)
+            game.draw_text(cx - 45, cy + 18, "R to restart", g.COLOR_YELLOW)
 
         if game_state.victory:
             cx = MAP_X + MAP_WIDTH // 2
