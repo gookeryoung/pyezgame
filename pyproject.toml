@@ -20,10 +20,8 @@ test = [
     "pytest-mock>=3.14.0",
     "pytest-xdist>=3.6.1",
     "pytest>=8.3.4",
-    "tox-uv>=1.13.1",
-    "tox>=4.25.0",
 ]
-dev = ["hatch>=1.14.2"]
+dev = ["hatch>=1.14.2", "tox>=4.25.0", "tox-uv>=1.13.1"]
 
 [[tool.uv.index]]
 url = "https://mirrors.aliyun.com/pypi/simple/"
