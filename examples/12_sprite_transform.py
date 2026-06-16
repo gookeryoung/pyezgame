@@ -198,7 +198,7 @@ def main() -> None:
             draw_checkerboard(game, 256, 116, 280, 160, 10)
             game.draw_rect(256, 116, 280, 160, g.COLOR_RGB(98, 110, 138))
             game.draw_sprite_scaled(
-                ship, 256 + (280 - 17 * scale) // 2, 116 + (160 - 17 * scale) // 2, 17 * scale, 17 * scale, flags
+                ship, 256 + (280 - 17 * scale) // 2, 116 + (160 - 17 * scale) // 2, 17 * scale, 17 * scale, flags,
             )
             game.draw_printf(256, 282, g.COLOR_WHITE, f"17x17 -> {17 * scale}x{17 * scale}")
 

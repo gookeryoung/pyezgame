@@ -36,7 +36,7 @@ def main() -> None:
             game.show_mouse(mouse_visible)
         if game.is_key_pressed(g.KEY_M):
             last_message_result = game.show_message(
-                "GameLib now has DrawPrintfFont, ShowMouse and ShowMessage.", "New UI APIs", g.MESSAGEBOX_OK
+                "GameLib now has DrawPrintfFont, ShowMouse and ShowMessage.", "New UI APIs", g.MESSAGEBOX_OK,
             )
         if game.is_key_pressed(g.KEY_Y):
             last_message_result = game.show_message("Show the mouse cursor?", "ShowMessage YES/NO", g.MESSAGEBOX_YESNO)
@@ -68,7 +68,7 @@ def main() -> None:
         game.draw_printf_font(470, 180, g.COLOR_SKY_BLUE, FONT_MONO, 18, f"Time: {time_sec:5.1f} s")
         game.draw_printf_font(470, 206, g.COLOR_WHITE, FONT_MONO, 18, f"FPS: {game.get_fps():5.1f}")
         game.draw_printf_font(
-            470, 232, g.COLOR_PINK, FONT_MONO, 18, f"Mouse: {game.get_mouse_x():3d}, {game.get_mouse_y():3d}"
+            470, 232, g.COLOR_PINK, FONT_MONO, 18, f"Mouse: {game.get_mouse_x():3d}, {game.get_mouse_y():3d}",
         )
         cursor_str = "visible" if mouse_visible else "hidden"
         game.draw_printf_font(470, 258, g.COLOR_LIGHT_GRAY, FONT_MONO, 18, f"Cursor: {cursor_str}")
