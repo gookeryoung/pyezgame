@@ -2,6 +2,9 @@ name: Build & Publish
 
 on:
   push:
+    branches:
+      - main
+      - master
     tags:
       - "v*"
   workflow_dispatch:
@@ -56,6 +59,7 @@ jobs:
 
   publish:
     name: Publish to PyPI
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     permissions:
