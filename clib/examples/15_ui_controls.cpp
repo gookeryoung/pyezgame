@@ -230,17 +230,17 @@ static void DrawInputTab(GameLib &game, int cx, int cy, UIState &s)
     int tx = px+10, ty = cy+30;
     game.DrawText(tx, ty, "NAME:", COLOR_WHITE);
     game.TextInput(tx+50, ty-4, 160, s.playerName, sizeof(s.playerName), &s.nameFocused);
-    game.DrawPrintf(tx, ty+18, COLOR_YELLOW, "Hello, %s!", s.playerName);
+    game.DrawPrintf(tx, ty+26, COLOR_YELLOW, "Hello, %s!", s.playerName);
 
-    game.DrawText(tx, ty+50, "SEARCH:", COLOR_WHITE);
-    game.TextInput(tx+56, ty+46, 154, s.searchText, sizeof(s.searchText), &s.searchFocused);
+    game.DrawText(tx, ty+56, "SEARCH:", COLOR_WHITE);
+    game.TextInput(tx+56, ty+52, 154, s.searchText, sizeof(s.searchText), &s.searchFocused);
     if (s.searchText[0])
-        game.DrawPrintf(tx, ty+68, COLOR_LIGHT_GRAY, "Query: %s", s.searchText);
+        game.DrawPrintf(tx, ty+82, COLOR_LIGHT_GRAY, "Query: %s", s.searchText);
     else
-        game.DrawText(tx, ty+68, "Type to search...", COLOR_GRAY);
-    game.Separator(tx, ty+96, 218);
-    game.DrawText(tx, ty+108, "Click field to focus,", COLOR_LIGHT_GRAY);
-    game.DrawText(tx, ty+122, "BACKSPACE to delete.", COLOR_LIGHT_GRAY);
+        game.DrawText(tx, ty+82, "Type to search...", COLOR_GRAY);
+    game.Separator(tx, ty+110, 218);
+    game.DrawText(tx, ty+122, "Click field to focus,", COLOR_LIGHT_GRAY);
+    game.DrawText(tx, ty+136, "BACKSPACE to delete.", COLOR_LIGHT_GRAY);
 
     // Dropdown
     int dx = px+pw+gap+10, dy = cy+30;

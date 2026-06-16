@@ -3160,11 +3160,14 @@ bool GameLib::Dropdown(int x, int y, int w, const char **items, int itemCount, i
     int arrowX = x + w - arrowW;
     FillRect(arrowX, y, arrowW, h, _gamelib_ui_darken(face, 20));
     int triCx = arrowX + arrowW / 2;
-    int triY = y + h / 2 - 2;
-    for (int row = 0; row < 5; row++) {
+    int triCy = y + h / 2;
+    for (int row = 0; row < 6; row++) {
         int half = row;
-        if (half > 4) half = 4;
-        FillRect(triCx - half, triY + row, half * 2 + 1, 1, COLOR_WHITE);
+        if (half > 5) half = 5;
+        if (*open)
+            FillRect(triCx - half, triCy - 2 + row, half * 2 + 1, 1, COLOR_WHITE);
+        else
+            FillRect(triCx - half, triCy + 3 - row, half * 2 + 1, 1, COLOR_WHITE);
     }
 
     bool changed = false;

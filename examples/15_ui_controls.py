@@ -200,24 +200,24 @@ def draw_input_tab(game: g.GameLib, cx: int, cy: int, state: dict[str, Any]) -> 
         state["player_name"],
         state["name_focused"],
     )
-    game.draw_text(tx, ty + 18, f"Hello, {state['player_name']}!", g.COLOR_YELLOW)
+    game.draw_text(tx, ty + 26, f"Hello, {state['player_name']}!", g.COLOR_YELLOW)
 
-    game.draw_text(tx, ty + 50, "SEARCH:", g.COLOR_WHITE)
+    game.draw_text(tx, ty + 56, "SEARCH:", g.COLOR_WHITE)
     _, state["search_text"], state["search_focused"] = game.text_input(
         tx + 56,
-        ty + 46,
+        ty + 52,
         154,
         state["search_text"],
         state["search_focused"],
     )
     if state["search_text"]:
-        game.draw_text(tx, ty + 68, f"Query: {state['search_text']}", g.COLOR_LIGHT_GRAY)
+        game.draw_text(tx, ty + 82, f"Query: {state['search_text']}", g.COLOR_LIGHT_GRAY)
     else:
-        game.draw_text(tx, ty + 68, "Type to search...", g.COLOR_GRAY)
+        game.draw_text(tx, ty + 82, "Type to search...", g.COLOR_GRAY)
 
-    game.separator(tx, ty + 96, 218)
-    game.draw_text(tx, ty + 108, "Click field to focus,", g.COLOR_LIGHT_GRAY)
-    game.draw_text(tx, ty + 122, "BACKSPACE to delete.", g.COLOR_LIGHT_GRAY)
+    game.separator(tx, ty + 110, 218)
+    game.draw_text(tx, ty + 122, "Click field to focus,", g.COLOR_LIGHT_GRAY)
+    game.draw_text(tx, ty + 136, "BACKSPACE to delete.", g.COLOR_LIGHT_GRAY)
 
     # Dropdown
     dx, dy = px + pw + gap + 10, cy + 30
