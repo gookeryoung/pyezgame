@@ -1,0 +1,101 @@
+name: pyezgame CI Build
+
+sources:
+  my_repo:
+    type: codeup
+    name: pyezgame
+    endpoint: 'https://codeup.aliyun.com/678008df52027c9a54e70902/pypi/pyezgame.git'
+    branch: main
+    triggerEvents: push
+    certificate:
+      type: serviceConnection
+      serviceConnection: x9jakytjkjrnm8sb
+
+stages:
+  lint_stage:
+    name: 代码检查阶段
+    jobs:
+      lint_job:
+        name: Ruff 代码检查
+        runsOn: public/cn-beijing
+        steps:
+          setup_step:
+            step: PythonBuild
+            name: 安装依赖
+            with:
+              pythonVersion: "3.11"
+              run: |
+                pip install ruff
+          check_step:
+            step: PythonBuild
+            name: Ruff Lint
+            with:
+              pythonVersion: "3.11"
+              run: |
+                ruff check .
+
+  build_stage:
+    name: 构建阶段
+    jobs:
+      build_linux_job:
+        name: Linux wheels 构建
+        runsOn: public/cn-beijing
+        steps:
+          install_deps_step:
+            step: LinuxBuild
+            name: 安装系统依赖
+            with:
+              run: |
+                yum install -y epel-release || true
+                yum install -y SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel || \
+                dnf install -y epel-release && \
+                dnf config-manager --set-enabled powertools || dnf config-manager --set-enabled crb || true && \
+                dnf install -y SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
+          build_step:
+            step: PythonBuild
+            name: cibuildwheel 构建
+            with:
+              pythonVersion: "3.11"
+              run: |
+                pip install cibuildwheel
+                cibuildwheel --output-dir wheelhouse
+              env:
+                CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+                CIBW_SKIP: "*-musllinux_* *-manylinux_i686 pp*"
+                CIBW_MANYLINUX_X86_64_IMAGE: "manylinux_2_28"
+                CIBW_TEST_REQUIRES: "pytest pytest-asyncio pytest-xdist"
+                CIBW_TEST_COMMAND: "cd /tmp && pytest {project}/tests -x"
+                CIBW_TEST_SKIP: "cp38-* cp39-* cp310-* cp311-* cp313-*"
+                CIBW_BUILD_VERBOSITY: "1"
+          sdist_step:
+            step: PythonBuild
+            name: 构建 sdist
+            with:
+              pythonVersion: "3.11"
+              run: |
+                pip install build
+                python -m build --sdist --outdir wheelhouse
+          upload_step:
+            step: ArtifactUpload
+            name: 上传构建产物
+            with:
+              uploadType: flowPublic
+              artifact: dist-linux
+              filePath:
+                - wheelhouse/
+
+  test_stage:
+    name: 测试阶段
+    jobs:
+      test_job:
+        name: 单元测试
+        runsOn: public/cn-beijing
+        steps:
+          test_step:
+            step: PythonBuild
+            name: pytest 测试
+            with:
+              pythonVersion: "3.11"
+              run: |
+                pip install -e ".[test]"
+                pytest tests -x --import-mode=importlib
