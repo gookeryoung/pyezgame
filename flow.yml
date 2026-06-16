@@ -1,5 +1,17 @@
 name: pyezgame CI Build
 
+# ── 全局变量 ──
+variables:
+  - key: PIP_INDEX_URL
+    value: 'https://mirrors.aliyun.com/pypi/simple/'
+  - key: PIP_TRUSTED_HOST
+    value: 'mirrors.aliyun.com'
+  - key: PIP_CACHE_DIR
+    value: '/root/.cache/pip'
+  # cibuildwheel 内部构建也使用国内源
+  - key: CIBW_ENVIRONMENT
+    value: 'PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/ PIP_TRUSTED_HOST=mirrors.aliyun.com'
+
 sources:
   my_repo:
     type: codeup
@@ -20,6 +32,9 @@ stages:
       lint_job:
         name: Ruff 代码检查
         runsOn: public/cn-beijing
+        caches:
+          - path: /root/.cache/pip
+            key: pip-lint-${{hashFiles('pyproject.toml')}}
         steps:
           lint_step:
             step: PythonBuild
@@ -36,6 +51,11 @@ stages:
       build_linux_job:
         name: Linux wheels 构建
         runsOn: public/cn-beijing
+        caches:
+          - path: /root/.cache/pip
+            key: pip-build-${{hashFiles('pyproject.toml')}}
+          - path: /root/.cache/cibuildwheel
+            key: cibw-${{hashFiles('pyproject.toml')}}
         steps:
           build_step:
             step: PythonBuild
@@ -68,6 +88,9 @@ stages:
       test_job:
         name: 单元测试
         runsOn: public/cn-beijing
+        caches:
+          - path: /root/.cache/pip
+            key: pip-test-${{hashFiles('pyproject.toml')}}
         steps:
           install_deps_step:
             step: PythonBuild
