@@ -34,6 +34,7 @@ default = true
 [tool.scikit-build]
 cmake.build-type = "Release"
 wheel.packages = ["pyezgame"]
+cmake.verbose = true
 
 [tool.basedpyright]
 exclude = ["**/.git", "**/.venv", "**/__pycache__", "**/build", "**/dist"]
@@ -59,7 +60,7 @@ test-command = "pytest {project}/tests -x --timeout=30"
 
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux_2_28"
-before-all = "dnf install -y epel-release && dnf install -y SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel"
+before-all = "dnf install -y epel-release && dnf config-manager --set-enabled powertools || dnf config-manager --set-enabled crb || true && dnf install -y SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel"
 
 [tool.cibuildwheel.macos]
 before-all = "brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer"
