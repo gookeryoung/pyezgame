@@ -52,6 +52,14 @@ dev = ["pyezgame[test]"]
 testpaths = ["tests"]
 asyncio_default_fixture_loop_scope = "function"
 
+[tool.cibuildwheel]
+build = "cp38-*"
+skip = ["*-musllinux_*", "*-manylinux_i686", "*-win32", "pp*"]
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux_2_28"
+before-all = "dnf install -y epel-release && dnf install -y SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel"
+
 [tool.ruff]
 line-length = 120
 src = ["src"]

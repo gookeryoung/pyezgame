@@ -1920,7 +1920,7 @@ wheels = [
 
 [[package]]
 name = "pyezgame"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "." }
 
 [package.optional-dependencies]
@@ -1929,8 +1929,6 @@ dev = [
     { name = "hatch", version = "1.14.2", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version < '3.9'" },
     { name = "hatch", version = "1.15.1", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version == '3.9.*'" },
     { name = "hatch", version = "1.17.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version >= '3.10'" },
-    { name = "hatchling", version = "1.27.0", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version < '3.10'" },
-    { name = "hatchling", version = "1.30.1", source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }, marker = "python_full_version >= '3.10'" },
 ]
 test = [
     { name = "pysnooper" },
@@ -1966,7 +1964,6 @@ dev = [
 requires-dist = [
     { name = "bitool", marker = "extra == 'dev'", specifier = ">=0.1.19" },
     { name = "hatch", marker = "extra == 'dev'", specifier = ">=1.14.2" },
-    { name = "hatchling", marker = "extra == 'dev'", specifier = ">=1.27.0" },
     { name = "pysnooper", marker = "extra == 'test'", specifier = ">=1.2.3" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8.3.4" },
     { name = "pytest-asyncio", marker = "extra == 'test'", specifier = ">=0.24.0" },
