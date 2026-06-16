@@ -2,16 +2,23 @@
 //
 // Demonstrates the immediate-mode UI helpers:
 //   Button, Checkbox, RadioBox, ToggleButton,
-//   Slider, Spinner, ProgressBar, Separator, Label.
+//   Slider, Spinner, ProgressBar, Separator, Label,
+//   TextInput, Dropdown, TabBar, Tooltip, VSeparator,
+//   ImageButton, ListBox, Collapsible, ColorPicker,
+//   Knob, Menu.
 // Labels use the built-in 8x8 bitmap font, so keep them ASCII.
 //
 // Controls:
 //   Mouse left button : interact with all UI controls
+//   Mouse wheel       : scroll in ListBox
+//   Keyboard          : type in text input field
 //   ESC               : quit
 //
 // Learn: Button, Checkbox, RadioBox, ToggleButton,
 //        Slider, Spinner, ProgressBar, Separator, Label,
-//        release-trigger UI, built-in 8x8 UI labels
+//        TextInput, Dropdown, TabBar, Tooltip, VSeparator,
+//        ImageButton, ListBox, Collapsible, ColorPicker,
+//        Knob, Menu, release-trigger UI, built-in 8x8 UI labels
 //
 // Compile (Win32): g++ -o 15_ui_controls.exe 15_ui_controls.cpp -mwindows
 // Compile (SDL):   g++ -std=c++11 -O2 -o 15_ui_controls 15_ui_controls.cpp -lSDL2
@@ -51,7 +58,7 @@ static void DrawBackdrop(GameLib &game, bool showGrid)
 int main()
 {
     GameLib game;
-    game.Open(1100, 620, "15 - UI Controls", true);
+    game.Open(1100, 960, "15 - UI Controls", true);
 
     // --- State variables ---
     bool musicOn = true, sfxOn = true, showGrid = false, hardMode = false;
@@ -68,7 +75,49 @@ int main()
     int level = 1;
     int scoreMult = 1;
 
+    // --- Extended widget states ---
+    char playerName[64] = "Player1";
+    bool nameFocused = false;
+    char searchText[64] = "";
+    bool searchFocused = false;
+    int resolutionIdx = 0;
+    bool resolutionOpen = false;
+    int qualityIdx = 1;
+    bool qualityOpen = false;
+    int activeTab = 0;
+
+    const char *resolutions[] = {"640x480", "800x600", "1024x768", "1280x720", "1920x1080"};
+    const char *qualities[] = {"LOW", "MEDIUM", "HIGH", "ULTRA"};
+    const char *tabNames[] = {"GENERAL", "GRAPHICS", "AUDIO", "CONTROLS"};
+
     const char *diffNames[] = {"EASY", "MEDIUM", "HARD"};
+
+    // --- Advanced widget states ---
+    const char *listItems[] = {"APPLE", "BANANA", "CHERRY", "DATE", "ELDERBERRY",
+                               "FIG", "GRAPE", "HONEYDEW", "KIWI", "LEMON",
+                               "MANGO", "NECTARINE"};
+    int listIdx = 0, listScroll = 0;
+    bool sectionOpen = true, section2Open = false;
+    int knobVal = 50;
+    uint32_t colorPalette[] = {
+        0xFF0000FF, 0xFF00FF00, 0xFFFF0000, 0xFFFFFF00,
+        0xFF00FFFF, 0xFFFF00FF, 0xFFFFFFFF, 0xFF000000,
+        0xFF800000, 0xFF008000, 0xFF000080, 0xFF808000,
+        0xFF800080, 0xFF008080, 0xFFC0C0C0, 0xFF808080,
+    };
+    int colorIdx = 0;
+    bool menuOpen = false;
+    int menuResult = -1;
+    const char *menuItems[] = {"NEW GAME", "LOAD GAME", "OPTIONS", "CREDITS", "QUIT"};
+
+    // create sprite for ImageButton demo
+    int iconId = game.CreateSprite(20, 20);
+    for (int py = 0; py < 20; py++) {
+        for (int px = 0; px < 20; px++) {
+            uint32_t c = ((px + py) % 2 == 0) ? COLOR_RGB(px * 12, py * 12, 200) : COLOR_RGB(40, 40, 60);
+            game.SetSpritePixel(iconId, px, py, c);
+        }
+    }
 
     while (!game.IsClosed()) {
         if (game.IsKeyPressed(KEY_ESCAPE)) break;
@@ -88,6 +137,7 @@ int main()
         DrawPanel(game, 216, 70, 180, 230, "Checkboxes");
         DrawPanel(game, 412, 70, 180, 230, "RadioBox");
         DrawPanel(game, 608, 70, 180, 230, "Toggle");
+        DrawPanel(game, 804, 70, 276, 230, "Tabs & Tooltip");
 
         // --- Buttons ---
         if (game.Button(40, 108, 140, 28, "START", COLOR_RGB(52, 150, 92))) {
@@ -97,6 +147,9 @@ int main()
             musicOn = true; sfxOn = true; showGrid = false; hardMode = false;
             volume = 75; brightness = 50; speed = 30;
             hp = 100; level = 1; scoreMult = 1;
+            strcpy(playerName, "Player1");
+            searchText[0] = '\0';
+            resolutionIdx = 0; qualityIdx = 1; activeTab = 0;
             resetCount++; lastEvent = "RESET";
         }
         if (game.Button(40, 188, 140, 28, "QUIT", COLOR_RGB(180, 76, 76))) break;
@@ -142,6 +195,35 @@ int main()
         game.DrawText(628, 244, "PAUSED:", COLOR_WHITE);
         game.DrawText(628, 260, paused ? "YES" : "NO", paused ? COLOR_YELLOW : COLOR_LIGHT_GRAY);
 
+        // --- Tab Bar ---
+        game.TabBar(814, 100, 256, tabNames, 4, &activeTab);
+
+        // draw tab content area
+        game.FillRect(814, 126, 256, 96, COLOR_RGB(48, 58, 82));
+        game.DrawRect(814, 126, 256, 96, COLOR_RGB(84, 94, 120));
+
+        const char *tabContents[] = {
+            "General settings", "Graphics options",
+            "Audio settings", "Key bindings",
+        };
+        game.DrawText(824, 136, tabNames[activeTab], COLOR_YELLOW);
+        game.Separator(824, 150, 236);
+        game.DrawText(824, 158, tabContents[activeTab], COLOR_LIGHT_GRAY);
+        game.DrawPrintf(824, 174, COLOR_WHITE, "Tab %d/4", activeTab + 1);
+
+        // --- Tooltip ---
+        game.Separator(814, 198, 256);
+        if (game.Button(824, 210, 100, 24, "HOVER ME", COLOR_RGB(100, 80, 160)))
+            lastEvent = "HOVER BTN";
+        int mx = game.GetMouseX(), my = game.GetMouseY();
+        if (GameLib::PointInRect(mx, my, 824, 210, 100, 24))
+            game.Tooltip(mx + 12, my + 12, "Click to trigger!");
+
+        if (game.Button(940, 210, 120, 24, "TIP BUTTON", COLOR_RGB(80, 120, 160)))
+            lastEvent = "TIP BTN";
+        if (GameLib::PointInRect(mx, my, 940, 210, 120, 24))
+            game.Tooltip(mx + 12, my + 12, "Another tooltip!");
+
         // =================================================================
         // ROW 2 - New controls (y=316 .. y=606)
         // =================================================================
@@ -150,6 +232,9 @@ int main()
         DrawPanel(game, 296, 316, 260, 290, "Spinners");
         DrawPanel(game, 572, 316, 260, 290, "Progress Bars");
         DrawPanel(game, 848, 316, 232, 290, "Status");
+
+        // --- VSeparator between slider groups ---
+        game.VSeparator(155, 354, 200);
 
         // --- Sliders ---
         game.DrawText(40, 354, "VOLUME:", COLOR_WHITE);
@@ -222,6 +307,96 @@ int main()
         game.DrawPrintf(858, 558, COLOR_LIGHT_GRAY, "DIFF:%s", diffNames[difficulty]);
         game.DrawPrintf(858, 574, COLOR_LIGHT_GRAY, "PAUSE:%s TURBO:%s",
                         paused ? "Y" : "N", turbo ? "Y" : "N");
+
+        // =================================================================
+        // ROW 3 - Extended controls (y=622 .. y=770)
+        // =================================================================
+
+        DrawPanel(game, 20, 622, 350, 148, "Text Input");
+        DrawPanel(game, 386, 622, 350, 148, "Dropdown");
+
+        // --- Text Input ---
+        game.DrawText(40, 660, "NAME:", COLOR_WHITE);
+        game.TextInput(90, 656, 200, playerName, sizeof(playerName), &nameFocused);
+        game.DrawPrintf(40, 680, COLOR_YELLOW, "Hello, %s!", playerName);
+
+        game.DrawText(40, 706, "SEARCH:", COLOR_WHITE);
+        game.TextInput(100, 702, 190, searchText, sizeof(searchText), &searchFocused);
+        if (searchText[0])
+            game.DrawPrintf(40, 722, COLOR_LIGHT_GRAY, "Query: %s", searchText);
+        else
+            game.DrawText(40, 722, "Type to search...", COLOR_GRAY);
+
+        game.Separator(40, 740, 310);
+        game.DrawText(40, 750, "Click field to focus,", COLOR_LIGHT_GRAY);
+        game.DrawText(200, 750, "BACKSPACE to delete.", COLOR_LIGHT_GRAY);
+
+        // --- Dropdown ---
+        game.DrawText(406, 660, "RESOLUTION:", COLOR_WHITE);
+        game.Dropdown(500, 656, 180, resolutions, 5, &resolutionIdx, &resolutionOpen);
+
+        game.DrawText(406, 700, "QUALITY:", COLOR_WHITE);
+        game.Dropdown(500, 696, 180, qualities, 4, &qualityIdx, &qualityOpen);
+
+        game.Separator(406, 734, 310);
+        game.DrawPrintf(406, 744, COLOR_LIGHT_GRAY, "Selected: %s", resolutions[resolutionIdx]);
+        game.DrawPrintf(406, 758, COLOR_LIGHT_GRAY, "Quality:  %s", qualities[qualityIdx]);
+
+        // =================================================================
+        // ROW 4 - Advanced controls (y=790 .. y=948)
+        // =================================================================
+
+        DrawPanel(game, 20, 790, 240, 158, "ListBox");
+        DrawPanel(game, 276, 790, 200, 158, "Knob & Collapsible");
+        DrawPanel(game, 492, 790, 220, 158, "ColorPicker");
+        DrawPanel(game, 728, 790, 352, 158, "Menu & ImageButton");
+
+        // --- ListBox ---
+        game.ListBox(30, 820, 220, 118, listItems, 12, &listIdx, &listScroll);
+        game.DrawPrintf(30, 940, COLOR_YELLOW, "Selected: %s", listItems[listIdx]);
+
+        // --- Knob ---
+        game.Knob(290, 822, 50, &knobVal, 0, 100);
+        game.DrawPrintf(350, 830, COLOR_WHITE, "KNOB: %d", knobVal);
+        game.ProgressBar(350, 846, 110, 12, knobVal, 100, COLOR_RGB(70, 130, 200));
+
+        // --- Collapsible ---
+        game.Collapsible(286, 878, 180, "DETAILS", &sectionOpen);
+        if (sectionOpen) {
+            game.FillRect(286, 900, 180, 38, COLOR_RGB(40, 46, 62));
+            game.DrawText(296, 908, "Expanded content", COLOR_LIGHT_GRAY);
+            game.DrawText(296, 922, "inside section", COLOR_LIGHT_GRAY);
+        }
+
+        game.Collapsible(286, 940, 180, "EXTRA", &section2Open);
+
+        // --- ColorPicker ---
+        game.ColorPicker(502, 822, colorPalette, 16, &colorIdx);
+        uint32_t selectedColor = colorPalette[colorIdx];
+        game.FillRect(502, 886, 200, 20, selectedColor);
+        game.DrawRect(502, 886, 200, 20, COLOR_RGB(84, 94, 120));
+        game.DrawPrintf(502, 912, COLOR_LIGHT_GRAY, "R:%d G:%d B:%d",
+                        COLOR_GET_R(selectedColor), COLOR_GET_G(selectedColor),
+                        COLOR_GET_B(selectedColor));
+        game.DrawPrintf(502, 928, COLOR_LIGHT_GRAY, "Selected: #%08X", selectedColor);
+
+        // --- Menu ---
+        if (game.Button(738, 822, 120, 24, "OPEN MENU", COLOR_RGB(80, 120, 160)))
+            menuOpen = true;
+        int menuResultIdx = game.Menu(738, 852, menuItems, 5, &menuOpen);
+        if (menuResultIdx >= 0) {
+            menuResult = menuResultIdx;
+            lastEvent = "MENU";
+        }
+        game.DrawText(870, 826, "Last pick:", COLOR_WHITE);
+        if (menuResult >= 0)
+            game.DrawText(870, 842, menuItems[menuResult], COLOR_YELLOW);
+
+        // --- ImageButton ---
+        if (game.ImageButton(738, 880, 56, 56, iconId, COLOR_RGB(60, 70, 100)))
+            lastEvent = "IMAGE BTN";
+        game.DrawText(804, 896, "ImageButton", COLOR_WHITE);
+        game.DrawText(804, 912, "with sprite", COLOR_LIGHT_GRAY);
 
         game.Update();
         game.WaitFrame(60);

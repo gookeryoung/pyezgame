@@ -930,6 +930,147 @@ class GameLib:
         """Draw a centered text label with a filled background rectangle."""
         ...
 
+    def v_separator(self, x: int, y: int, h: int) -> None:
+        """Draw a vertical separator line with 3D effect."""
+        ...
+
+    def text_input(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        buffer: str,
+        focused: bool,
+    ) -> tuple[bool, str, bool]:
+        """Draw an immediate-mode text input field.
+
+        Returns (changed, text, focused) where changed is True when text was modified.
+        """
+        ...
+
+    def dropdown(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        items: list[str],
+        selected_index: int,
+        open: bool,
+    ) -> tuple[bool, int, bool]:
+        """Draw an immediate-mode dropdown/combo box.
+
+        Returns (changed, selected_index, open) where changed is True when selection changed.
+        """
+        ...
+
+    def tab_bar(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        tabs: list[str],
+        selected_tab: int,
+    ) -> tuple[bool, int]:
+        """Draw an immediate-mode tab bar.
+
+        Returns (changed, selected_tab) where changed is True when a different tab was clicked.
+        """
+        ...
+
+    def tooltip(self, x: int, y: int, text: str) -> None:
+        """Draw a tooltip overlay at the given position."""
+        ...
+
+    def image_button(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        sprite_id: int,
+        color: int,
+    ) -> bool:
+        """Draw an immediate-mode button with a sprite instead of text.
+
+        Returns True when clicked.
+        """
+        ...
+
+    def list_box(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        items: list[str],
+        selected_index: int,
+        scroll_offset: int,
+    ) -> tuple[bool, int, int]:
+        """Draw an immediate-mode scrollable list box.
+
+        Returns (changed, selected_index, scroll_offset) where changed is True
+        when the selection was modified.
+        """
+        ...
+
+    def collapsible(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        title: str,
+        open: bool,
+    ) -> tuple[bool, bool]:
+        """Draw an immediate-mode collapsible section header.
+
+        Returns (triggered, open) where triggered is True when state was toggled.
+        """
+        ...
+
+    def color_picker(
+        self,
+        x: int,
+        y: int,
+        colors: list[int],
+        selected_index: int,
+    ) -> tuple[bool, int]:
+        """Draw an immediate-mode color swatch grid.
+
+        Returns (changed, selected_index) where changed is True when a different
+        color was selected.
+        """
+        ...
+
+    def knob(
+        self,
+        x: int,
+        y: int,
+        size: int,
+        value: int,
+        min_val: int,
+        max_val: int,
+    ) -> tuple[bool, int]:
+        """Draw an immediate-mode rotary knob control.
+
+        Returns (changed, value) where changed is True when value was modified
+        by vertical mouse dragging.
+        """
+        ...
+
+    def menu(
+        self,
+        x: int,
+        y: int,
+        items: list[str],
+        open: bool,
+    ) -> tuple[int, bool]:
+        """Draw an immediate-mode popup menu.
+
+        Returns (selected_index, open) where selected_index is -1 if no item was
+        clicked this frame. The menu auto-closes on selection or outside click.
+        """
+        ...
+
     # ---- Static Methods: Save/Load ----
 
     @staticmethod

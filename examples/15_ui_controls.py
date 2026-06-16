@@ -2,16 +2,23 @@
 
 Demonstrates the immediate-mode UI helpers:
   button, checkbox, radio_box, toggle_button,
-  slider, spinner, progress_bar, separator, label.
+  slider, spinner, progress_bar, separator, label,
+  text_input, dropdown, tab_bar, tooltip, v_separator,
+  image_button, list_box, collapsible, color_picker,
+  knob, menu.
 Labels use the built-in 8x8 bitmap font, so keep them ASCII.
 
 Controls:
   Mouse left button : interact with all UI controls
+  Mouse wheel       : scroll in list_box
+  Keyboard          : type in text input field
   ESC               : quit
 
 Learn: button, checkbox, radio_box, toggle_button,
        slider, spinner, progress_bar, separator, label,
-       release-trigger UI, built-in 8x8 UI labels
+       text_input, dropdown, tab_bar, tooltip, v_separator,
+       image_button, list_box, collapsible, color_picker,
+       knob, menu, release-trigger UI, built-in 8x8 UI labels
 """
 
 import pyezgame as g
@@ -43,7 +50,7 @@ def draw_backdrop(game: g.GameLib, show_grid: bool) -> None:
 
 def main() -> None:
     game = g.GameLib()
-    game.open(1100, 620, "15 - UI Controls", True)
+    game.open(1100, 960, "15 - UI Controls", True)
 
     # --- State variables ---
     music_on = True
@@ -65,6 +72,71 @@ def main() -> None:
     level = 1
     score_mult = 1
 
+    # --- Extended widget states ---
+    player_name = "Player1"
+    name_focused = False
+    search_text = ""
+    search_focused = False
+    resolution_idx = 0
+    resolution_open = False
+    quality_idx = 1
+    quality_open = False
+    active_tab = 0
+
+    # --- Advanced widget states ---
+    list_items = [
+        "APPLE",
+        "BANANA",
+        "CHERRY",
+        "DATE",
+        "ELDERBERRY",
+        "FIG",
+        "GRAPE",
+        "HONEYDEW",
+        "KIWI",
+        "LEMON",
+        "MANGO",
+        "NECTARINE",
+    ]
+    list_idx = 0
+    list_scroll = 0
+    section_open = True
+    section2_open = False
+    knob_val = 50
+    color_palette = [
+        0xFF0000FF,
+        0xFF00FF00,
+        0xFFFF0000,
+        0xFFFFFF00,
+        0xFF00FFFF,
+        0xFFFF00FF,
+        0xFFFFFFFF,
+        0xFF000000,
+        0xFF800000,
+        0xFF008000,
+        0xFF000080,
+        0xFF808000,
+        0xFF800080,
+        0xFF008080,
+        0xFFC0C0C0,
+        0xFF808080,
+    ]
+    color_idx = 0
+    menu_open = False
+    menu_result = -1
+    menu_items = ["NEW GAME", "LOAD GAME", "OPTIONS", "CREDITS", "QUIT"]
+
+    # create sprite for image_button demo
+    icon_id = game.create_sprite(20, 20)
+    for py in range(20):
+        for px in range(20):
+            c = g.COLOR_RGB(px * 12, py * 12, 200) if (px + py) % 2 == 0 else g.COLOR_RGB(40, 40, 60)
+            game.set_sprite_pixel(icon_id, px, py, c)
+
+    resolutions = ["640x480", "800x600", "1024x768", "1280x720", "1920x1080"]
+    qualities = ["LOW", "MEDIUM", "HIGH", "ULTRA"]
+    tab_names = ["GENERAL", "GRAPHICS", "AUDIO", "CONTROLS"]
+
     while not game.is_closed():
         if game.is_key_pressed(g.KEY_ESCAPE):
             break
@@ -84,6 +156,7 @@ def main() -> None:
         draw_panel(game, 216, 70, 180, 230, "Checkboxes")
         draw_panel(game, 412, 70, 180, 230, "RadioBox")
         draw_panel(game, 608, 70, 180, 230, "Toggle")
+        draw_panel(game, 804, 70, 276, 230, "Tabs & Tooltip")
 
         # --- Buttons ---
         if game.button(40, 108, 140, 28, "START", g.COLOR_RGB(52, 150, 92)):
@@ -100,6 +173,11 @@ def main() -> None:
             hp = 100
             level = 1
             score_mult = 1
+            player_name = "Player1"
+            search_text = ""
+            resolution_idx = 0
+            quality_idx = 1
+            active_tab = 0
             reset_count += 1
             last_event = "RESET"
         if game.button(40, 188, 140, 28, "QUIT", g.COLOR_RGB(180, 76, 76)):
@@ -160,6 +238,39 @@ def main() -> None:
         game.draw_text(628, 244, "PAUSED:", g.COLOR_WHITE)
         game.draw_text(628, 260, "YES" if paused else "NO", g.COLOR_YELLOW if paused else g.COLOR_LIGHT_GRAY)
 
+        # --- Tab Bar ---
+        _, active_tab = game.tab_bar(814, 100, 256, tab_names, active_tab)
+
+        # draw tab content area
+        game.fill_rect(814, 126, 256, 96, g.COLOR_RGB(48, 58, 82))
+        game.draw_rect(814, 126, 256, 96, g.COLOR_RGB(84, 94, 120))
+
+        tab_contents = [
+            "General settings",
+            "Graphics options",
+            "Audio settings",
+            "Key bindings",
+        ]
+        game.draw_text(824, 136, tab_names[active_tab], g.COLOR_YELLOW)
+        game.separator(824, 150, 236)
+        game.draw_text(824, 158, tab_contents[active_tab], g.COLOR_LIGHT_GRAY)
+        game.draw_text(824, 174, f"Tab {active_tab + 1}/{len(tab_names)}", g.COLOR_WHITE)
+
+        # --- Tooltip ---
+        game.separator(814, 198, 256)
+        # hover button to show tooltip
+        if game.button(824, 210, 100, 24, "HOVER ME", g.COLOR_RGB(100, 80, 160)):
+            last_event = "HOVER BTN"
+        mx = game.get_mouse_x()
+        my = game.get_mouse_y()
+        if g.GameLib.point_in_rect(mx, my, 824, 210, 100, 24):
+            game.tooltip(mx + 12, my + 12, "Click to trigger!")
+
+        if game.button(940, 210, 120, 24, "TIP BUTTON", g.COLOR_RGB(80, 120, 160)):
+            last_event = "TIP BTN"
+        if g.GameLib.point_in_rect(mx, my, 940, 210, 120, 24):
+            game.tooltip(mx + 12, my + 12, "Another tooltip!")
+
         # =================================================================
         # ROW 2 - New controls (y=316 .. y=600)
         # =================================================================
@@ -168,6 +279,9 @@ def main() -> None:
         draw_panel(game, 296, 316, 260, 290, "Spinners")
         draw_panel(game, 572, 316, 260, 290, "Progress Bars")
         draw_panel(game, 848, 316, 232, 290, "Status")
+
+        # --- VSeparator between slider groups ---
+        game.v_separator(155, 354, 200)
 
         # --- Sliders ---
         game.draw_text(40, 354, "VOLUME:", g.COLOR_WHITE)
@@ -240,6 +354,117 @@ def main() -> None:
 
         game.draw_printf(858, 558, g.COLOR_LIGHT_GRAY, f"DIFF:{diff_names[difficulty]}")
         game.draw_printf(858, 574, g.COLOR_LIGHT_GRAY, f"PAUSE:{'Y' if paused else 'N'} TURBO:{'Y' if turbo else 'N'}")
+
+        # =================================================================
+        # ROW 3 - Extended controls (y=622 .. y=770)
+        # =================================================================
+
+        draw_panel(game, 20, 622, 350, 148, "Text Input")
+        draw_panel(game, 386, 622, 350, 148, "Dropdown")
+
+        # --- Text Input ---
+        game.draw_text(40, 660, "NAME:", g.COLOR_WHITE)
+        _, player_name, name_focused = game.text_input(90, 656, 200, player_name, name_focused)
+        game.draw_text(40, 680, f"Hello, {player_name}!", g.COLOR_YELLOW)
+
+        game.draw_text(40, 706, "SEARCH:", g.COLOR_WHITE)
+        _, search_text, search_focused = game.text_input(100, 702, 190, search_text, search_focused)
+        if search_text:
+            game.draw_text(40, 722, f"Query: {search_text}", g.COLOR_LIGHT_GRAY)
+        else:
+            game.draw_text(40, 722, "Type to search...", g.COLOR_GRAY)
+
+        game.separator(40, 740, 310)
+        game.draw_text(40, 750, "Click field to focus,", g.COLOR_LIGHT_GRAY)
+        game.draw_text(200, 750, "BACKSPACE to delete.", g.COLOR_LIGHT_GRAY)
+
+        # --- Dropdown ---
+        game.draw_text(406, 660, "RESOLUTION:", g.COLOR_WHITE)
+        _, resolution_idx, resolution_open = game.dropdown(
+            500,
+            656,
+            180,
+            resolutions,
+            resolution_idx,
+            resolution_open,
+        )
+
+        game.draw_text(406, 700, "QUALITY:", g.COLOR_WHITE)
+        _, quality_idx, quality_open = game.dropdown(
+            500,
+            696,
+            180,
+            qualities,
+            quality_idx,
+            quality_open,
+        )
+
+        game.separator(406, 734, 310)
+        game.draw_text(406, 744, f"Selected: {resolutions[resolution_idx]}", g.COLOR_LIGHT_GRAY)
+        game.draw_text(406, 758, f"Quality:  {qualities[quality_idx]}", g.COLOR_LIGHT_GRAY)
+
+        # =================================================================
+        # ROW 4 - Advanced controls (y=790 .. y=948)
+        # =================================================================
+
+        draw_panel(game, 20, 790, 240, 158, "ListBox")
+        draw_panel(game, 276, 790, 200, 158, "Knob & Collapsible")
+        draw_panel(game, 492, 790, 220, 158, "ColorPicker")
+        draw_panel(game, 728, 790, 352, 158, "Menu & ImageButton")
+
+        # --- ListBox ---
+        _, list_idx, list_scroll = game.list_box(
+            30,
+            820,
+            220,
+            118,
+            list_items,
+            list_idx,
+            list_scroll,
+        )
+        game.draw_text(30, 940, f"Selected: {list_items[list_idx]}", g.COLOR_YELLOW)
+
+        # --- Knob ---
+        _, knob_val = game.knob(290, 822, 50, knob_val, 0, 100)
+        game.draw_text(350, 830, f"KNOB: {knob_val}", g.COLOR_WHITE)
+        game.progress_bar(350, 846, 110, 12, knob_val, 100, g.COLOR_RGB(70, 130, 200))
+
+        # --- Collapsible ---
+        _, section_open = game.collapsible(286, 878, 180, "DETAILS", section_open)
+        if section_open:
+            game.fill_rect(286, 900, 180, 38, g.COLOR_RGB(40, 46, 62))
+            game.draw_text(296, 908, "Expanded content", g.COLOR_LIGHT_GRAY)
+            game.draw_text(296, 922, "inside section", g.COLOR_LIGHT_GRAY)
+
+        _, section2_open = game.collapsible(286, 940 if not section_open else 940, 180, "EXTRA", section2_open)
+
+        # --- ColorPicker ---
+        _, color_idx = game.color_picker(502, 822, color_palette, color_idx)
+        selected_color = color_palette[color_idx]
+        game.fill_rect(502, 886, 200, 20, selected_color)
+        game.draw_rect(502, 886, 200, 20, g.COLOR_RGB(84, 94, 120))
+        r_val = g.COLOR_GET_R(selected_color)
+        g_val = g.COLOR_GET_G(selected_color)
+        b_val = g.COLOR_GET_B(selected_color)
+        game.draw_text(502, 912, f"R:{r_val} G:{g_val} B:{b_val}", g.COLOR_LIGHT_GRAY)
+        game.draw_text(502, 928, f"Selected: #{selected_color:08X}", g.COLOR_LIGHT_GRAY)
+
+        # --- Menu ---
+        if game.button(738, 822, 120, 24, "OPEN MENU", g.COLOR_RGB(80, 120, 160)):
+            menu_open = True
+        menu_result_idx, menu_open = game.menu(738, 852, menu_items, menu_open)
+        if menu_result_idx >= 0:
+            menu_result = menu_result_idx
+            last_event = f"MENU: {menu_items[menu_result]}"
+        game.draw_text(870, 826, "Last pick:", g.COLOR_WHITE)
+        if menu_result >= 0:
+            game.draw_text(870, 842, menu_items[menu_result], g.COLOR_YELLOW)
+
+        # --- ImageButton ---
+        if game.image_button(738, 880, 56, 56, icon_id, g.COLOR_RGB(60, 70, 100)):
+            last_event = "IMAGE BTN"
+        game.draw_text(804, 896, "ImageButton", g.COLOR_WHITE)
+        game.draw_text(804, 912, "with sprite", g.COLOR_LIGHT_GRAY)
 
         game.update()
         game.wait_frame(60)

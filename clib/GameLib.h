@@ -448,7 +448,18 @@ public:
     void ProgressBar(int x, int y, int w, int h, int value, int maxVal, uint32_t color);
     bool Spinner(int x, int y, int w, int *value, int minVal, int maxVal, int step);
     void Separator(int x, int y, int w);
+    void VSeparator(int x, int y, int h);
     void Label(int x, int y, int w, int h, const char *text, uint32_t bgColor, uint32_t textColor);
+    bool TextInput(int x, int y, int w, char *buffer, int bufferSize, bool *focused);
+    bool Dropdown(int x, int y, int w, const char **items, int itemCount, int *selectedIndex, bool *open);
+    bool TabBar(int x, int y, int w, const char **tabs, int tabCount, int *selectedTab);
+    void Tooltip(int x, int y, const char *text);
+    bool ImageButton(int x, int y, int w, int h, int spriteId, uint32_t color);
+    bool ListBox(int x, int y, int w, int h, const char **items, int itemCount, int *selectedIndex, int *scrollOffset);
+    bool Collapsible(int x, int y, int w, const char *title, bool *open);
+    bool ColorPicker(int x, int y, const uint32_t *colors, int colorCount, int *selectedIndex);
+    bool Knob(int x, int y, int size, int *value, int minVal, int maxVal);
+    int Menu(int x, int y, const char **items, int itemCount, bool *open);
 
     // -------- Save / Load Data --------
     static bool SaveInt(const char *filename, const char *key, int value);
@@ -566,6 +577,9 @@ private:
     int _mouseButtons_prev[3];
     int _mouseWheelDelta;
     uint32_t _uiActiveId;
+    uint32_t _uiFocusId;
+    int _uiCursorPos;
+    int _uiFrameCount;
 
     // timing
     uint64_t _timeStartCounter;
@@ -1220,6 +1234,9 @@ GameLib::GameLib()
     memset(_mouseButtons_prev, 0, sizeof(_mouseButtons_prev));
     _mouseWheelDelta = 0;
     _uiActiveId = 0;
+    _uiFocusId = 0;
+    _uiCursorPos = 0;
+    _uiFrameCount = 0;
     _timeStartCounter = 0;
     _timePrevCounter = 0;
     _fpsTimeCounter = 0;
@@ -2051,6 +2068,9 @@ int GameLib::Open(int width, int height, const char *title, bool center, bool re
     memset(_mouseButtons_prev, 0, sizeof(_mouseButtons_prev));
     _mouseWheelDelta = 0;
     _uiActiveId = 0;
+    _uiFocusId = 0;
+    _uiCursorPos = 0;
+    _uiFrameCount = 0;
     ClearClip();
 
     return 0;
@@ -2077,6 +2097,7 @@ void GameLib::Update()
     memcpy(_keys_prev, _keys, sizeof(_keys));
     memcpy(_mouseButtons_prev, _mouseButtons, sizeof(_mouseButtons));
     _mouseWheelDelta = 0;
+    _uiFrameCount++;
 
     // Dispatch messages
     _DispatchMessages();
@@ -5246,6 +5267,641 @@ void GameLib::Label(int x, int y, int w, int h, const char *text, uint32_t bgCol
         int ty = y + ((h - th) > 0 ? (h - th) / 2 : 2);
         DrawText(tx, ty, text, textColor);
     }
+}
+
+void GameLib::VSeparator(int x, int y, int h)
+{
+    if (h <= 0) return;
+    for (int j = y; j < y + h; j++) {
+        SetPixel(x, j, COLOR_RGB(60, 66, 80));
+        SetPixel(x + 1, j, COLOR_RGB(110, 118, 140));
+    }
+}
+
+bool GameLib::TextInput(int x, int y, int w, char *buffer, int bufferSize, bool *focused)
+{
+    if (!buffer || bufferSize <= 0 || w <= 0) return false;
+
+    const int h = 24;
+    uint32_t id = _gamelib_ui_make_id(0x54584931u, x, y, w, h, "textinput");
+    bool hovered = PointInRect(_mouseX, _mouseY, x, y, w, h);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+
+    // handle focus
+    if (mousePressed) {
+        if (hovered) {
+            if (!*focused) {
+                *focused = true;
+                _uiFocusId = id;
+                int len = (int)strlen(buffer);
+                _uiCursorPos = len;
+            }
+        } else if (_uiFocusId == id) {
+            *focused = false;
+            _uiFocusId = 0;
+            _uiCursorPos = 0;
+        }
+    }
+
+    bool changed = false;
+    if (*focused && _uiFocusId == id) {
+        int len = (int)strlen(buffer);
+        // handle keyboard input
+        for (int k = 32; k < 127; k++) {
+            if (IsKeyPressed(k)) {
+                if (len < bufferSize - 1) {
+                    buffer[len] = (char)k;
+                    buffer[len + 1] = '\0';
+                    _uiCursorPos = len + 1;
+                    changed = true;
+                }
+                break;
+            }
+        }
+        if (IsKeyPressed(KEY_BACK) && len > 0) {
+            buffer[len - 1] = '\0';
+            _uiCursorPos = len - 1;
+            changed = true;
+        }
+    }
+
+    // draw background
+    uint32_t bgColor = *focused ? COLOR_RGB(36, 44, 68) : COLOR_RGB(28, 32, 44);
+    FillRect(x, y, w, h, bgColor);
+
+    // draw border
+    uint32_t borderColor = *focused ? COLOR_RGB(90, 140, 220) : (hovered ? COLOR_RGB(100, 110, 140) : COLOR_RGB(60, 66, 80));
+    DrawRect(x, y, w, h, borderColor);
+
+    // draw text
+    int textY = y + (h - 8) / 2;
+    int textX = x + 4;
+    if (buffer[0]) {
+        DrawText(textX, textY, buffer, COLOR_WHITE);
+    }
+
+    // draw cursor (blink at ~2Hz)
+    if (*focused && (_uiFrameCount / 30) % 2 == 0) {
+        int cursorX = textX + _uiCursorPos * 8;
+        if (cursorX >= x + w - 2) cursorX = x + w - 2;
+        FillRect(cursorX, textY, 1, 8, COLOR_WHITE);
+    }
+
+    return changed;
+}
+
+bool GameLib::Dropdown(int x, int y, int w, const char **items, int itemCount, int *selectedIndex, bool *open)
+{
+    if (!items || !selectedIndex || !open || itemCount <= 0 || w <= 0) return false;
+
+    const int h = 24;
+    const int arrowW = 20;
+    uint32_t id = _gamelib_ui_make_id(0x44524F31u, x, y, w, h, "dropdown");
+    bool hovered = PointInRect(_mouseX, _mouseY, x, y, w, h);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    if (mousePressed && hovered) {
+        _uiActiveId = id;
+    }
+
+    // toggle open
+    bool clicked = mouseReleased && hovered && (_uiActiveId == id);
+    if (clicked) {
+        *open = !*open;
+    }
+    if (mouseReleased && _uiActiveId == id) {
+        _uiActiveId = 0;
+    }
+
+    // draw main box
+    uint32_t face = hovered ? _gamelib_ui_lighten(COLOR_RGB(60, 68, 90), 20) : COLOR_RGB(60, 68, 90);
+    bool pressed = (_uiActiveId == id) && mouseDown && hovered;
+    _gamelib_ui_draw_bevel_rect(this, x, y, w, h, face, pressed || *open);
+
+    // draw selected text
+    int idx = *selectedIndex;
+    if (idx < 0) idx = 0;
+    if (idx >= itemCount) idx = itemCount - 1;
+    const char *label = items[idx] ? items[idx] : "";
+    DrawText(x + 6, y + (h - 8) / 2, label, COLOR_WHITE);
+
+    // draw arrow
+    int arrowX = x + w - arrowW;
+    FillRect(arrowX, y, arrowW, h, _gamelib_ui_darken(face, 20));
+    // down triangle
+    int triCx = arrowX + arrowW / 2;
+    int triY = y + h / 2 - 2;
+    for (int row = 0; row < 5; row++) {
+        int half = row;
+        if (half > 4) half = 4;
+        FillRect(triCx - half, triY + row, half * 2 + 1, 1, COLOR_WHITE);
+    }
+
+    bool changed = false;
+    // draw popup list when open
+    if (*open) {
+        int itemH = 18;
+        int popupY = y + h;
+        int popupH = itemCount * itemH + 2;
+
+        // popup background
+        FillRect(x, popupY, w, popupH, COLOR_RGB(42, 48, 66));
+        DrawRect(x, popupY, w, popupH, COLOR_RGB(84, 94, 120));
+
+        for (int i = 0; i < itemCount; i++) {
+            int iy = popupY + 1 + i * itemH;
+            bool itemHov = PointInRect(_mouseX, _mouseY, x + 1, iy, w - 2, itemH);
+            if (itemHov) {
+                FillRect(x + 1, iy, w - 2, itemH, COLOR_RGB(70, 100, 160));
+            }
+            if (i == idx) {
+                FillRect(x + 1, iy, w - 2, itemH, COLOR_RGB(52, 80, 140));
+            }
+            const char *itemText = items[i] ? items[i] : "";
+            DrawText(x + 6, iy + (itemH - 8) / 2, itemText, itemHov ? COLOR_WHITE : COLOR_LIGHT_GRAY);
+
+            if (itemHov && mouseReleased) {
+                *selectedIndex = i;
+                *open = false;
+                changed = true;
+            }
+        }
+
+        // close if clicked outside
+        if (mouseReleased && !hovered) {
+            bool inPopup = PointInRect(_mouseX, _mouseY, x, popupY, w, popupH);
+            if (!inPopup) {
+                *open = false;
+            }
+        }
+    }
+
+    return changed;
+}
+
+bool GameLib::TabBar(int x, int y, int w, const char **tabs, int tabCount, int *selectedTab)
+{
+    if (!tabs || !selectedTab || tabCount <= 0 || w <= 0) return false;
+
+    const int tabH = 26;
+    int tabW = w / tabCount;
+    if (tabW < 40) tabW = 40;
+
+    uint32_t id = _gamelib_ui_make_id(0x54414231u, x, y, w, tabH, "tabbar");
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    bool changed = false;
+    int sel = *selectedTab;
+    if (sel < 0) sel = 0;
+    if (sel >= tabCount) sel = tabCount - 1;
+
+    for (int i = 0; i < tabCount; i++) {
+        int tx = x + i * tabW;
+        int tw = tabW;
+        if (i == tabCount - 1) tw = w - i * tabW; // last tab fills remainder
+        bool tabHov = PointInRect(_mouseX, _mouseY, tx, y, tw, tabH);
+
+        if (mousePressed && tabHov) {
+            _uiActiveId = _gamelib_ui_make_id(0x54414231u, tx, y, tw, tabH, tabs[i] ? tabs[i] : "");
+        }
+
+        bool isActive = (i == sel);
+        bool isPressed = (_uiActiveId == _gamelib_ui_make_id(0x54414231u, tx, y, tw, tabH, tabs[i] ? tabs[i] : "")) && mouseDown && tabHov;
+
+        uint32_t face;
+        if (isActive) {
+            face = COLOR_RGB(48, 58, 82);
+        } else if (tabHov) {
+            face = COLOR_RGB(58, 68, 96);
+        } else {
+            face = COLOR_RGB(38, 44, 62);
+        }
+        if (isPressed) face = _gamelib_ui_darken(face, 20);
+
+        // draw tab body
+        FillRect(tx, y, tw, tabH, face);
+
+        // active tab: draw highlight bar on top and connect to content
+        if (isActive) {
+            FillRect(tx, y, tw, 3, COLOR_RGB(90, 140, 220));
+            // erase bottom border for active tab to connect with content
+            FillRect(tx + 1, y + tabH - 1, tw - 2, 1, face);
+        }
+
+        // draw tab border (left, right, top)
+        DrawLine(tx, y, tx, y + tabH - 1, COLOR_RGB(84, 94, 120));
+        DrawLine(tx + tw - 1, y, tx + tw - 1, y + tabH - 1, COLOR_RGB(84, 94, 120));
+        DrawLine(tx, y, tx + tw - 1, y, COLOR_RGB(84, 94, 120));
+
+        // draw text
+        const char *label = tabs[i] ? tabs[i] : "";
+        int lw = _gamelib_ui_text_width(label);
+        int lh = _gamelib_ui_text_height(label);
+        int lx = tx + ((tw - lw) > 0 ? (tw - lw) / 2 : 4);
+        int ly = y + ((tabH - lh) > 0 ? (tabH - lh) / 2 : 4);
+        uint32_t textColor = isActive ? COLOR_WHITE : (tabHov ? COLOR_LIGHT_GRAY : COLOR_GRAY);
+        _gamelib_ui_draw_text_with_shadow(this, lx, ly, label, textColor, COLOR_ARGB(120, 0, 0, 0));
+
+        if (mouseReleased && tabHov && _uiActiveId == _gamelib_ui_make_id(0x54414231u, tx, y, tw, tabH, tabs[i] ? tabs[i] : "")) {
+            if (!isActive) {
+                *selectedTab = i;
+                changed = true;
+            }
+        }
+    }
+
+    if (mouseReleased) {
+        _uiActiveId = 0;
+    }
+
+    // draw bottom border line (connecting bar)
+    DrawLine(x, y + tabH - 1, x + w - 1, y + tabH - 1, COLOR_RGB(84, 94, 120));
+
+    return changed;
+}
+
+void GameLib::Tooltip(int x, int y, const char *text)
+{
+    if (!text || !text[0]) return;
+
+    int tw = _gamelib_ui_text_width(text);
+    int th = _gamelib_ui_text_height(text);
+    if (tw <= 0 || th <= 0) return;
+
+    int pad = 4;
+    int boxW = tw + pad * 2;
+    int boxH = th + pad * 2;
+
+    // keep tooltip on screen
+    if (x + boxW > _width) x = _width - boxW;
+    if (y + boxH > _height) y = y - boxH - 16; // flip above cursor
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+
+    // shadow
+    FillRect(x + 2, y + 2, boxW, boxH, COLOR_ARGB(100, 0, 0, 0));
+
+    // background
+    FillRect(x, y, boxW, boxH, COLOR_RGB(255, 255, 225));
+    DrawRect(x, y, boxW, boxH, COLOR_RGB(120, 120, 80));
+
+    // text
+    DrawText(x + pad, y + pad, text, COLOR_BLACK);
+}
+
+bool GameLib::ImageButton(int x, int y, int w, int h, int spriteId, uint32_t color)
+{
+    if (w <= 0 || h <= 0) return false;
+
+    uint32_t id = _gamelib_ui_make_id(0x494D4731u, x, y, w, h, "imagebtn");
+    bool hovered = PointInRect(_mouseX, _mouseY, x, y, w, h);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    if (mousePressed && hovered) {
+        _uiActiveId = id;
+    }
+
+    bool pressed = (_uiActiveId == id) && mouseDown && hovered;
+    uint32_t face = color;
+    if (pressed) face = _gamelib_ui_darken(color, 36);
+    else if (hovered) face = _gamelib_ui_lighten(color, 46);
+
+    _gamelib_ui_draw_bevel_rect(this, x, y, w, h, face, pressed);
+
+    // draw sprite centered
+    int sw = GetSpriteWidth(spriteId);
+    int sh = GetSpriteHeight(spriteId);
+    if (sw > 0 && sh > 0) {
+        int sx = x + (w - sw) / 2;
+        int sy = y + (h - sh) / 2;
+        if (pressed) { sx += 1; sy += 1; }
+        DrawSprite(spriteId, sx, sy);
+    }
+
+    bool clicked = mouseReleased && hovered && (_uiActiveId == id);
+    if (mouseReleased && _uiActiveId == id) {
+        _uiActiveId = 0;
+    }
+    return clicked;
+}
+
+bool GameLib::ListBox(int x, int y, int w, int h, const char **items, int itemCount,
+                      int *selectedIndex, int *scrollOffset)
+{
+    if (!items || itemCount <= 0 || !selectedIndex || !scrollOffset || w <= 0 || h <= 0) return false;
+
+    const int itemH = 20;
+    int visibleCount = h / itemH;
+    if (visibleCount < 1) visibleCount = 1;
+
+    // clamp scroll
+    int maxScroll = itemCount - visibleCount;
+    if (maxScroll < 0) maxScroll = 0;
+    if (*scrollOffset > maxScroll) *scrollOffset = maxScroll;
+    if (*scrollOffset < 0) *scrollOffset = 0;
+
+    // mouse wheel scroll
+    bool hovered = PointInRect(_mouseX, _mouseY, x, y, w, h);
+    int wheel = GetMouseWheelDelta();
+    if (hovered && wheel != 0) {
+        *scrollOffset -= (wheel > 0 ? 3 : -3);
+        if (*scrollOffset < 0) *scrollOffset = 0;
+        if (*scrollOffset > maxScroll) *scrollOffset = maxScroll;
+    }
+
+    // draw background
+    FillRect(x, y, w, h, COLOR_RGB(32, 36, 48));
+    DrawRect(x, y, w, h, COLOR_RGB(84, 94, 120));
+
+    // draw visible items
+    bool changed = false;
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    int startIdx = *scrollOffset;
+    int endIdx = startIdx + visibleCount;
+    if (endIdx > itemCount) endIdx = itemCount;
+
+    for (int i = startIdx; i < endIdx; i++) {
+        int iy = y + (i - startIdx) * itemH;
+        bool itemHov = PointInRect(_mouseX, _mouseY, x + 1, iy, w - 2, itemH);
+        bool selected = (i == *selectedIndex);
+
+        if (selected) {
+            FillRect(x + 1, iy, w - 2, itemH, COLOR_RGB(60, 80, 140));
+        } else if (itemHov) {
+            FillRect(x + 1, iy, w - 2, itemH, COLOR_RGB(48, 56, 78));
+        }
+
+        uint32_t textColor = selected ? COLOR_WHITE : (itemHov ? COLOR_WHITE : COLOR_LIGHT_GRAY);
+        const char *text = items[i] ? items[i] : "";
+        DrawText(x + 6, iy + (itemH - 8) / 2, text, textColor);
+
+        if (mousePressed && itemHov && !selected) {
+            *selectedIndex = i;
+            changed = true;
+        }
+    }
+
+    // draw scroll indicator
+    if (itemCount > visibleCount) {
+        int sbH = h - 4;
+        int thumbH = (sbH * visibleCount) / itemCount;
+        if (thumbH < 8) thumbH = 8;
+        int thumbY = y + 2 + (int)((long long)*scrollOffset * (sbH - thumbH) / maxScroll);
+        FillRect(x + w - 5, thumbY, 3, thumbH, COLOR_RGB(120, 130, 160));
+    }
+
+    return changed;
+}
+
+bool GameLib::Collapsible(int x, int y, int w, const char *title, bool *open)
+{
+    if (!open || w <= 0) return false;
+
+    const int headerH = 22;
+    uint32_t id = _gamelib_ui_make_id(0x434F4C31u, x, y, w, headerH, title);
+    bool hovered = PointInRect(_mouseX, _mouseY, x, y, w, headerH);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    if (mousePressed && hovered) {
+        _uiActiveId = id;
+    }
+
+    bool pressed = (_uiActiveId == id) && mouseDown && hovered;
+
+    // draw header background
+    uint32_t face = hovered
+        ? _gamelib_ui_lighten(COLOR_RGB(50, 58, 78), 20)
+        : COLOR_RGB(50, 58, 78);
+    if (pressed) face = _gamelib_ui_darken(face, 20);
+    FillRect(x, y, w, headerH, face);
+    DrawRect(x, y, w, headerH, COLOR_RGB(84, 94, 120));
+
+    // draw triangle indicator
+    int triX = x + 8;
+    int triY = y + headerH / 2;
+    if (*open) {
+        // down-pointing triangle
+        FillTriangle(triX, triY - 3, triX + 7, triY - 3, triX + 3, triY + 3, COLOR_WHITE);
+    } else {
+        // right-pointing triangle
+        FillTriangle(triX, triY - 4, triX + 5, triY, triX, triY + 4, COLOR_WHITE);
+    }
+
+    // draw title text
+    if (title && title[0]) {
+        DrawText(x + 20, y + (headerH - 8) / 2, title, COLOR_WHITE);
+    }
+
+    bool changed = false;
+    if (mouseReleased && _uiActiveId == id) {
+        if (hovered) {
+            *open = !*open;
+            changed = true;
+        }
+        _uiActiveId = 0;
+    }
+    return changed;
+}
+
+bool GameLib::ColorPicker(int x, int y, const uint32_t *colors, int colorCount, int *selectedIndex)
+{
+    if (!colors || colorCount <= 0 || !selectedIndex) return false;
+
+    const int swatchSize = 18;
+    const int gap = 2;
+    const int cols = 8;
+    int rows = (colorCount + cols - 1) / cols;
+
+    int totalW = cols * (swatchSize + gap) + gap;
+    int totalH = rows * (swatchSize + gap) + gap;
+
+    // draw background
+    FillRect(x, y, totalW, totalH, COLOR_RGB(32, 36, 48));
+    DrawRect(x, y, totalW, totalH, COLOR_RGB(84, 94, 120));
+
+    bool changed = false;
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+
+    for (int i = 0; i < colorCount; i++) {
+        int col = i % cols;
+        int row = i / cols;
+        int sx = x + gap + col * (swatchSize + gap);
+        int sy = y + gap + row * (swatchSize + gap);
+
+        bool swatchHov = PointInRect(_mouseX, _mouseY, sx, sy, swatchSize, swatchSize);
+        bool selected = (i == *selectedIndex);
+
+        // draw swatch
+        FillRect(sx, sy, swatchSize, swatchSize, colors[i]);
+
+        // selection border
+        if (selected) {
+            DrawRect(sx - 1, sy - 1, swatchSize + 2, swatchSize + 2, COLOR_WHITE);
+        } else if (swatchHov) {
+            DrawRect(sx, sy, swatchSize, swatchSize, COLOR_WHITE);
+        }
+
+        if (mousePressed && swatchHov && !selected) {
+            *selectedIndex = i;
+            changed = true;
+        }
+    }
+
+    return changed;
+}
+
+bool GameLib::Knob(int x, int y, int size, int *value, int minVal, int maxVal)
+{
+    if (!value || size <= 0) return false;
+    if (minVal > maxVal) { int t = minVal; minVal = maxVal; maxVal = t; }
+
+    int cx = x + size / 2;
+    int cy = y + size / 2;
+    int r = size / 2;
+    if (r < 8) r = 8;
+
+    uint32_t id = _gamelib_ui_make_id(0x4B4E4231u, x, y, size, size, "knob");
+    bool hovered = PointInRect(_mouseX, _mouseY, x, y, size, size);
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    bool mouseReleased = IsMouseReleased(MOUSE_LEFT);
+    bool mouseDown = IsMouseDown(MOUSE_LEFT);
+
+    if (mousePressed && hovered) {
+        _uiActiveId = id;
+    }
+
+    bool dragging = (_uiActiveId == id) && mouseDown;
+    bool changed = false;
+
+    if (dragging) {
+        int range = maxVal - minVal;
+        if (range <= 0) range = 1;
+        // vertical drag: moving up increases value, down decreases
+        int dragRange = size * 2;
+        int relY = cy - _mouseY + dragRange / 2;
+        if (relY < 0) relY = 0;
+        if (relY > dragRange) relY = dragRange;
+        int newVal = minVal + (int)((long long)relY * range / dragRange);
+        if (newVal < minVal) newVal = minVal;
+        if (newVal > maxVal) newVal = maxVal;
+        if (newVal != *value) {
+            *value = newVal;
+            changed = true;
+        }
+    }
+
+    // draw knob body
+    uint32_t face = hovered || dragging
+        ? _gamelib_ui_lighten(COLOR_RGB(140, 148, 170), 24)
+        : COLOR_RGB(140, 148, 170);
+    if (dragging) face = _gamelib_ui_darken(face, 16);
+    FillCircle(cx, cy, r, face);
+
+    // draw bevel ring
+    uint32_t lightColor = _gamelib_ui_lighten(face, 80);
+    uint32_t darkColor = _gamelib_ui_darken(face, 80);
+    DrawCircle(cx, cy, r, darkColor);
+    DrawCircle(cx, cy, r - 1, lightColor);
+
+    // draw indicator line based on angle
+    // angle range: -135 deg (min) to +135 deg (max), 0 = top
+    int range = maxVal - minVal;
+    if (range <= 0) range = 1;
+    double fraction = (double)(*value - minVal) / (double)range;
+    double angle = -135.0 + fraction * 270.0; // -135 to +135
+    double rad = angle * 3.14159265358979323846 / 180.0;
+    int lineLen = r - 4;
+    if (lineLen < 4) lineLen = 4;
+    int lx = cx + (int)(sin(rad) * lineLen);
+    int ly = cy - (int)(cos(rad) * lineLen);
+    DrawLine(cx, cy, lx, ly, COLOR_WHITE);
+
+    // draw tick marks at min/max
+    double minRad = -135.0 * 3.14159265358979323846 / 180.0;
+    double maxRad =  135.0 * 3.14159265358979323846 / 180.0;
+    int tickInner = r + 2;
+    int tickOuter = r + 5;
+    int t1x1 = cx + (int)(sin(minRad) * tickInner);
+    int t1y1 = cy - (int)(cos(minRad) * tickInner);
+    int t1x2 = cx + (int)(sin(minRad) * tickOuter);
+    int t1y2 = cy - (int)(cos(minRad) * tickOuter);
+    DrawLine(t1x1, t1y1, t1x2, t1y2, COLOR_LIGHT_GRAY);
+    int t2x1 = cx + (int)(sin(maxRad) * tickInner);
+    int t2y1 = cy - (int)(cos(maxRad) * tickInner);
+    int t2x2 = cx + (int)(sin(maxRad) * tickOuter);
+    int t2y2 = cy - (int)(cos(maxRad) * tickOuter);
+    DrawLine(t2x1, t2y1, t2x2, t2y2, COLOR_LIGHT_GRAY);
+
+    if (mouseReleased && _uiActiveId == id) {
+        _uiActiveId = 0;
+    }
+    return changed;
+}
+
+int GameLib::Menu(int x, int y, const char **items, int itemCount, bool *open)
+{
+    if (!open || !*open) return -1;
+    if (!items || itemCount <= 0) return -1;
+
+    const int itemH = 22;
+    const int pad = 4;
+    int menuW = 0;
+    for (int i = 0; i < itemCount; i++) {
+        int tw = _gamelib_ui_text_width(items[i] ? items[i] : "");
+        if (tw > menuW) menuW = tw;
+    }
+    menuW += pad * 2 + 8;
+    if (menuW < 80) menuW = 80;
+    int menuH = itemCount * itemH + pad * 2;
+
+    // keep on screen
+    if (x + menuW > _width) x = _width - menuW;
+    if (y + menuH > _height) y = y - menuH;
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+
+    // shadow
+    FillRect(x + 3, y + 3, menuW, menuH, COLOR_ARGB(100, 0, 0, 0));
+    // background
+    FillRect(x, y, menuW, menuH, COLOR_RGB(42, 48, 66));
+    DrawRect(x, y, menuW, menuH, COLOR_RGB(84, 94, 120));
+
+    bool mousePressed = IsMousePressed(MOUSE_LEFT);
+    int result = -1;
+
+    for (int i = 0; i < itemCount; i++) {
+        int iy = y + pad + i * itemH;
+        bool itemHov = PointInRect(_mouseX, _mouseY, x + 1, iy, menuW - 2, itemH);
+
+        if (itemHov) {
+            FillRect(x + 1, iy, menuW - 2, itemH, COLOR_RGB(70, 90, 150));
+        }
+
+        uint32_t textColor = itemHov ? COLOR_WHITE : COLOR_LIGHT_GRAY;
+        if (items[i] && items[i][0]) {
+            DrawText(x + pad + 4, iy + (itemH - 8) / 2, items[i], textColor);
+        }
+
+        if (mousePressed && itemHov) {
+            result = i;
+            *open = false;
+        }
+    }
+
+    // close menu if clicked outside
+    if (mousePressed && !PointInRect(_mouseX, _mouseY, x, y, menuW, menuH)) {
+        *open = false;
+    }
+
+    return result;
 }
 
 

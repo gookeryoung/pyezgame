@@ -401,6 +401,77 @@ PYBIND11_MODULE(_pyezgame, m) {
         .def("label", &GameLib::Label,
              py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
              py::arg("text"), py::arg("bg_color"), py::arg("text_color"))
+        .def("v_separator", &GameLib::VSeparator,
+             py::arg("x"), py::arg("y"), py::arg("h"))
+        .def("text_input", [](GameLib& self, int x, int y, int w, const char* buffer, bool focused) {
+            char buf[256];
+            strncpy(buf, buffer ? buffer : "", sizeof(buf) - 1);
+            buf[sizeof(buf) - 1] = '\0';
+            bool result = self.TextInput(x, y, w, buf, (int)sizeof(buf), &focused);
+            return py::make_tuple(result, std::string(buf), focused);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("buffer"), py::arg("focused"))
+        .def("dropdown", [](GameLib& self, int x, int y, int w,
+                             const std::vector<std::string>& items,
+                             int selected_index, bool open) {
+            std::vector<const char*> ptrs;
+            ptrs.reserve(items.size());
+            for (auto& s : items) ptrs.push_back(s.c_str());
+            bool result = self.Dropdown(x, y, w, ptrs.data(), (int)ptrs.size(), &selected_index, &open);
+            return py::make_tuple(result, selected_index, open);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("items"),
+           py::arg("selected_index"), py::arg("open"))
+        .def("tab_bar", [](GameLib& self, int x, int y, int w,
+                            const std::vector<std::string>& tabs,
+                            int selected_tab) {
+            std::vector<const char*> ptrs;
+            ptrs.reserve(tabs.size());
+            for (auto& s : tabs) ptrs.push_back(s.c_str());
+            bool result = self.TabBar(x, y, w, ptrs.data(), (int)ptrs.size(), &selected_tab);
+            return py::make_tuple(result, selected_tab);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("tabs"),
+           py::arg("selected_tab"))
+        .def("tooltip", &GameLib::Tooltip,
+             py::arg("x"), py::arg("y"), py::arg("text"))
+        .def("image_button", [](GameLib& self, int x, int y, int w, int h, int sprite_id, uint32_t color) {
+            bool result = self.ImageButton(x, y, w, h, sprite_id, color);
+            return result;
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
+           py::arg("sprite_id"), py::arg("color"))
+        .def("list_box", [](GameLib& self, int x, int y, int w, int h,
+                             const std::vector<std::string>& items,
+                             int selected_index, int scroll_offset) {
+            std::vector<const char*> ptrs;
+            ptrs.reserve(items.size());
+            for (auto& s : items) ptrs.push_back(s.c_str());
+            bool result = self.ListBox(x, y, w, h, ptrs.data(), (int)ptrs.size(),
+                                       &selected_index, &scroll_offset);
+            return py::make_tuple(result, selected_index, scroll_offset);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
+           py::arg("items"), py::arg("selected_index"), py::arg("scroll_offset"))
+        .def("collapsible", [](GameLib& self, int x, int y, int w, const char* title, bool open) {
+            bool result = self.Collapsible(x, y, w, title, &open);
+            return py::make_tuple(result, open);
+        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("title"), py::arg("open"))
+        .def("color_picker", [](GameLib& self, int x, int y,
+                                 const std::vector<uint32_t>& colors,
+                                 int selected_index) {
+            bool result = self.ColorPicker(x, y, colors.data(), (int)colors.size(),
+                                           &selected_index);
+            return py::make_tuple(result, selected_index);
+        }, py::arg("x"), py::arg("y"), py::arg("colors"), py::arg("selected_index"))
+        .def("knob", [](GameLib& self, int x, int y, int size, int value, int min_val, int max_val) {
+            bool result = self.Knob(x, y, size, &value, min_val, max_val);
+            return py::make_tuple(result, value);
+        }, py::arg("x"), py::arg("y"), py::arg("size"), py::arg("value"),
+           py::arg("min_val"), py::arg("max_val"))
+        .def("menu", [](GameLib& self, int x, int y,
+                         const std::vector<std::string>& items, bool open) {
+            std::vector<const char*> ptrs;
+            ptrs.reserve(items.size());
+            for (auto& s : items) ptrs.push_back(s.c_str());
+            int result = self.Menu(x, y, ptrs.data(), (int)ptrs.size(), &open);
+            return py::make_tuple(result, open);
+        }, py::arg("x"), py::arg("y"), py::arg("items"), py::arg("open"))
 
         // ---- Static Methods: Save/Load ----
         .def_static("save_int", &GameLib::SaveInt,
