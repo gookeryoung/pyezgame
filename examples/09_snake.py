@@ -94,12 +94,12 @@ def main() -> None:
                     # Wall collision
                     if head_r < 0 or head_r >= GRID_ROWS or head_c < 0 or head_c >= GRID_COLS:
                         game_over = True
-                        game.play_wav(game_over_sfx, 1, 1000)
+                        _ = game.play_wav(game_over_sfx, 1, 1000)
                     else:
                         # Self collision
                         if (head_r, head_c) in snake[:snake_len]:
                             game_over = True
-                            game.play_wav(game_over_sfx, 1, 1000)
+                            _ = game.play_wav(game_over_sfx, 1, 1000)
 
                     if not game_over:
                         ate = head_r == food_r and head_c == food_c
@@ -107,7 +107,7 @@ def main() -> None:
                         if not ate:
                             # Move: shift body, drop tail
                             snake.insert(0, (head_r, head_c))
-                            snake.pop()
+                            _ = snake.pop()
                         else:
                             # Grow
                             snake.insert(0, (head_r, head_c))
@@ -122,7 +122,7 @@ def main() -> None:
                                 food_c = g.GameLib.random(0, GRID_COLS - 1)
                                 if (food_r, food_c) not in snake[:snake_len]:
                                     break
-                            game.play_wav(eat_sfx, 1, 800)
+                            _ = game.play_wav(eat_sfx, 1, 800)
         else:
             if game.is_key_pressed(g.KEY_R):
                 snake = [(10, 10), (10, 9), (10, 8)]

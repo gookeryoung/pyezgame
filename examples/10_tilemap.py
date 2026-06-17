@@ -36,13 +36,14 @@ BG_HILL_TOP = 3
 BG_HILL = 4
 
 
-def sprite_fill(game, sid, x0, y0, w, h, c) -> None:
+def sprite_fill(game: g.GameLib, sid: int, x0: int, y0: int, w: int, h: int, c: int) -> None:
+    """Fill a rectangle of the sprite with the given color."""
     for y in range(y0, y0 + h):
         for x in range(x0, x0 + w):
             game.set_sprite_pixel(sid, x, y, c)
 
 
-def make_bg_tileset(game):
+def make_bg_tileset(game: g.GameLib) -> int:
     sid = game.create_sprite(5 * TS, TS)
     sky = g.COLOR_RGB(135, 206, 235)
 

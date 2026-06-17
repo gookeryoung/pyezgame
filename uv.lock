@@ -1,5 +1,5 @@
 version = 1
-revision = 1
+revision = 3
 requires-python = ">=3.9"
 resolution-markers = [
     "python_full_version >= '3.10'",
@@ -1342,7 +1342,7 @@ wheels = [
 
 [[package]]
 name = "pyezgame"
-version = "0.4.3"
+version = "0.4.4"
 source = { editable = "." }
 
 [package.optional-dependencies]

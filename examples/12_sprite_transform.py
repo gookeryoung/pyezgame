@@ -16,10 +16,6 @@ Learn: draw_sprite_scaled, draw_sprite_frame_scaled, draw_sprite_rotated,
 import pyezgame as g
 
 
-def clamp(v, lo, hi):
-    return max(lo, min(v, hi))
-
-
 def wrap_angle(a):
     while a >= 360.0:
         a -= 360.0
@@ -167,7 +163,7 @@ def main() -> None:
                 scale -= 1
             if game.is_key_pressed(g.KEY_E):
                 scale += 1
-            scale = clamp(scale, 1, 6)
+            scale = g.clamp(scale, 1, 6)
 
             if game.is_key_pressed(g.KEY_R):
                 scale, frame, flip = 4, 0, False
@@ -198,7 +194,12 @@ def main() -> None:
             draw_checkerboard(game, 256, 116, 280, 160, 10)
             game.draw_rect(256, 116, 280, 160, g.COLOR_RGB(98, 110, 138))
             game.draw_sprite_scaled(
-                ship, 256 + (280 - 17 * scale) // 2, 116 + (160 - 17 * scale) // 2, 17 * scale, 17 * scale, flags,
+                ship,
+                256 + (280 - 17 * scale) // 2,
+                116 + (160 - 17 * scale) // 2,
+                17 * scale,
+                17 * scale,
+                flags,
             )
             game.draw_printf(256, 282, g.COLOR_WHITE, f"17x17 -> {17 * scale}x{17 * scale}")
 
@@ -249,7 +250,7 @@ def main() -> None:
                 angle_speed -= 1
             if game.is_key_pressed(g.KEY_E):
                 angle_speed += 1
-            angle_speed = clamp(angle_speed, -12, 12)
+            angle_speed = g.clamp(angle_speed, -12, 12)
             if game.is_key_pressed(g.KEY_SPACE):
                 spinning = not spinning
             if game.is_key_pressed(g.KEY_R):
