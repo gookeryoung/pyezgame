@@ -5,11 +5,7 @@ Learn: play_beep, play_wav, stop_wav, is_playing, set_volume, stop_all,
        set_master_volume, get_master_volume, play_music, stop_music
 """
 
-import os
-
 import pyezgame as g
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def main() -> None:
@@ -18,8 +14,8 @@ def main() -> None:
 
     last_wav_channel = -1
     last_music_ok = True
-    wav_effect = g.get_respath("../clib/assets/sound/explosion.wav")
-    music_file = g.get_respath("../clib/assets/music/battle1.mid")
+    wav_effect = g.get_asset_path("sound/explosion.wav")
+    music_file = g.get_asset_path("music/battle1.mid")
     music_label = "Background Music (MCI MIDI):"
     music_hint = "(uses assets/music/battle1.mid via MCI sequencer)"
 

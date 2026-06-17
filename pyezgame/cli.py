@@ -4,8 +4,12 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import logging
 import sys
 from pathlib import Path
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 # Installed: pyezgame/examples/; Dev: ../examples/ (relative to pyezgame/)
 _pkg_dir = Path(__file__).resolve().parent
@@ -49,8 +53,10 @@ def cmd_list(_args: argparse.Namespace) -> None:
     examples = _discover_examples()
     if not examples:
         return
-    for _num, _name, _ in examples:
-        pass
+
+    logger.info("Available examples:")
+    for n, name, _ in examples:
+        logger.info(f"  {n}  {name}")
 
 
 def cmd_run(args: argparse.Namespace) -> None:

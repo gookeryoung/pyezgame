@@ -66,7 +66,9 @@ install(TARGETS _pyezgame LIBRARY DESTINATION pyezgame)
 install(FILES pyezgame/__init__.py DESTINATION pyezgame)
 install(FILES pyezgame/__init__.pyi DESTINATION pyezgame)
 
-# Install Python examples and their assets under pyezgame/
+# Install Python examples under pyezgame/
 file(GLOB EXAMPLE_PY_FILES ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.py)
 install(FILES ${EXAMPLE_PY_FILES} DESTINATION pyezgame/examples)
-install(DIRECTORY clib/assets DESTINATION pyezgame/examples)
+
+# Install assets under pyezgame/assets/ so get_asset_path() works after pip install
+install(DIRECTORY clib/assets DESTINATION pyezgame)

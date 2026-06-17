@@ -22,14 +22,22 @@ def get_respath(*parts: str | Path) -> str:
 
 
 def get_asset_path(filename: str) -> str:
-    """Get the absolute POSIX path to a file inside clib/assets/.
+    """Get the absolute POSIX path to a file inside the assets directory.
+
+    Looks in the installed package location first (``pyezgame/assets/``),
+    then falls back to the development source tree (``clib/assets/``).
 
     Args:
-        filename: Asset filename (e.g. ``"coin.png"``).
+        filename: Asset filename (e.g. ``"coin.png"``, ``"sound/click.wav"``).
 
     Returns:
         str: The absolute POSIX path to the asset file.
     """
+    # Installed wheel layout: pyezgame/assets/<filename>
+    installed = ROOT_PATH / "assets" / filename
+    if installed.exists():
+        return installed.as_posix()
+    # Development source tree: clib/assets/<filename>
     return (ROOT_PATH.parent / "clib" / "assets" / filename).as_posix()
 
 

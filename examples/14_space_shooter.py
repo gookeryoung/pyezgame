@@ -112,17 +112,17 @@ def main() -> None:
     game = g.GameLib()
     game.open(W, H, "14 - Space Shooter", True)
 
-    player_path = g.get_respath("../clib/assets/plane0.png")
-    bullet_path = g.get_respath("../clib/assets/bullet.png")
-    explosion_path = g.get_respath("../clib/assets/explosion.png")
+    player_path = g.get_asset_path("plane0.png")
+    bullet_path = g.get_asset_path("bullet.png")
+    explosion_path = g.get_asset_path("explosion.png")
 
-    shoot_sfx = g.get_respath("../clib/assets/sound/click.wav")
-    enemy_hit_sfx = g.get_respath("../clib/assets/sound/hit.wav")
-    enemy_down_sfx = g.get_respath("../clib/assets/sound/coin.wav")
-    level_up_sfx = g.get_respath("../clib/assets/sound/note_do_high.wav")
-    player_hit_sfx = g.get_respath("../clib/assets/sound/explosion.wav")
-    game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
-    restart_sfx = g.get_respath("../clib/assets/sound/click.wav")
+    shoot_sfx = g.get_asset_path("sound/click.wav")
+    enemy_hit_sfx = g.get_asset_path("sound/hit.wav")
+    enemy_down_sfx = g.get_asset_path("sound/coin.wav")
+    level_up_sfx = g.get_asset_path("sound/note_do_high.wav")
+    player_hit_sfx = g.get_asset_path("sound/explosion.wav")
+    game_over_sfx = g.get_asset_path("sound/game_over.wav")
+    restart_sfx = g.get_asset_path("sound/click.wav")
 
     spr_player = game.load_sprite(player_path)
     if spr_player >= 0:

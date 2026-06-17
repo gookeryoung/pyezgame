@@ -67,7 +67,7 @@ FPS = 60
 # Sprite sheet configuration (magic_tower.png)
 # The sprite sheet contains various magic tower elements
 # We'll use DrawSpriteEx to extract individual sprites
-SPRITE_SHEET = "assets/magic_tower.png"
+SPRITE_SHEET = "magic_tower.png"  # resolved via get_asset_path() in main()
 
 # Sprite definitions (x, y, width, height) in the sprite sheet
 # These are approximate positions based on typical magic tower sprite sheets
@@ -439,7 +439,7 @@ def combat(game: g.GameLib, game_state: GameState, monster_type: str) -> bool:
             show_notification(game_state, f"Victory! +{monster_template.exp}EXP +{monster_template.gold}G", 2.0)
 
             # Play victory sound
-            game.play_wav("assets/sound/victory.wav", False)
+            game.play_wav(g.get_asset_path("sound/victory.wav"), False)
 
             # Check level up
             check_level_up(game_state)
@@ -458,7 +458,7 @@ def combat(game: g.GameLib, game_state: GameState, monster_type: str) -> bool:
             game_state.game_over = True
 
             # Play game over sound
-            game.play_wav("assets/sound/game_over.wav", False)
+            game.play_wav(g.get_asset_path("sound/game_over.wav"), False)
             return False
 
 
@@ -527,7 +527,7 @@ def try_move(game: g.GameLib, game_state: GameState, dx: int, dy: int) -> bool:
             game_state.player.yellow_keys -= 1
             game_state.current_map[new_y][new_x] = TILE_EMPTY
             show_notification(game_state, "Used Yellow Key", 1.0)
-            game.play_wav("assets/sound/click.wav", False)
+            game.play_wav(g.get_asset_path("sound/click.wav"), False)
         else:
             show_notification(game_state, "Need Yellow Key!", 1.0)
             return False
@@ -537,7 +537,7 @@ def try_move(game: g.GameLib, game_state: GameState, dx: int, dy: int) -> bool:
             game_state.player.blue_keys -= 1
             game_state.current_map[new_y][new_x] = TILE_EMPTY
             show_notification(game_state, "Used Blue Key", 1.0)
-            game.play_wav("assets/sound/click.wav", False)
+            game.play_wav(g.get_asset_path("sound/click.wav"), False)
         else:
             show_notification(game_state, "Need Blue Key!", 1.0)
             return False
@@ -547,7 +547,7 @@ def try_move(game: g.GameLib, game_state: GameState, dx: int, dy: int) -> bool:
             game_state.player.red_keys -= 1
             game_state.current_map[new_y][new_x] = TILE_EMPTY
             show_notification(game_state, "Used Red Key", 1.0)
-            game.play_wav("assets/sound/click.wav", False)
+            game.play_wav(g.get_asset_path("sound/click.wav"), False)
         else:
             show_notification(game_state, "Need Red Key!", 1.0)
             return False
@@ -556,51 +556,51 @@ def try_move(game: g.GameLib, game_state: GameState, dx: int, dy: int) -> bool:
         game_state.player.yellow_keys += 1
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, "+1 Yellow Key", 1.0)
-        game.play_wav("assets/sound/coin.wav", False)
+        game.play_wav(g.get_asset_path("sound/coin.wav"), False)
 
     elif tile == TILE_BLUE_KEY:
         game_state.player.blue_keys += 1
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, "+1 Blue Key", 1.0)
-        game.play_wav("assets/sound/coin.wav", False)
+        game.play_wav(g.get_asset_path("sound/coin.wav"), False)
 
     elif tile == TILE_RED_KEY:
         game_state.player.red_keys += 1
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, "+1 Red Key", 1.0)
-        game.play_wav("assets/sound/coin.wav", False)
+        game.play_wav(g.get_asset_path("sound/coin.wav"), False)
 
     elif tile == TILE_POTION_SMALL:
         heal = 100
         game_state.player.hp = min(game_state.player.max_hp, game_state.player.hp + heal)
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, f"+{heal} HP", 1.0)
-        game.play_wav("assets/sound/jump.wav", False)
+        game.play_wav(g.get_asset_path("sound/jump.wav"), False)
 
     elif tile == TILE_POTION_LARGE:
         heal = 500
         game_state.player.hp = min(game_state.player.max_hp, game_state.player.hp + heal)
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, f"+{heal} HP", 1.0)
-        game.play_wav("assets/sound/jump.wav", False)
+        game.play_wav(g.get_asset_path("sound/jump.wav"), False)
 
     elif tile == TILE_GEM_RED:
         game_state.player.attack += 4  # Increased from 3
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, "+4 ATK", 1.0)
-        game.play_wav("assets/sound/coin.wav", False)
+        game.play_wav(g.get_asset_path("sound/coin.wav"), False)
 
     elif tile == TILE_GEM_BLUE:
         game_state.player.defense += 4  # Increased from 3
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, "+4 DEF", 1.0)
-        game.play_wav("assets/sound/coin.wav", False)
+        game.play_wav(g.get_asset_path("sound/coin.wav"), False)
 
     elif tile == TILE_GOLD:
         game_state.player.gold += 100
         game_state.current_map[new_y][new_x] = TILE_EMPTY
         show_notification(game_state, "+100 Gold", 1.0)
-        game.play_wav("assets/sound/coin.wav", False)
+        game.play_wav(g.get_asset_path("sound/coin.wav"), False)
 
     elif tile == TILE_CHEST:
         # Random reward from chest
@@ -615,7 +615,7 @@ def try_move(game: g.GameLib, game_state: GameState, dx: int, dy: int) -> bool:
             game_state.player.defense += 5
             show_notification(game_state, "Chest: +5 DEF", 1.5)
         game_state.current_map[new_y][new_x] = TILE_EMPTY
-        game.play_wav("assets/sound/coin.wav", False)
+        game.play_wav(g.get_asset_path("sound/coin.wav"), False)
 
     elif tile == TILE_STAIRS_UP:
         if game_state.player.floor < 50:
@@ -654,7 +654,7 @@ def go_to_floor(game: g.GameLib, game_state: GameState, floor_num: int) -> None:
         show_notification(game_state, f"Floor {floor_num}", 1.5)
 
     # Play stair sound
-    game.play_wav("assets/sound/click.wav", False)
+    game.play_wav(g.get_asset_path("sound/click.wav"), False)
 
 
 # ============================================================================
@@ -941,7 +941,7 @@ def main() -> None:
     _ = game.open(WIN_WIDTH, WIN_HEIGHT, "18 - Magic Tower 50F", True)
 
     # Load sprite sheet
-    sprite_sheet_id = game.load_sprite(SPRITE_SHEET)
+    sprite_sheet_id = game.load_sprite(g.get_asset_path(SPRITE_SHEET))
 
     # Initialize game state
     game_state = GameState()

@@ -4,11 +4,7 @@ Classic Breakout: bounce the ball with paddle, destroy all bricks to win.
 Learn: in-depth collision detection, multi-object management, game state
 """
 
-import os
-
 import pyezgame as g
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 BRICK_ROWS = 6
 BRICK_COLS = 10
@@ -23,20 +19,20 @@ def main() -> None:
     game = g.GameLib()
     _ = game.open(640, 480, "08 - Breakout", True)
 
-    launch_sfx = g.get_respath("../clib/assets/sound/jump.wav")
-    bounce_sfx = g.get_respath("../clib/assets/sound/hit.wav")
+    launch_sfx = g.get_asset_path("sound/jump.wav")
+    bounce_sfx = g.get_asset_path("sound/hit.wav")
     brick_row_sfx = [
-        g.get_respath("../clib/assets/sound/note_do_high.wav"),
-        g.get_respath("../clib/assets/sound/note_si.wav"),
-        g.get_respath("../clib/assets/sound/note_la.wav"),
-        g.get_respath("../clib/assets/sound/note_sol.wav"),
-        g.get_respath("../clib/assets/sound/note_fa.wav"),
-        g.get_respath("../clib/assets/sound/note_mi.wav"),
+        g.get_asset_path("sound/note_do_high.wav"),
+        g.get_asset_path("sound/note_si.wav"),
+        g.get_asset_path("sound/note_la.wav"),
+        g.get_asset_path("sound/note_sol.wav"),
+        g.get_asset_path("sound/note_fa.wav"),
+        g.get_asset_path("sound/note_mi.wav"),
     ]
-    lose_life_sfx = g.get_respath("../clib/assets/sound/explosion.wav")
-    restart_sfx = g.get_respath("../clib/assets/sound/click.wav")
-    game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
-    win_sfx = g.get_respath("../clib/assets/sound/victory.wav")
+    lose_life_sfx = g.get_asset_path("sound/explosion.wav")
+    restart_sfx = g.get_asset_path("sound/click.wav")
+    game_over_sfx = g.get_asset_path("sound/game_over.wav")
+    win_sfx = g.get_asset_path("sound/victory.wav")
 
     brick_colors = [g.COLOR_RED, g.COLOR_ORANGE, g.COLOR_YELLOW, g.COLOR_GREEN, g.COLOR_CYAN, g.COLOR_PURPLE]
 

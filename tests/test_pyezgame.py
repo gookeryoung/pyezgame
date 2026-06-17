@@ -493,9 +493,9 @@ class TestGetAssetPath:
         result = get_asset_path("coin.png")
         assert result.endswith("coin.png")
 
-    def test_contains_clib_assets(self) -> None:
+    def test_contains_assets(self) -> None:
         result = get_asset_path("heart.png")
-        assert "clib/assets/heart.png" in result
+        assert "assets/heart.png" in result
 
     def test_uses_forward_slashes(self) -> None:
         result = get_asset_path("star.png")

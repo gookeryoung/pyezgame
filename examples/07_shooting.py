@@ -5,11 +5,7 @@ Learn: lists for multiple objects, bullet firing, collision destroy, is_key_pres
        load_sprite, draw_sprite_scaled, play_wav
 """
 
-import os
-
 import pyezgame as g
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MAX_BULLETS = 30
 MAX_ENEMIES = 15
@@ -43,11 +39,11 @@ def main() -> None:
     _ = game.open(640, 480, "07 - Shooting Stars", True)
 
     # Load sprite assets
-    player_path = g.get_respath("../clib/assets/player_ship.png")
-    enemy_path = g.get_respath("../clib/assets/enemy_ship.png")
-    bullet_path = g.get_respath("../clib/assets/bullet.png")
-    explosion_path = g.get_respath("../clib/assets/explosion.png")
-    star_path = g.get_respath("../clib/assets/star.png")
+    player_path = g.get_asset_path("player_ship.png")
+    enemy_path = g.get_asset_path("enemy_ship.png")
+    bullet_path = g.get_asset_path("bullet.png")
+    explosion_path = g.get_asset_path("explosion.png")
+    star_path = g.get_asset_path("star.png")
 
     spr_player = game.load_sprite(player_path)
     spr_enemy = game.load_sprite(enemy_path)
@@ -56,10 +52,10 @@ def main() -> None:
     spr_star = game.load_sprite(star_path)
 
     # Load sound assets
-    shoot_sfx = g.get_respath("../clib/assets/sound/click.wav")
-    hit_sfx = g.get_respath("../clib/assets/sound/hit.wav")
-    coin_sfx = g.get_respath("../clib/assets/sound/coin.wav")
-    game_over_sfx = g.get_respath("../clib/assets/sound/game_over.wav")
+    shoot_sfx = g.get_asset_path("sound/click.wav")
+    hit_sfx = g.get_asset_path("sound/hit.wav")
+    coin_sfx = g.get_asset_path("sound/coin.wav")
+    game_over_sfx = g.get_asset_path("sound/game_over.wav")
 
     # Player ship
     ship_x, ship_y = 300, 420
