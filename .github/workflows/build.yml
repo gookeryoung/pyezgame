@@ -27,22 +27,27 @@ jobs:
         uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_ENVIRONMENT: "PIP_CACHE_DIR=/host/home/runner/.cache/pip"
+          CIBW_BUILD: ${{ startsWith(github.ref, 'refs/tags/') && 'cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*' || 'cp312-*' }}
 
       - name: Build sdist
+        if: startsWith(github.ref, 'refs/tags/')
         run: pipx run build --sdist
 
       - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: dist-sdist
           path: dist/*.tar.gz
 
       - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: dist-linux
           path: wheelhouse/*.whl
 
   build-windows:
     name: Windows wheels
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +69,7 @@ jobs:
 
   build-macos:
     name: macOS wheels
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -87,7 +93,7 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: always() && startsWith(github.ref, 'refs/tags/v') && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     permissions:
