@@ -38,6 +38,24 @@ default = true
 cmake.build-type = "Release"
 wheel.packages = ["pyezgame"]
 build.verbose = true
+sdist.exclude = [
+    "wheelhouse",
+    ".github",
+    ".tox",
+    ".venv",
+    ".benchmarks",
+    ".pytest_cache",
+    ".vscode",
+    "dist",
+    "build",
+    "scripts",
+    "flow.yml",
+    "tox.ini",
+    "uv.lock",
+    "clib/docs",
+    "clib/tests",
+    "clib/examples",
+]
 
 [tool.basedpyright]
 exclude = ["**/.git", "**/.venv", "**/__pycache__", "**/build", "**/dist"]
