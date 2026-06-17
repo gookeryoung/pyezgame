@@ -7,7 +7,22 @@ window creation, graphics, sprites, sound, input, and more.
 
 from ._pyezgame import *  # noqa: F403
 from ._pyezgame import GameLib
-from .utils import get_respath
+from .utils import (
+    clamp,
+    draw_checkerboard,
+    draw_panel,
+    get_asset_path,
+    get_respath,
+    safe_dt,
+)
 
 __version__ = "0.4.3"
-__all__ = ["GameLib", "get_respath"]
+__all__ = [
+    "GameLib",
+    "clamp",
+    "draw_checkerboard",
+    "draw_panel",
+    "get_asset_path",
+    "get_respath",
+    "safe_dt",
+]

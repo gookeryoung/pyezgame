@@ -8,7 +8,7 @@ from collections.abc import Iterator
 
 import pyezgame
 import pytest
-from pyezgame import GameLib
+from pyezgame import GameLib, clamp, get_asset_path, get_respath
 
 # ── Fixtures ──────────────────────────────────────────────
 
@@ -447,3 +447,76 @@ class TestSaveKeyOperations:
         assert os.path.exists(save_file)
         assert GameLib.delete_save(save_file)
         assert GameLib.load_int(save_file, "x", -1) == -1
+
+
+# ── clamp 工具函数 ──────────────────────────────────────
+
+
+class TestClamp:
+    """clamp 工具函数"""
+
+    def test_value_in_range(self) -> None:
+        assert clamp(5, 0, 10) == 5
+
+    def test_value_below_min(self) -> None:
+        assert clamp(-5, 0, 10) == 0
+
+    def test_value_above_max(self) -> None:
+        assert clamp(15, 0, 10) == 10
+
+    def test_value_at_min(self) -> None:
+        assert clamp(0, 0, 10) == 0
+
+    def test_value_at_max(self) -> None:
+        assert clamp(10, 0, 10) == 10
+
+    def test_min_equals_max(self) -> None:
+        assert clamp(99, 5, 5) == 5
+
+    def test_negative_range(self) -> None:
+        assert clamp(-3, -10, -1) == -3
+        assert clamp(0, -10, -1) == -1
+        assert clamp(-20, -10, -1) == -10
+
+
+# ── get_asset_path 工具函数 ─────────────────────────────
+
+
+class TestGetAssetPath:
+    """get_asset_path 工具函数"""
+
+    def test_returns_string(self) -> None:
+        result = get_asset_path("coin.png")
+        assert isinstance(result, str)
+
+    def test_ends_with_filename(self) -> None:
+        result = get_asset_path("coin.png")
+        assert result.endswith("coin.png")
+
+    def test_contains_clib_assets(self) -> None:
+        result = get_asset_path("heart.png")
+        assert "clib/assets/heart.png" in result
+
+    def test_uses_forward_slashes(self) -> None:
+        result = get_asset_path("star.png")
+        assert "\\" not in result  # POSIX path, no backslashes
+
+
+# ── get_respath 工具函数 ─────────────────────────────
+
+
+class TestGetRespath:
+    """get_respath 工具函数"""
+
+    def test_returns_string(self) -> None:
+        result = get_respath("utils.py")
+        assert isinstance(result, str)
+
+    def test_contains_package_name(self) -> None:
+        result = get_respath("utils.py")
+        assert "pyezgame" in result
+        assert result.endswith("utils.py")
+
+    def test_uses_forward_slashes(self) -> None:
+        result = get_respath("__init__.py")
+        assert "\\" not in result  # POSIX path, no backslashes
