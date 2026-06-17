@@ -1,12 +1,23 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.15...3.27)
 project(pyezgame LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(pybind11 REQUIRED)
+# Find Python with Stable ABI support
+find_package(Python 3.9
+    REQUIRED COMPONENTS Interpreter Development.Module
+    OPTIONAL_COMPONENTS Development.SABIModule)
 
-pybind11_add_module(_pyezgame src/bindings.cpp)
+# Import nanobind through CMake's find_package mechanism
+find_package(nanobind CONFIG REQUIRED)
+
+nanobind_add_module(
+    _pyezgame
+    STABLE_ABI
+    NOMINSIZE
+    src/bindings.cpp
+)
 
 target_include_directories(_pyezgame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/clib)
 

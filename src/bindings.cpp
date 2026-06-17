@@ -1,6 +1,6 @@
 /**
  * GameLib Python Bindings
- * pybind11 wrapper for GameLib
+ * nanobind wrapper for GameLib
  * - Windows: uses GameLib.h (Win32 GDI backend)
  * - Linux/macOS: uses GameLib.SDL.h (SDL2 backend)
  */
@@ -13,13 +13,13 @@
     #include "../clib/GameLib.SDL.h"
 #endif
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/numpy.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-PYBIND11_MODULE(_pyezgame, m) {
+NB_MODULE(_pyezgame, m) {
     m.doc() = "Python bindings for GameLib - a beginner-friendly game development library";
 
     // =========================================================================
@@ -51,11 +51,11 @@ PYBIND11_MODULE(_pyezgame, m) {
     // Color helper functions
     m.def("COLOR_RGB", [](int r, int g, int b) {
         return (uint32_t)(0xFF000000 | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF));
-    }, "Create RGB color", py::arg("r"), py::arg("g"), py::arg("b"));
+    }, "Create RGB color", nb::arg("r"), nb::arg("g"), nb::arg("b"));
 
     m.def("COLOR_ARGB", [](int a, int r, int g, int b) {
         return (uint32_t)(((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF));
-    }, "Create ARGB color", py::arg("a"), py::arg("r"), py::arg("g"), py::arg("b"));
+    }, "Create ARGB color", nb::arg("a"), nb::arg("r"), nb::arg("g"), nb::arg("b"));
 
     m.def("COLOR_GET_A", [](uint32_t c) { return (c >> 24) & 0xFF; }, "Get alpha component");
     m.def("COLOR_GET_R", [](uint32_t c) { return (c >> 16) & 0xFF; }, "Get red component");
@@ -129,287 +129,287 @@ PYBIND11_MODULE(_pyezgame, m) {
     // =========================================================================
     // GameLib Class
     // =========================================================================
-    py::class_<GameLib>(m, "GameLib")
-        .def(py::init<>())
+    nb::class_<GameLib>(m, "GameLib")
+        .def(nb::init<>())
 
         // ---- Window and Main Loop ----
         .def("open", &GameLib::Open,
-             py::arg("width"), py::arg("height"), py::arg("title"),
-             py::arg("center") = false, py::arg("resizable") = false)
+             nb::arg("width"), nb::arg("height"), nb::arg("title"),
+             nb::arg("center") = false, nb::arg("resizable") = false)
         .def("is_closed", &GameLib::IsClosed)
         .def("update", &GameLib::Update)
-        .def("wait_frame", &GameLib::WaitFrame, py::arg("fps"))
+        .def("wait_frame", &GameLib::WaitFrame, nb::arg("fps"))
         .def("get_delta_time", &GameLib::GetDeltaTime)
         .def("get_fps", &GameLib::GetFPS)
         .def("get_time", &GameLib::GetTime)
         .def("get_width", &GameLib::GetWidth)
         .def("get_height", &GameLib::GetHeight)
-        .def("win_resize", &GameLib::WinResize, py::arg("width"), py::arg("height"))
-        .def("set_maximized", &GameLib::SetMaximized, py::arg("maximized"))
-        .def("set_title", &GameLib::SetTitle, py::arg("title"))
-        .def("show_fps", &GameLib::ShowFps, py::arg("show"))
-        .def("show_mouse", &GameLib::ShowMouse, py::arg("show"))
+        .def("win_resize", &GameLib::WinResize, nb::arg("width"), nb::arg("height"))
+        .def("set_maximized", &GameLib::SetMaximized, nb::arg("maximized"))
+        .def("set_title", &GameLib::SetTitle, nb::arg("title"))
+        .def("show_fps", &GameLib::ShowFps, nb::arg("show"))
+        .def("show_mouse", &GameLib::ShowMouse, nb::arg("show"))
         .def("aspect_lock", &GameLib::AspectLock,
-             py::arg("lock"), py::arg("color") = COLOR_BLACK)
+             nb::arg("lock"), nb::arg("color") = COLOR_BLACK)
         .def("show_message", &GameLib::ShowMessage,
-             py::arg("text"), py::arg("title") = nullptr,
-             py::arg("buttons") = MESSAGEBOX_OK)
+             nb::arg("text"), nb::arg("title") = nullptr,
+             nb::arg("buttons") = MESSAGEBOX_OK)
 
         // ---- Framebuffer ----
-        .def("clear", &GameLib::Clear, py::arg("color") = COLOR_BLACK)
-        .def("set_pixel", &GameLib::SetPixel, py::arg("x"), py::arg("y"), py::arg("color"))
-        .def("get_pixel", &GameLib::GetPixel, py::arg("x"), py::arg("y"))
+        .def("clear", &GameLib::Clear, nb::arg("color") = COLOR_BLACK)
+        .def("set_pixel", &GameLib::SetPixel, nb::arg("x"), nb::arg("y"), nb::arg("color"))
+        .def("get_pixel", &GameLib::GetPixel, nb::arg("x"), nb::arg("y"))
         .def("set_clip", &GameLib::SetClip,
-             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"))
+             nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"))
         .def("clear_clip", &GameLib::ClearClip)
         .def("get_clip", [](const GameLib& self) {
             int x, y, w, h;
             self.GetClip(&x, &y, &w, &h);
-            return py::make_tuple(x, y, w, h);
+            return nb::make_tuple(x, y, w, h);
         })
         .def("get_clip_x", &GameLib::GetClipX)
         .def("get_clip_y", &GameLib::GetClipY)
         .def("get_clip_w", &GameLib::GetClipW)
         .def("get_clip_h", &GameLib::GetClipH)
-        .def("screenshot", &GameLib::Screenshot, py::arg("filename"))
+        .def("screenshot", &GameLib::Screenshot, nb::arg("filename"))
 
         // ---- Drawing ----
         .def("draw_line", &GameLib::DrawLine,
-             py::arg("x1"), py::arg("y1"), py::arg("x2"), py::arg("y2"), py::arg("color"))
+             nb::arg("x1"), nb::arg("y1"), nb::arg("x2"), nb::arg("y2"), nb::arg("color"))
         .def("draw_rect", &GameLib::DrawRect,
-             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"), py::arg("color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"), nb::arg("color"))
         .def("fill_rect", &GameLib::FillRect,
-             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"), py::arg("color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"), nb::arg("color"))
         .def("draw_circle", &GameLib::DrawCircle,
-             py::arg("cx"), py::arg("cy"), py::arg("r"), py::arg("color"))
+             nb::arg("cx"), nb::arg("cy"), nb::arg("r"), nb::arg("color"))
         .def("fill_circle", &GameLib::FillCircle,
-             py::arg("cx"), py::arg("cy"), py::arg("r"), py::arg("color"))
+             nb::arg("cx"), nb::arg("cy"), nb::arg("r"), nb::arg("color"))
         .def("draw_ellipse", &GameLib::DrawEllipse,
-             py::arg("cx"), py::arg("cy"), py::arg("rx"), py::arg("ry"), py::arg("color"))
+             nb::arg("cx"), nb::arg("cy"), nb::arg("rx"), nb::arg("ry"), nb::arg("color"))
         .def("fill_ellipse", &GameLib::FillEllipse,
-             py::arg("cx"), py::arg("cy"), py::arg("rx"), py::arg("ry"), py::arg("color"))
+             nb::arg("cx"), nb::arg("cy"), nb::arg("rx"), nb::arg("ry"), nb::arg("color"))
         .def("draw_triangle", &GameLib::DrawTriangle,
-             py::arg("x1"), py::arg("y1"), py::arg("x2"), py::arg("y2"),
-             py::arg("x3"), py::arg("y3"), py::arg("color"))
+             nb::arg("x1"), nb::arg("y1"), nb::arg("x2"), nb::arg("y2"),
+             nb::arg("x3"), nb::arg("y3"), nb::arg("color"))
         .def("fill_triangle", &GameLib::FillTriangle,
-             py::arg("x1"), py::arg("y1"), py::arg("x2"), py::arg("y2"),
-             py::arg("x3"), py::arg("y3"), py::arg("color"))
+             nb::arg("x1"), nb::arg("y1"), nb::arg("x2"), nb::arg("y2"),
+             nb::arg("x3"), nb::arg("y3"), nb::arg("color"))
 
         // ---- Text Rendering (built-in 8x8 font) ----
         .def("draw_text", &GameLib::DrawText,
-             py::arg("x"), py::arg("y"), py::arg("text"), py::arg("color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("text"), nb::arg("color"))
         .def("draw_number", &GameLib::DrawNumber,
-             py::arg("x"), py::arg("y"), py::arg("number"), py::arg("color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("number"), nb::arg("color"))
         .def("draw_text_scale", &GameLib::DrawTextScale,
-             py::arg("x"), py::arg("y"), py::arg("text"), py::arg("color"),
-             py::arg("w"), py::arg("h"))
+             nb::arg("x"), nb::arg("y"), nb::arg("text"), nb::arg("color"),
+             nb::arg("w"), nb::arg("h"))
         .def("draw_printf", [](GameLib& self, int x, int y, uint32_t color, const char* text) {
             self.DrawText(x, y, text, color);
-        }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("text"))
+        }, nb::arg("x"), nb::arg("y"), nb::arg("color"), nb::arg("text"))
         .def("draw_printf_scale", [](GameLib& self, int x, int y, uint32_t color, int w, int h, const char* text) {
             self.DrawTextScale(x, y, text, color, w, h);
-        }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("w"), py::arg("h"), py::arg("text"))
+        }, nb::arg("x"), nb::arg("y"), nb::arg("color"), nb::arg("w"), nb::arg("h"), nb::arg("text"))
 
         // ---- Font Text Rendering (scalable fonts) ----
         .def("draw_text_font",
-             py::overload_cast<int, int, const char*, uint32_t, const char*, int>(
+             nb::overload_cast<int, int, const char*, uint32_t, const char*, int>(
                  &GameLib::DrawTextFont),
-             py::arg("x"), py::arg("y"), py::arg("text"), py::arg("color"),
-             py::arg("font_name"), py::arg("font_size"))
+             nb::arg("x"), nb::arg("y"), nb::arg("text"), nb::arg("color"),
+             nb::arg("font_name"), nb::arg("font_size"))
         .def("draw_text_font",
-             py::overload_cast<int, int, const char*, uint32_t, int>(
+             nb::overload_cast<int, int, const char*, uint32_t, int>(
                  &GameLib::DrawTextFont),
-             py::arg("x"), py::arg("y"), py::arg("text"), py::arg("color"),
-             py::arg("font_size"))
+             nb::arg("x"), nb::arg("y"), nb::arg("text"), nb::arg("color"),
+             nb::arg("font_size"))
         .def("get_text_width_font",
-             py::overload_cast<const char*, const char*, int>(
+             nb::overload_cast<const char*, const char*, int>(
                  &GameLib::GetTextWidthFont),
-             py::arg("text"), py::arg("font_name"), py::arg("font_size"))
+             nb::arg("text"), nb::arg("font_name"), nb::arg("font_size"))
         .def("get_text_width_font",
-             py::overload_cast<const char*, int>(
+             nb::overload_cast<const char*, int>(
                  &GameLib::GetTextWidthFont),
-             py::arg("text"), py::arg("font_size"))
+             nb::arg("text"), nb::arg("font_size"))
         .def("get_text_height_font",
-             py::overload_cast<const char*, const char*, int>(
+             nb::overload_cast<const char*, const char*, int>(
                  &GameLib::GetTextHeightFont),
-             py::arg("text"), py::arg("font_name"), py::arg("font_size"))
+             nb::arg("text"), nb::arg("font_name"), nb::arg("font_size"))
         .def("get_text_height_font",
-             py::overload_cast<const char*, int>(
+             nb::overload_cast<const char*, int>(
                  &GameLib::GetTextHeightFont),
-             py::arg("text"), py::arg("font_size"))
+             nb::arg("text"), nb::arg("font_size"))
         .def("draw_printf_font",
              [](GameLib& self, int x, int y, uint32_t color, const char* font_name, int font_size, const char* text) {
                  self.DrawTextFont(x, y, text, color, font_name, font_size);
-             }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("font_name"), py::arg("font_size"), py::arg("text"))
+             }, nb::arg("x"), nb::arg("y"), nb::arg("color"), nb::arg("font_name"), nb::arg("font_size"), nb::arg("text"))
         .def("draw_printf_font",
              [](GameLib& self, int x, int y, uint32_t color, int font_size, const char* text) {
                  self.DrawTextFont(x, y, text, color, font_size);
-             }, py::arg("x"), py::arg("y"), py::arg("color"), py::arg("font_size"), py::arg("text"))
+             }, nb::arg("x"), nb::arg("y"), nb::arg("color"), nb::arg("font_size"), nb::arg("text"))
 
         // ---- Sprite System ----
         .def("create_sprite", &GameLib::CreateSprite,
-             py::arg("width"), py::arg("height"))
-        .def("load_sprite", &GameLib::LoadSprite, py::arg("filename"))
-        .def("load_sprite_bmp", &GameLib::LoadSpriteBMP, py::arg("filename"))
-        .def("free_sprite", &GameLib::FreeSprite, py::arg("id"))
+             nb::arg("width"), nb::arg("height"))
+        .def("load_sprite", &GameLib::LoadSprite, nb::arg("filename"))
+        .def("load_sprite_bmp", &GameLib::LoadSpriteBMP, nb::arg("filename"))
+        .def("free_sprite", &GameLib::FreeSprite, nb::arg("id"))
         .def("draw_sprite", &GameLib::DrawSprite,
-             py::arg("id"), py::arg("x"), py::arg("y"))
+             nb::arg("id"), nb::arg("x"), nb::arg("y"))
         .def("draw_sprite_ex", &GameLib::DrawSpriteEx,
-             py::arg("id"), py::arg("x"), py::arg("y"), py::arg("flags"))
+             nb::arg("id"), nb::arg("x"), nb::arg("y"), nb::arg("flags"))
         .def("draw_sprite_region", &GameLib::DrawSpriteRegion,
-             py::arg("id"), py::arg("x"), py::arg("y"),
-             py::arg("sx"), py::arg("sy"), py::arg("sw"), py::arg("sh"))
+             nb::arg("id"), nb::arg("x"), nb::arg("y"),
+             nb::arg("sx"), nb::arg("sy"), nb::arg("sw"), nb::arg("sh"))
         .def("draw_sprite_region_ex", &GameLib::DrawSpriteRegionEx,
-             py::arg("id"), py::arg("x"), py::arg("y"),
-             py::arg("sx"), py::arg("sy"), py::arg("sw"), py::arg("sh"),
-             py::arg("flags") = 0)
+             nb::arg("id"), nb::arg("x"), nb::arg("y"),
+             nb::arg("sx"), nb::arg("sy"), nb::arg("sw"), nb::arg("sh"),
+             nb::arg("flags") = 0)
         .def("draw_sprite_scaled", &GameLib::DrawSpriteScaled,
-             py::arg("id"), py::arg("x"), py::arg("y"),
-             py::arg("w"), py::arg("h"), py::arg("flags") = 0)
+             nb::arg("id"), nb::arg("x"), nb::arg("y"),
+             nb::arg("w"), nb::arg("h"), nb::arg("flags") = 0)
         .def("draw_sprite_rotated", &GameLib::DrawSpriteRotated,
-             py::arg("id"), py::arg("cx"), py::arg("cy"),
-             py::arg("angle_deg"), py::arg("flags") = 0)
+             nb::arg("id"), nb::arg("cx"), nb::arg("cy"),
+             nb::arg("angle_deg"), nb::arg("flags") = 0)
         .def("draw_sprite_frame", &GameLib::DrawSpriteFrame,
-             py::arg("id"), py::arg("x"), py::arg("y"),
-             py::arg("frame_w"), py::arg("frame_h"), py::arg("frame_index"),
-             py::arg("flags") = 0)
+             nb::arg("id"), nb::arg("x"), nb::arg("y"),
+             nb::arg("frame_w"), nb::arg("frame_h"), nb::arg("frame_index"),
+             nb::arg("flags") = 0)
         .def("draw_sprite_frame_scaled", &GameLib::DrawSpriteFrameScaled,
-             py::arg("id"), py::arg("x"), py::arg("y"),
-             py::arg("frame_w"), py::arg("frame_h"), py::arg("frame_index"),
-             py::arg("w"), py::arg("h"), py::arg("flags") = 0)
+             nb::arg("id"), nb::arg("x"), nb::arg("y"),
+             nb::arg("frame_w"), nb::arg("frame_h"), nb::arg("frame_index"),
+             nb::arg("w"), nb::arg("h"), nb::arg("flags") = 0)
         .def("draw_sprite_frame_rotated", &GameLib::DrawSpriteFrameRotated,
-             py::arg("id"), py::arg("cx"), py::arg("cy"),
-             py::arg("frame_w"), py::arg("frame_h"), py::arg("frame_index"),
-             py::arg("angle_deg"), py::arg("flags") = 0)
+             nb::arg("id"), nb::arg("cx"), nb::arg("cy"),
+             nb::arg("frame_w"), nb::arg("frame_h"), nb::arg("frame_index"),
+             nb::arg("angle_deg"), nb::arg("flags") = 0)
         .def("set_sprite_pixel", &GameLib::SetSpritePixel,
-             py::arg("id"), py::arg("x"), py::arg("y"), py::arg("color"))
+             nb::arg("id"), nb::arg("x"), nb::arg("y"), nb::arg("color"))
         .def("get_sprite_pixel", &GameLib::GetSpritePixel,
-             py::arg("id"), py::arg("x"), py::arg("y"))
-        .def("get_sprite_width", &GameLib::GetSpriteWidth, py::arg("id"))
-        .def("get_sprite_height", &GameLib::GetSpriteHeight, py::arg("id"))
+             nb::arg("id"), nb::arg("x"), nb::arg("y"))
+        .def("get_sprite_width", &GameLib::GetSpriteWidth, nb::arg("id"))
+        .def("get_sprite_height", &GameLib::GetSpriteHeight, nb::arg("id"))
         .def("set_sprite_color_key", &GameLib::SetSpriteColorKey,
-             py::arg("id"), py::arg("color"))
-        .def("get_sprite_color_key", &GameLib::GetSpriteColorKey, py::arg("id"))
+             nb::arg("id"), nb::arg("color"))
+        .def("get_sprite_color_key", &GameLib::GetSpriteColorKey, nb::arg("id"))
 
         // ---- Tilemap System ----
         .def("create_tilemap", &GameLib::CreateTilemap,
-             py::arg("cols"), py::arg("rows"), py::arg("tile_size"), py::arg("tileset_id"))
+             nb::arg("cols"), nb::arg("rows"), nb::arg("tile_size"), nb::arg("tileset_id"))
         .def("save_tilemap", &GameLib::SaveTilemap,
-             py::arg("filename"), py::arg("map_id"))
+             nb::arg("filename"), nb::arg("map_id"))
         .def("load_tilemap", &GameLib::LoadTilemap,
-             py::arg("filename"), py::arg("tileset_id"))
-        .def("free_tilemap", &GameLib::FreeTilemap, py::arg("map_id"))
+             nb::arg("filename"), nb::arg("tileset_id"))
+        .def("free_tilemap", &GameLib::FreeTilemap, nb::arg("map_id"))
         .def("set_tile", &GameLib::SetTile,
-             py::arg("map_id"), py::arg("col"), py::arg("row"), py::arg("tile_id"))
+             nb::arg("map_id"), nb::arg("col"), nb::arg("row"), nb::arg("tile_id"))
         .def("get_tile", &GameLib::GetTile,
-             py::arg("map_id"), py::arg("col"), py::arg("row"))
-        .def("get_tilemap_cols", &GameLib::GetTilemapCols, py::arg("map_id"))
-        .def("get_tilemap_rows", &GameLib::GetTilemapRows, py::arg("map_id"))
-        .def("get_tile_size", &GameLib::GetTileSize, py::arg("map_id"))
+             nb::arg("map_id"), nb::arg("col"), nb::arg("row"))
+        .def("get_tilemap_cols", &GameLib::GetTilemapCols, nb::arg("map_id"))
+        .def("get_tilemap_rows", &GameLib::GetTilemapRows, nb::arg("map_id"))
+        .def("get_tile_size", &GameLib::GetTileSize, nb::arg("map_id"))
         .def("world_to_tile_col", &GameLib::WorldToTileCol,
-             py::arg("map_id"), py::arg("x"))
+             nb::arg("map_id"), nb::arg("x"))
         .def("world_to_tile_row", &GameLib::WorldToTileRow,
-             py::arg("map_id"), py::arg("y"))
+             nb::arg("map_id"), nb::arg("y"))
         .def("get_tile_at_pixel", &GameLib::GetTileAtPixel,
-             py::arg("map_id"), py::arg("x"), py::arg("y"))
+             nb::arg("map_id"), nb::arg("x"), nb::arg("y"))
         .def("fill_tile_rect", &GameLib::FillTileRect,
-             py::arg("map_id"), py::arg("col"), py::arg("row"),
-             py::arg("cols"), py::arg("rows"), py::arg("tile_id"))
+             nb::arg("map_id"), nb::arg("col"), nb::arg("row"),
+             nb::arg("cols"), nb::arg("rows"), nb::arg("tile_id"))
         .def("clear_tilemap", &GameLib::ClearTilemap,
-             py::arg("map_id"), py::arg("tile_id") = -1)
+             nb::arg("map_id"), nb::arg("tile_id") = -1)
         .def("draw_tilemap", &GameLib::DrawTilemap,
-             py::arg("map_id"), py::arg("x"), py::arg("y"), py::arg("flags") = 0)
+             nb::arg("map_id"), nb::arg("x"), nb::arg("y"), nb::arg("flags") = 0)
 
         // ---- Grid Helpers ----
         .def("draw_grid", &GameLib::DrawGrid,
-             py::arg("x"), py::arg("y"), py::arg("rows"), py::arg("cols"),
-             py::arg("cell_size"), py::arg("color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("rows"), nb::arg("cols"),
+             nb::arg("cell_size"), nb::arg("color"))
         .def("fill_cell", &GameLib::FillCell,
-             py::arg("grid_x"), py::arg("grid_y"), py::arg("row"), py::arg("col"),
-             py::arg("cell_size"), py::arg("color"))
+             nb::arg("grid_x"), nb::arg("grid_y"), nb::arg("row"), nb::arg("col"),
+             nb::arg("cell_size"), nb::arg("color"))
 
         // ---- Input ----
-        .def("is_key_down", &GameLib::IsKeyDown, py::arg("key"))
-        .def("is_key_pressed", &GameLib::IsKeyPressed, py::arg("key"))
-        .def("is_key_released", &GameLib::IsKeyReleased, py::arg("key"))
+        .def("is_key_down", &GameLib::IsKeyDown, nb::arg("key"))
+        .def("is_key_pressed", &GameLib::IsKeyPressed, nb::arg("key"))
+        .def("is_key_released", &GameLib::IsKeyReleased, nb::arg("key"))
         .def("get_mouse_x", &GameLib::GetMouseX)
         .def("get_mouse_y", &GameLib::GetMouseY)
-        .def("is_mouse_down", &GameLib::IsMouseDown, py::arg("button"))
-        .def("is_mouse_pressed", &GameLib::IsMousePressed, py::arg("button"))
-        .def("is_mouse_released", &GameLib::IsMouseReleased, py::arg("button"))
+        .def("is_mouse_down", &GameLib::IsMouseDown, nb::arg("button"))
+        .def("is_mouse_pressed", &GameLib::IsMousePressed, nb::arg("button"))
+        .def("is_mouse_released", &GameLib::IsMouseReleased, nb::arg("button"))
         .def("get_mouse_wheel_delta", &GameLib::GetMouseWheelDelta)
         .def("is_active", &GameLib::IsActive)
 
         // ---- Sound ----
         .def("play_beep", &GameLib::PlayBeep,
-             py::arg("frequency"), py::arg("duration"),
-             py::arg("repeat") = 1, py::arg("volume") = 1000)
+             nb::arg("frequency"), nb::arg("duration"),
+             nb::arg("repeat") = 1, nb::arg("volume") = 1000)
         .def("play_wav", &GameLib::PlayWAV,
-             py::arg("filename"), py::arg("repeat") = 1, py::arg("volume") = 1000)
-        .def("stop_wav", &GameLib::StopWAV, py::arg("channel"))
-        .def("is_playing", &GameLib::IsPlaying, py::arg("channel"))
+             nb::arg("filename"), nb::arg("repeat") = 1, nb::arg("volume") = 1000)
+        .def("stop_wav", &GameLib::StopWAV, nb::arg("channel"))
+        .def("is_playing", &GameLib::IsPlaying, nb::arg("channel"))
         .def("set_volume", &GameLib::SetVolume,
-             py::arg("channel"), py::arg("volume"))
+             nb::arg("channel"), nb::arg("volume"))
         .def("stop_all", &GameLib::StopAll)
-        .def("set_master_volume", &GameLib::SetMasterVolume, py::arg("volume"))
+        .def("set_master_volume", &GameLib::SetMasterVolume, nb::arg("volume"))
         .def("get_master_volume", &GameLib::GetMasterVolume)
         .def("play_music", &GameLib::PlayMusic,
-             py::arg("filename"), py::arg("loop") = true)
+             nb::arg("filename"), nb::arg("loop") = true)
         .def("stop_music", &GameLib::StopMusic)
         .def("is_music_playing", &GameLib::IsMusicPlaying)
 
         // ---- Scene Management ----
-        .def("set_scene", &GameLib::SetScene, py::arg("scene"))
+        .def("set_scene", &GameLib::SetScene, nb::arg("scene"))
         .def("get_scene", &GameLib::GetScene)
         .def("is_scene_changed", &GameLib::IsSceneChanged)
         .def("get_previous_scene", &GameLib::GetPreviousScene)
 
         // ---- UI Helpers ----
         .def("button", &GameLib::Button,
-             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
-             py::arg("text"), py::arg("color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"),
+             nb::arg("text"), nb::arg("color"))
         .def("checkbox", [](GameLib& self, int x, int y, const char* text, bool checked) {
             bool result = self.Checkbox(x, y, text, &checked);
-            return py::make_tuple(result, checked);
-        }, py::arg("x"), py::arg("y"), py::arg("text"), py::arg("checked"))
+            return nb::make_tuple(result, checked);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("text"), nb::arg("checked"))
         .def("radio_box", [](GameLib& self, int x, int y, const char* text, int value, int index) {
             bool result = self.RadioBox(x, y, text, &value, index);
-            return py::make_tuple(result, value);
-        }, py::arg("x"), py::arg("y"), py::arg("text"), py::arg("value"), py::arg("index"))
+            return nb::make_tuple(result, value);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("text"), nb::arg("value"), nb::arg("index"))
         .def("toggle_button", [](GameLib& self, int x, int y, int w, int h,
                                   const char* text, bool toggled, uint32_t color) {
             bool result = self.ToggleButton(x, y, w, h, text, &toggled, color);
-            return py::make_tuple(result, toggled);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
-           py::arg("text"), py::arg("toggled"), py::arg("color"))
+            return nb::make_tuple(result, toggled);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"),
+           nb::arg("text"), nb::arg("toggled"), nb::arg("color"))
         .def("slider", [](GameLib& self, int x, int y, int w, int value, int min_val, int max_val) {
             bool result = self.Slider(x, y, w, &value, min_val, max_val);
-            return py::make_tuple(result, value);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("value"),
-           py::arg("min_val"), py::arg("max_val"))
+            return nb::make_tuple(result, value);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("value"),
+           nb::arg("min_val"), nb::arg("max_val"))
         .def("progress_bar", &GameLib::ProgressBar,
-             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
-             py::arg("value"), py::arg("max_val"), py::arg("color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"),
+             nb::arg("value"), nb::arg("max_val"), nb::arg("color"))
         .def("spinner", [](GameLib& self, int x, int y, int w, int value,
                             int min_val, int max_val, int step) {
             bool result = self.Spinner(x, y, w, &value, min_val, max_val, step);
-            return py::make_tuple(result, value);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("value"),
-           py::arg("min_val"), py::arg("max_val"), py::arg("step"))
+            return nb::make_tuple(result, value);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("value"),
+           nb::arg("min_val"), nb::arg("max_val"), nb::arg("step"))
         .def("separator", &GameLib::Separator,
-             py::arg("x"), py::arg("y"), py::arg("w"))
+             nb::arg("x"), nb::arg("y"), nb::arg("w"))
         .def("label", &GameLib::Label,
-             py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
-             py::arg("text"), py::arg("bg_color"), py::arg("text_color"))
+             nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"),
+             nb::arg("text"), nb::arg("bg_color"), nb::arg("text_color"))
         .def("v_separator", &GameLib::VSeparator,
-             py::arg("x"), py::arg("y"), py::arg("h"))
+             nb::arg("x"), nb::arg("y"), nb::arg("h"))
         .def("text_input", [](GameLib& self, int x, int y, int w, const char* buffer, bool focused) {
             char buf[256];
             strncpy(buf, buffer ? buffer : "", sizeof(buf) - 1);
             buf[sizeof(buf) - 1] = '\0';
             bool result = self.TextInput(x, y, w, buf, (int)sizeof(buf), &focused);
-            return py::make_tuple(result, std::string(buf), focused);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("buffer"), py::arg("focused"))
+            return nb::make_tuple(result, std::string(buf), focused);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("buffer"), nb::arg("focused"))
         .def("dropdown", [](GameLib& self, int x, int y, int w,
                              const std::vector<std::string>& items,
                              int selected_index, bool open) {
@@ -417,9 +417,9 @@ PYBIND11_MODULE(_pyezgame, m) {
             ptrs.reserve(items.size());
             for (auto& s : items) ptrs.push_back(s.c_str());
             bool result = self.Dropdown(x, y, w, ptrs.data(), (int)ptrs.size(), &selected_index, &open);
-            return py::make_tuple(result, selected_index, open);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("items"),
-           py::arg("selected_index"), py::arg("open"))
+            return nb::make_tuple(result, selected_index, open);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("items"),
+           nb::arg("selected_index"), nb::arg("open"))
         .def("tab_bar", [](GameLib& self, int x, int y, int w,
                             const std::vector<std::string>& tabs,
                             int selected_tab) {
@@ -427,16 +427,16 @@ PYBIND11_MODULE(_pyezgame, m) {
             ptrs.reserve(tabs.size());
             for (auto& s : tabs) ptrs.push_back(s.c_str());
             bool result = self.TabBar(x, y, w, ptrs.data(), (int)ptrs.size(), &selected_tab);
-            return py::make_tuple(result, selected_tab);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("tabs"),
-           py::arg("selected_tab"))
+            return nb::make_tuple(result, selected_tab);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("tabs"),
+           nb::arg("selected_tab"))
         .def("tooltip", &GameLib::Tooltip,
-             py::arg("x"), py::arg("y"), py::arg("text"))
+             nb::arg("x"), nb::arg("y"), nb::arg("text"))
         .def("image_button", [](GameLib& self, int x, int y, int w, int h, int sprite_id, uint32_t color) {
             bool result = self.ImageButton(x, y, w, h, sprite_id, color);
             return result;
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
-           py::arg("sprite_id"), py::arg("color"))
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"),
+           nb::arg("sprite_id"), nb::arg("color"))
         .def("list_box", [](GameLib& self, int x, int y, int w, int h,
                              const std::vector<std::string>& items,
                              int selected_index, int scroll_offset) {
@@ -445,33 +445,33 @@ PYBIND11_MODULE(_pyezgame, m) {
             for (auto& s : items) ptrs.push_back(s.c_str());
             bool result = self.ListBox(x, y, w, h, ptrs.data(), (int)ptrs.size(),
                                        &selected_index, &scroll_offset);
-            return py::make_tuple(result, selected_index, scroll_offset);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
-           py::arg("items"), py::arg("selected_index"), py::arg("scroll_offset"))
+            return nb::make_tuple(result, selected_index, scroll_offset);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"),
+           nb::arg("items"), nb::arg("selected_index"), nb::arg("scroll_offset"))
         .def("collapsible", [](GameLib& self, int x, int y, int w, const char* title, bool open) {
             bool result = self.Collapsible(x, y, w, title, &open);
-            return py::make_tuple(result, open);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("title"), py::arg("open"))
+            return nb::make_tuple(result, open);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("title"), nb::arg("open"))
         .def("color_picker", [](GameLib& self, int x, int y,
                                  const std::vector<uint32_t>& colors,
                                  int selected_index) {
             bool result = self.ColorPicker(x, y, colors.data(), (int)colors.size(),
                                            &selected_index);
-            return py::make_tuple(result, selected_index);
-        }, py::arg("x"), py::arg("y"), py::arg("colors"), py::arg("selected_index"))
+            return nb::make_tuple(result, selected_index);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("colors"), nb::arg("selected_index"))
         .def("knob", [](GameLib& self, int x, int y, int size, int value, int min_val, int max_val) {
             bool result = self.Knob(x, y, size, &value, min_val, max_val);
-            return py::make_tuple(result, value);
-        }, py::arg("x"), py::arg("y"), py::arg("size"), py::arg("value"),
-           py::arg("min_val"), py::arg("max_val"))
+            return nb::make_tuple(result, value);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("size"), nb::arg("value"),
+           nb::arg("min_val"), nb::arg("max_val"))
         .def("menu", [](GameLib& self, int x, int y,
                          const std::vector<std::string>& items, bool open) {
             std::vector<const char*> ptrs;
             ptrs.reserve(items.size());
             for (auto& s : items) ptrs.push_back(s.c_str());
             int result = self.Menu(x, y, ptrs.data(), (int)ptrs.size(), &open);
-            return py::make_tuple(result, open);
-        }, py::arg("x"), py::arg("y"), py::arg("items"), py::arg("open"))
+            return nb::make_tuple(result, open);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("items"), nb::arg("open"))
         .def("tab_panel", [](GameLib& self, int x, int y, int w, int h,
                               const std::vector<std::string>& tabs, int selected_tab) {
             std::vector<const char*> ptrs;
@@ -479,43 +479,43 @@ PYBIND11_MODULE(_pyezgame, m) {
             for (auto& s : tabs) ptrs.push_back(s.c_str());
             int result = self.TabPanel(x, y, w, h, ptrs.data(), (int)ptrs.size(), selected_tab);
             const int tabH = 26;
-            return py::make_tuple(result, x + 4, y + tabH + 4, w - 8, h - tabH - 8);
-        }, py::arg("x"), py::arg("y"), py::arg("w"), py::arg("h"),
-           py::arg("tabs"), py::arg("selected_tab"))
+            return nb::make_tuple(result, x + 4, y + tabH + 4, w - 8, h - tabH - 8);
+        }, nb::arg("x"), nb::arg("y"), nb::arg("w"), nb::arg("h"),
+           nb::arg("tabs"), nb::arg("selected_tab"))
 
         // ---- Static Methods: Save/Load ----
         .def_static("save_int", &GameLib::SaveInt,
-             py::arg("filename"), py::arg("key"), py::arg("value"))
+             nb::arg("filename"), nb::arg("key"), nb::arg("value"))
         .def_static("save_float", &GameLib::SaveFloat,
-             py::arg("filename"), py::arg("key"), py::arg("value"))
+             nb::arg("filename"), nb::arg("key"), nb::arg("value"))
         .def_static("save_string", &GameLib::SaveString,
-             py::arg("filename"), py::arg("key"), py::arg("value"))
+             nb::arg("filename"), nb::arg("key"), nb::arg("value"))
         .def_static("load_int", &GameLib::LoadInt,
-             py::arg("filename"), py::arg("key"), py::arg("default_value") = 0)
+             nb::arg("filename"), nb::arg("key"), nb::arg("default_value") = 0)
         .def_static("load_float", &GameLib::LoadFloat,
-             py::arg("filename"), py::arg("key"), py::arg("default_value") = 0.0f)
+             nb::arg("filename"), nb::arg("key"), nb::arg("default_value") = 0.0f)
         .def_static("load_string", [](const char* filename, const char* key, const char* default_value) {
             const char* result = GameLib::LoadString(filename, key, default_value);
             return std::string(result ? result : "");
-        }, py::arg("filename"), py::arg("key"), py::arg("default_value") = "")
+        }, nb::arg("filename"), nb::arg("key"), nb::arg("default_value") = "")
         .def_static("has_save_key", &GameLib::HasSaveKey,
-             py::arg("filename"), py::arg("key"))
+             nb::arg("filename"), nb::arg("key"))
         .def_static("delete_save_key", &GameLib::DeleteSaveKey,
-             py::arg("filename"), py::arg("key"))
-        .def_static("delete_save", &GameLib::DeleteSave, py::arg("filename"))
+             nb::arg("filename"), nb::arg("key"))
+        .def_static("delete_save", &GameLib::DeleteSave, nb::arg("filename"))
 
         // ---- Static Methods: Utilities ----
-        .def_static("random", &GameLib::Random, py::arg("min_val"), py::arg("max_val"))
+        .def_static("random", &GameLib::Random, nb::arg("min_val"), nb::arg("max_val"))
         .def_static("rect_overlap", &GameLib::RectOverlap,
-             py::arg("x1"), py::arg("y1"), py::arg("w1"), py::arg("h1"),
-             py::arg("x2"), py::arg("y2"), py::arg("w2"), py::arg("h2"))
+             nb::arg("x1"), nb::arg("y1"), nb::arg("w1"), nb::arg("h1"),
+             nb::arg("x2"), nb::arg("y2"), nb::arg("w2"), nb::arg("h2"))
         .def_static("circle_overlap", &GameLib::CircleOverlap,
-             py::arg("cx1"), py::arg("cy1"), py::arg("r1"),
-             py::arg("cx2"), py::arg("cy2"), py::arg("r2"))
+             nb::arg("cx1"), nb::arg("cy1"), nb::arg("r1"),
+             nb::arg("cx2"), nb::arg("cy2"), nb::arg("r2"))
         .def_static("point_in_rect", &GameLib::PointInRect,
-             py::arg("px"), py::arg("py"), py::arg("x"), py::arg("y"),
-             py::arg("w"), py::arg("h"))
+             nb::arg("px"), nb::arg("py"), nb::arg("x"), nb::arg("y"),
+             nb::arg("w"), nb::arg("h"))
         .def_static("distance", &GameLib::Distance,
-             py::arg("x1"), py::arg("y1"), py::arg("x2"), py::arg("y2"))
+             nb::arg("x1"), nb::arg("y1"), nb::arg("x2"), nb::arg("y2"))
         ;
 }

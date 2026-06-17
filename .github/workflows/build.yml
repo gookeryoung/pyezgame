@@ -30,7 +30,7 @@ jobs:
         uses: pypa/cibuildwheel@v4.1.0
         env:
           CIBW_ENVIRONMENT: "PIP_CACHE_DIR=/host/home/runner/.cache/pip"
-          CIBW_BUILD: ${{ startsWith(github.ref, 'refs/tags/') && 'cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*' || 'cp312-*' }}
+          CIBW_BUILD: ${{ startsWith(github.ref, 'refs/tags/') && 'cp39-* cp310-* cp311-* cp312-*' || 'cp312-*' }}
 
       - name: Build sdist
         if: startsWith(github.ref, 'refs/tags/')
