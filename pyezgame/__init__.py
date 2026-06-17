@@ -16,7 +16,7 @@ from .utils import (
     safe_dt,
 )
 
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 __all__ = [
     "GameLib",
     "clamp",
