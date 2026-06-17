@@ -1,6 +1,6 @@
 # pyezgame
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](clib/LICENSE) [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](pyproject.toml) [![GameLib](https://img.shields.io/badge/GameLib-header--only-green.svg)](clib/GameLib.h)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](clib/LICENSE) [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](pyproject.toml) [![GameLib](https://img.shields.io/badge/GameLib-header--only-green.svg)](clib/GameLib.h)
 
 Python bindings for [GameLib](https://github.com/skywind3000/GameLib) — write 2D games in Python, zero configuration, ready to go out of the box.
 
@@ -21,7 +21,7 @@ pyezgame brings the beginner-friendly C++ game development library [GameLib](htt
 
 ### Installation
 
-Requires Python 3.8+ and a C++11-capable compiler (MSVC or MinGW-w64 recommended on Windows).
+Requires Python 3.9+ and a C++14-capable compiler (MSVC or MinGW-w64 recommended on Windows).
 
 ```bash
 # Clone the repository (with GameLib subdirectory)
@@ -135,7 +135,7 @@ The `examples/` directory contains 18 progressive Python examples:
 | `12_sprite_transform.py` | Sprite scaling + rotation | draw_sprite_scaled / draw_sprite_rotated |
 | `13_clip_rect.py` | Clip rectangle | set_clip / clear_clip |
 | `14_space_shooter.py` | Space Shooter | Comprehensive project |
-| `15_ui_controls.py` | UI controls demo | button, checkbox, radio_box, slider, spinner |
+| `15_ui_controls.py` | UI controls demo | button, checkbox, radio_box, slider, spinner, tab_panel, dropdown, knob, etc. |
 
 ### Bonus Examples
 
@@ -291,17 +291,50 @@ Sprite flags: `SPRITE_FLIP_H` (horizontal flip), `SPRITE_FLIP_V` (vertical flip)
 
 ### UI Controls
 
+All UI controls are immediate-mode: call once per frame to draw and handle interaction automatically.
+
+#### Basic Controls
+
 | Method | Description |
 |-|-|
-| `button(x, y, w, h, text, color)` | Immediate-mode button, returns `True` on click |
+| `button(x, y, w, h, text, color)` | Button, returns `True` on click |
 | `checkbox(x, y, text, checked)` | Checkbox, returns `(triggered, checked)` |
 | `radio_box(x, y, text, value, index)` | Radio button, returns `(triggered, value)` |
 | `toggle_button(x, y, w, h, text, toggled, color)` | Toggle button, returns `(triggered, toggled)` |
 | `slider(x, y, w, value, min_val, max_val)` | Horizontal slider, returns `(changed, value)` |
 | `progress_bar(x, y, w, h, value, max_val, color)` | Progress bar |
 | `spinner(x, y, w, value, min_val, max_val, step)` | Numeric spinner, returns `(changed, value)` |
+| `knob(x, y, size, value, min_val, max_val)` | Rotary knob, vertical drag to adjust, returns `(changed, value)` |
 | `separator(x, y, w)` | Horizontal separator line |
+| `v_separator(x, y, h)` | Vertical separator line |
 | `label(x, y, w, h, text, bg_color, text_color)` | Centered text label |
+
+#### Input and Selection
+
+| Method | Description |
+|-|-|
+| `text_input(x, y, w, buffer, focused)` | Text input field, returns `(changed, text, focused)` |
+| `dropdown(x, y, w, items, selected_index, open)` | Dropdown combo box, returns `(changed, selected_index, open)` |
+| `list_box(x, y, w, h, items, selected_index, scroll_offset)` | Scrollable list box, returns `(changed, selected_index, scroll_offset)` |
+| `color_picker(x, y, colors, selected_index)` | Color swatch picker, returns `(changed, selected_index)` |
+
+#### Navigation and Layout
+
+| Method | Description |
+|-|-|
+| `tab_bar(x, y, w, tabs, selected_tab)` | Tab bar, returns `(changed, selected_tab)` |
+| `tab_panel(x, y, w, h, tabs, selected_tab)` | Tabbed panel, returns `(active_tab, cx, cy, cw, ch)` with content area rect |
+| `collapsible(x, y, w, title, open)` | Collapsible section header, returns `(triggered, open)` |
+| `menu(x, y, items, open)` | Popup menu, returns `(selected_index, open)`, auto-closes on selection or outside click |
+
+#### Other
+
+| Method | Description |
+|-|-|
+| `tooltip(x, y, text)` | Tooltip overlay |
+| `image_button(x, y, w, h, sprite_id, color)` | Image button (sprite instead of text), returns `True` on click |
+
+> **Tip**: `tab_panel` returns `(cx, cy, cw, ch)` which describes the content area rectangle inside the panel — use these coordinates directly to place child controls.
 
 ### Grid Helpers
 
@@ -352,9 +385,10 @@ Color component extraction: `COLOR_GET_A(c)` / `COLOR_GET_R(c)` / `COLOR_GET_G(c
 
 | Function | Description |
 |-|-|
-| `get_asset_path(filename)` | Get absolute path to a file in `clib/assets/` |
+| `get_respath(*parts)` | Get absolute path to a package resource (POSIX format) |
+| `get_asset_path(filename)` | Get absolute path to a file in `clib/assets/` (POSIX format) |
 | `clamp(value, lo, hi)` | Clamp value into `[lo, hi]` |
-| `safe_dt(game, max_dt)` | Get delta time capped at max_dt to prevent frame spikes |
+| `safe_dt(game, max_dt)` | Get delta time capped at max_dt to prevent frame spikes (default cap: 0.05s) |
 | `draw_checkerboard(game, x, y, w, h, cell)` | Draw a checkerboard pattern |
 | `draw_panel(game, x, y, w, h, title)` | Draw a panel with a title bar |
 
@@ -416,13 +450,15 @@ pyezgame/
 ├── pyezgame/          # Python package
 │   ├── __init__.py    # Package entry point
 │   ├── __init__.pyi   # Type stubs
-│   └── cli.py         # CLI tool
+│   ├── cli.py         # CLI tool
+│   └── utils.py       # Utility functions (clamp, safe_dt, etc.)
 ├── src/
 │   └── bindings.cpp   # pybind11 C++ binding code
 ├── examples/          # Python examples (18)
 │   ├── 01_hello.py
 │   ├── ...
 │   └── 18_magic_tower.py
+├── tests/             # Unit tests
 ├── CMakeLists.txt     # CMake build configuration
 └── pyproject.toml     # Python project configuration
 ```
