@@ -27,10 +27,10 @@ jobs:
           restore-keys: linux-pip-
 
       - name: Build wheels (cibuildwheel)
-        uses: pypa/cibuildwheel@v2.23
+        uses: pypa/cibuildwheel@v4.1.0
         env:
           CIBW_ENVIRONMENT: "PIP_CACHE_DIR=/host/home/runner/.cache/pip"
-          CIBW_BUILD: ${{ startsWith(github.ref, 'refs/tags/') && 'cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*' || 'cp312-*' }}
+          CIBW_BUILD: ${{ startsWith(github.ref, 'refs/tags/') && 'cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*' || 'cp312-*' }}
 
       - name: Build sdist
         if: startsWith(github.ref, 'refs/tags/')
@@ -63,7 +63,7 @@ jobs:
           restore-keys: windows-pip-
 
       - name: Build wheels (cibuildwheel)
-        uses: pypa/cibuildwheel@v2.23
+        uses: pypa/cibuildwheel@v4.1.0
 
       - uses: actions/upload-artifact@v7
         with:
@@ -85,7 +85,7 @@ jobs:
           restore-keys: macos-brew-
 
       - name: Build wheels (cibuildwheel)
-        uses: pypa/cibuildwheel@v2.23
+        uses: pypa/cibuildwheel@v4.1.0
         env:
           CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=15.0"
 
